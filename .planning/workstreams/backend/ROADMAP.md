@@ -6,7 +6,7 @@ Backend workstream: FastAPI + PostgreSQL/PostGIS + TiPG + TiTiler + MinIO + Redi
 
 ## Phases
 
-- [ ] **Phase 1: Foundation & Infrastructure** - Docker stack, PostGIS schema with provenance, MinIO, Redis, FastAPI skeleton
+- [x] **Phase 1: Foundation & Infrastructure** - Docker stack, PostGIS schema with provenance, MinIO, Redis, FastAPI skeleton (completed 2026-06-25)
 - [ ] **Phase 2: Data Ingestion & Spatial API** - Kazvodhoz ingestion with QazTRF-23, TiPG OGC API, REST CRUD, multilingual search
 - [ ] **Phase 3: Risk Models & Inspection Logic** - Risk score calculation, inspection intervals, repair status, RBAC, export endpoints
 - [ ] **Phase 4: Discovery & Matching Backend** - Evidence-fusion locator, four-state matching, STAC catalog, OCR pipeline
@@ -105,7 +105,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 2/2 | Executing (pending verifier) | - |
+| 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/TBD | Not started | - |
 | 3. Risk Models & Inspection Logic | 0/TBD | Not started | - |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
