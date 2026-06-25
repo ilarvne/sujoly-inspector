@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 
 from api.config.settings import settings
 from api.infrastructure.database import engine
-from api.routes import health, minio, provenance
+from api.routes import health, ingestion, minio, provenance
 from api.services.minio_client import MinIOService
 from api.utils.logging import configure_logging, get_logger
 
@@ -116,7 +116,7 @@ app.add_middleware(
         o.strip() for o in settings.allowed_origins.split(",") if o.strip()
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "DELETE", "OPTIONS"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-API-Key", "X-User-ID", "X-Request-ID"],
     expose_headers=["X-Request-ID", "X-Process-Time"],
 )
@@ -124,6 +124,7 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(provenance.router)
 app.include_router(minio.router)
+app.include_router(ingestion.router)
 
 
 @app.get("/health")
