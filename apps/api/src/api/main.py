@@ -14,7 +14,7 @@ from fastapi.responses import JSONResponse
 
 from api.config.settings import settings
 from api.infrastructure.database import engine
-from api.routes import health, ingestion, minio, provenance
+from api.routes import health, ingestion, minio, provenance, structures
 from api.services.minio_client import MinIOService
 from api.utils.logging import configure_logging, get_logger
 
@@ -125,6 +125,7 @@ app.include_router(health.router)
 app.include_router(provenance.router)
 app.include_router(minio.router)
 app.include_router(ingestion.router)
+app.include_router(structures.router)
 
 
 @app.get("/health")
