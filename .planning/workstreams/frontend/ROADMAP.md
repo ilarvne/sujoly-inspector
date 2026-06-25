@@ -26,7 +26,7 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
   3. Kazakh-specific Cyrillic characters (ә, ғ, қ, ң, ө, ұ, ү, h, і) render correctly using cyrillic-ext font subset
   4. Design system established: color palette (#0b4f6c primary, status colors green/yellow/orange/red/purple/gray), Inter/Manrope fonts, clean governmental style
   5. App shell with navigation: /, /dashboard, /map, /objects, /copilot, /reports, /hydrofinder routes created
-**Plans**: 01-01 (complete), 01-02, 01-03, 01-04 (pending)
+**Plans**: 01-01 (complete), 01-02 (complete), 01-03, 01-04 (pending)
 **UI hint**: yes
 
 ### Phase 2: Map UI & Digital Passport
@@ -103,7 +103,7 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. App Shell & i18n | 1/4 | In Progress | - |
+| 1. App Shell & i18n | 2/4 | In Progress | - |
 | 2. Map UI & Digital Passport | 0/TBD | Not started | - |
 | 3. Inspection & Risk UI | 0/TBD | Not started | - |
 | 4. Discovery & Matching UI | 0/TBD | Not started | - |
