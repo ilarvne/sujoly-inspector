@@ -106,3 +106,42 @@ def test_client(mock_healthy_minio):
 
         with TestClient(app) as client:
             yield client
+
+
+# ---------------------------------------------------------------------------
+# Fixtures for ingestion tests
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def mock_xlrd_sheet():
+    """Mock xlrd Sheet simulating the 'Корректировка' sheet structure.
+
+    Returns a MagicMock with cell_value(row, col), nrows, ncols attributes.
+    Simulates 2 data rows (row_num 1 and 2) with headers in rows 0-6.
+
+    Col layout (Корректировка sheet, 13 cols):
+    0: № (float), 1: name, 2: commissioning_year, 3: water_source,
+    4: capacity_m3s, 5: total_length_before_km, 6: earthwork_length_km,
+    7: lined_length_km, 9: total_length_after_km, 12: notes
+    """
+    sheet = MagicMock()
+    # 9 rows: 7 header rows + 2 data rows
+    sheet.nrows = 9
+    sheet.ncols = 13
+
+    # Data rows at index 7 and 8
+    _data = {
+        7: [1.0, "Канал 1", 1973.0, "р. Иртыш", 2.5, 10.0, 5.0, 3.0, "", 8.0, "", "", "", "примечание"],
+        8: [2.0, "Канал 2", 1985.0, "р. Нура", 1.8, 15.0, 8.0, 5.0, "", 12.0, "", "", "", ""],
+    }
+
+    def cell_value(row_idx, col_idx):
+        if row_idx in _data:
+            cols = _data[row_idx]
+            if col_idx < len(cols):
+                return cols[col_idx]
+        return ""
+
+    sheet.cell_value = cell_value
+    return sheet

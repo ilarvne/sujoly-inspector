@@ -13,7 +13,7 @@ import uuid
 from datetime import datetime
 
 from geoalchemy2 import Geometry
-from sqlalchemy import DateTime, ForeignKey, String, Uuid
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -34,7 +34,20 @@ class StructureModel(Base):
     name_kk: Mapped[str | None] = mapped_column(String(500), nullable=True)
     name_en: Mapped[str | None] = mapped_column(String(500), nullable=True)
     type: Mapped[str] = mapped_column(String(100), nullable=False)
-    geometry = mapped_column(Geometry("Point", srid=4326), nullable=False)
+    # D-02: geometry nullable — spreadsheet has no coordinates, assigned in Phase 4
+    geometry = mapped_column(Geometry("Point", srid=4326), nullable=True)
+    # D-08: filterable denormalized columns for indexed filtering
+    district: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    water_source: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    technical_condition: Mapped[str | None] = mapped_column(String(100), nullable=True)
+    wear_percentage: Mapped[float | None] = mapped_column(Float, nullable=True)
+    commissioning_year: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    cadastral_number: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    structure_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    # D-13: status column for soft-delete support
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="active")
+    # NOTE: search_ts_ru/kk/en are GENERATED tsvector columns managed by PostgreSQL
+    # via Alembic migration 0002 — NOT declared as ORM Mapped types (PATTERNS.md line 146).
     provenance_id: Mapped[uuid.UUID] = mapped_column(
         Uuid, ForeignKey("provenance.id"), nullable=False
     )
