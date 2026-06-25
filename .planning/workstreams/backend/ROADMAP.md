@@ -31,7 +31,7 @@ Backend workstream: FastAPI + PostgreSQL/PostGIS + TiPG + TiTiler + MinIO + Redi
 Plans:
 **Wave 1**
 
-- [ ] 01-01-PLAN.md — Walking Skeleton: Docker stack + FastAPI health check (5 services, provenance-ready)
+- [x] 01-01-PLAN.md — Walking Skeleton: Docker stack + FastAPI health check (5 services, provenance-ready)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -105,7 +105,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 0/2 | Not started | - |
+| 1. Foundation & Infrastructure | 1/2 | Executing | - |
 | 2. Data Ingestion & Spatial API | 0/TBD | Not started | - |
 | 3. Risk Models & Inspection Logic | 0/TBD | Not started | - |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |

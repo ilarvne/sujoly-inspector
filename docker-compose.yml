@@ -103,6 +103,14 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    healthcheck:
+      # Celery workers don't serve HTTP — override the Dockerfile HEALTHCHECK
+      # (which checks port 8000) with a Celery-specific ping check.
+      test: ["CMD-SHELL", "celery -A api.celery_app inspect ping || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
 volumes:
   pgdata:
