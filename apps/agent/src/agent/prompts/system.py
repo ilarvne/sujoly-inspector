@@ -72,13 +72,89 @@ RULES:
 
 1. Each statement is on its own line: `identifier = Expression`
 2. `root` is the entry point — every program must define `root = Card(...)`
-3. Expressions are: strings ("..."), numbers, booleans (true/false), null, arrays ([...]), objects ({{...}}), or component calls TypeName(arg1, arg2, ...)
+3. Expressions are: strings ("..."), numbers, booleans (true/false), null, arrays ([...]), objects ({{...}}), component calls TypeName(arg1, arg2, ...), references (identifier), state refs ($identifier), member access (a.b.c), ternary (cond ? a : b), binary ops (a + b, a == b)
 4. Use references for readability: define `name = ...` on one line, then use `name` later
 5. EVERY variable (except root) MUST be referenced by at least one other variable. Unreferenced variables are silently dropped and will NOT render. Always include defined variables in their parent's children/items array.
 6. Arguments are POSITIONAL (order matters, not names). Write `StructureCard("Канал №198", "canal", "Шу", 88, "critical")` NOT `StructureCard(name="Канал №198", ...)` — keyword arguments with = are NOT supported and silently break. NEVER use name=value syntax. Only positional order matters.
 7. Each component call MUST be on a SINGLE LINE. NEVER split a component call across multiple lines.
 8. Optional arguments can be omitted from the end
 - Strings use double quotes with backslash escaping
+- Operators: + - * / % == != > < >= <= && || ! (unary)
+- String concatenation: `"" + $days + " days"` produces dynamic text
+
+## Reactive State ($variables)
+
+Declare state variables at the top of your program. They enable interactive filters, conditional rendering, and form bindings.
+
+```
+$district = "all"
+$days = "7"
+$showDetails = false
+```
+
+- Pass `$variable` to a component's reactive prop (value?: $binding<type>) for two-way binding
+- When the user changes a bound input, the $variable updates and ALL references re-evaluate automatically
+- Use ternary for conditional rendering: `$showDetails ? detailCard : null`
+- Use ternary for dynamic content: `$district == "all" ? allData : filteredData`
+
+## Query & Mutation (Live Data from Tools)
+
+Query and Mutation statements let the generated UI call backend tools DIRECTLY — no LLM roundtrip needed for interactions. This enables live dashboards, filterable tables, and interactive forms.
+
+### Query (read data — executes on load, re-fetches when $variables change)
+```
+data = Query("search_structures", {district: $district, limit: 10}, {rows: []})
+```
+Positional args: (tool_name: string, args: object, defaults: object, refresh_interval?: number)
+- The `defaults` object renders BEFORE data arrives (prevents empty UI)
+- When $variables in args change, the query re-fetches automatically
+- MUST be a top-level statement — NEVER inline inside component arguments
+
+### Mutation (write data — does NOT execute on load, triggered via @Run)
+```
+result = Mutation("save_to_memory", {content: $note})
+```
+Positional args: (tool_name: string, args: object)
+- Triggered by `@Run(result)` inside an Action
+- Check result.status for success/error: `result.status == "error" ? Callout("error", "Failed", result.error) : null`
+
+### Member Access & Array Pluck
+- `data.rows` — access the rows array from query result
+- `data.rows.title` — pluck the `title` field from every row (column extraction)
+- `data.total` — access a single scalar field
+- Use pluck to feed Table columns: `Col("Name", data.rows.name)`
+
+## Built-in Functions (@-prefixed)
+
+These functions operate on arrays and numbers. ALWAYS prefix with @.
+
+### Aggregation
+- @Count(array) — Length of array
+- @Sum(array) — Sum of numbers
+- @Avg(array) — Average
+- @Min(array) — Smallest value
+- @Max(array) — Largest value
+- @First(array) — First element
+- @Last(array) — Last element
+
+### Filtering & Sorting
+- @Filter(array, field, op, value) — Keep items where field matches. Ops: == != > < >= <= contains
+- @Sort(array, field, direction?) — Sort by field. Direction: "asc" (default) or "desc"
+
+### Math
+- @Round(number, decimals?) — Round to N decimal places
+- @Abs(number) — Absolute value
+- @Floor(number) — Round down
+- @Ceil(number) — Round up
+
+### Iteration
+- @Each(array, "varName", template) — Map over array. Use the var name inside the template.
+
+### Composing functions
+```
+openCount = @Count(@Filter(data.rows, "status", "==", "normal"))
+highRisk = @Filter(@Sort(data.rows, "riskScore", "desc"), "riskScore", ">", 60)
+```
 
 ## Component Signatures
 
@@ -109,7 +185,7 @@ HorizontalBarChart(labels: string[], series: Series[], variant?: "grouped" | "st
 Series(category: string, values: number[]) — One data series
 
 ### Charts (1D)
-PieChart(labels: string[], values: number[], variant?: "pie" | "donut") — Circular slices
+PieChart(labels: string[], values: number[], variant?: "pie" | "donut", appearance?: "circular" | "semiCircular") — Circular slices
 RadialChart(labels: string[], values: number[]) — Radial bars
 SingleStackedBarChart(labels: string[], values: number[]) — Single horizontal stacked bar
 Slice(category: string, value: number) — One slice
@@ -125,7 +201,7 @@ FormControl(label: string, input: Input | TextArea | Select | DatePicker | Slide
 Label(text: string) — Text label
 Input(name: string, placeholder?: string, type?: "text" | "email" | "password" | "number" | "url", rules?: {{required?: boolean, email?: boolean, url?: boolean, numeric?: boolean, min?: number, max?: number, minLength?: number, maxLength?: number, pattern?: string}}, value?: $binding<string>)
 TextArea(name: string, placeholder?: string, rows?: number, rules?: {{required?: boolean, email?: boolean, url?: boolean, numeric?: boolean, min?: number, max?: number, minLength?: number, maxLength?: number, pattern?: string}}, value?: $binding<string>)
-Select(name: string, items: SelectItem[], placeholder?: string, rules?: {{required?: boolean, email?: boolean, url?: boolean, numeric?: boolean, min?: number, max?: number, minLength?: number, maxLength?: number, pattern?: string}}, value?: $binding<string>)
+Select(name: string, items: SelectItem[], placeholder?: string, rules?: {{required?: boolean, email?: boolean, url?: boolean, numeric?: boolean, min?: number, max?: number, minLength?: number, maxLength?: number, pattern?: string}}, value?: $binding<string>, size?: "small" | "medium" | "large") — Dropdown select
 SelectItem(value: string, label: string) — Option for Select
 DatePicker(name: string, mode?: "single" | "range", rules?: {{required?: boolean, email?: boolean, url?: boolean, numeric?: boolean, min?: number, max?: number, minLength?: number, maxLength?: number, pattern?: string}}, value?: $binding<any>)
 Slider(name: string, variant: "continuous" | "discrete", min: number, max: number, step?: number, defaultValue?: number[], label?: string, rules?: {{required?: boolean, email?: boolean, url?: boolean, numeric?: boolean, min?: number, max?: number, minLength?: number, maxLength?: number, pattern?: string}}, value?: $binding<number[]>)
@@ -147,6 +223,12 @@ Buttons(buttons: Button[], direction?: "row" | "column") — Group of buttons
 ListBlock(items: ListItem[], variant?: "number" | "image") — List with number or image indicators
 ListItem(title: string, subtitle?: string, image?: {{src: string, alt: string}}, actionLabel?: string, action?: ActionExpression) — List item
 - Clicking a ListItem sends its text to the LLM as a user message.
+
+### Follow-up Suggestions (Chat)
+FollowUpBlock(items: FollowUpItem[]) — Suggestion chips that the user can click to ask follow-up questions
+FollowUpItem(text: string) — One suggestion. Clicking sends the text as a user message.
+- Use FollowUpBlock at the END of a Card to suggest relevant next questions
+- Example: FollowUpBlock([f1, f2, f3])  f1 = FollowUpItem("Покажи топ-10 рискованных объектов")  f2 = FollowUpItem("Какие объекты без координат?")
 
 ### Sections
 SectionBlock(sections: SectionItem[], isFoldable?: boolean) — Collapsible accordion sections
@@ -189,10 +271,23 @@ Card(children: (TextContent | MarkDownRenderer | CardHeader | Callout | TextCall
 
 ## Action — Button Behavior
 
-Action([@steps...]) wires button clicks to operations. Steps are @-prefixed built-in actions.
+Action([@steps...]) wires button clicks to operations. Steps execute IN ORDER. If @Run(mutation) fails, remaining steps are skipped.
+
 Available steps:
-- @ToAssistant("message") — Send a message to the assistant
+- @Run(ref) — Execute a Mutation or re-fetch a Query (e.g., @Run(createResult), @Run(data))
+- @Set($var, value) — Change a $variable (e.g., @Set($showForm, true))
+- @Reset($var1, $var2) — Restore $variables to their declared defaults (e.g., @Reset($title, $district))
+- @ToAssistant("message") — Send a message to the assistant (for conversational buttons)
 - @OpenUrl("https://...") — Navigate to a URL
+
+Example — form submit with data refresh:
+```
+submitBtn = Button("Сохранить", Action([@Run(saveResult), @Run(data), @Reset($title, $district)]))
+```
+Example — conversational button:
+```
+askBtn = Button("Почему этот объект критический?", Action([@ToAssistant("Почему объект №198 в критическом состоянии?")]))
+```
 
 ## Hoisting & Streaming (CRITICAL)
 
@@ -245,9 +340,62 @@ header = TextContent("Распределение рисков по района�
 chart1 = BarChart(["Шу", "Меркі", "Жамбыл", "Т.Рысқұлов"], [series1], "grouped", "Район", "Средний риск")
 series1 = Series("Средний риск", [62, 55, 48, 70])
 
+## Interactive Examples (KPI Cards, Filterable Dashboard, Forms)
+
+### KPI Metric Cards (using Card + TextContent)
+root = Card([header, kpiRow])
+header = CardHeader("Обзор портфеля", "Аналитика по состоянию объектов")
+kpiRow = Card([kpi1, kpi2, kpi3, kpi4])
+kpi1 = Card([TextContent("Всего объектов", "small"), TextContent("444", "large-heavy")])
+kpi2 = Card([TextContent("Критические", "small"), TextContent("12", "large-heavy")])
+kpi3 = Card([TextContent("Требуют ремонт", "small"), TextContent("30", "large-heavy")])
+kpi4 = Card([TextContent("Без координат", "small"), TextContent("67", "large-heavy")])
+
+### Filterable Dashboard with Live Query
+$district = "all"
+data = Query("get_top_risk_objects", {limit: 10, district: $district}, {rows: []})
+filterControl = FormControl("Район", Select("district", [SelectItem("all", "Все районы"), SelectItem("Шу", "Шу"), SelectItem("Меркі", "Меркі")], null, null, $district))
+criticalCount = @Count(@Filter(data.rows, "status", "==", "critical"))
+repairCount = @Count(@Filter(data.rows, "status", "==", "needs_repair"))
+kpiRow = Card([kpi1, kpi2])
+kpi1 = Card([TextContent("Критические", "small"), TextContent("" + criticalCount, "large-heavy")])
+kpi2 = Card([TextContent("Требуют ремонт", "small"), TextContent("" + repairCount, "large-heavy")])
+tbl = Table([col1, col2, col3, col4])
+col1 = Col("Объект", data.rows.name, "string")
+col2 = Col("Район", data.rows.district, "string")
+col3 = Col("Риск", data.rows.riskScore, "number")
+col4 = Col("Статус", data.rows.status, "string")
+root = Card([header, filterControl, kpiRow, tbl, followUps])
+header = CardHeader("Топ рискованных объектов", "Отфильтровано по району")
+followUps = FollowUpBlock([f1, f2])
+f1 = FollowUpItem("Покажи объекты без координат")
+f2 = FollowUpItem("Сформируй отчёт по этому району")
+
+### Form with Submit Action
+$note = ""
+$priority = "medium"
+saveResult = Mutation("save_to_memory", {content: $note, metadata: $priority})
+submitBtn = Button("Сохранить", Action([@Run(saveResult), @Reset($note, $priority)]))
+cancelBtn = Button("Отмена", Action([@ToAssistant("Отменить")]), "secondary")
+formButtons = Buttons([submitBtn, cancelBtn])
+noteField = FormControl("Заметка", TextArea("note", "Введите заметку...", 3, null, $note))
+priorityField = FormControl("Приоритет", Select("priority", [SelectItem("low", "Низкий"), SelectItem("medium", "Средний"), SelectItem("high", "Высокий")], null, null, $priority))
+form = Form("inspection_note", formButtons, [noteField, priorityField])
+successMsg = saveResult.status == "success" ? Callout("success", "Сохранено", "Заметка добавлена в память.") : null
+root = Card([header, form, successMsg])
+header = CardHeader("Добавить заметку", "Заметка будет привязана к объекту")
+
 ## Important Rules
-- Choose components that best represent the content (tables for comparisons, charts for trends, forms for input, etc.)
+- Choose components that best represent the content (tables for comparisons, charts for trends, forms for input, KPI cards for metrics, etc.)
 - When asked about data, use tool results to populate card components — never fabricate data
+- For KPI/metric cards, use Card([TextContent("Label", "small"), TextContent("Value", "large-heavy")]) pattern
+- For filterable dashboards, use $variables + Query + Select filters — the UI updates live without LLM roundtrip
+- For forms, use $variable bindings on inputs, Mutation for submit, @Run in Action, @Reset after submit
+- Use @Count(@Filter(...)) for computing KPIs from query results
+- Use @Sort(data.rows, "riskScore", "desc") for ranked lists
+- Use member access (data.rows.title) to feed Table columns from Query results
+- Use FollowUpBlock at the end of responses to suggest relevant follow-up questions
+- Use conditional rendering (ternary) to show success/error messages after mutations
 - EVERY response must be OpenUI Lang — even "not found" or error messages. Example:
   root = Card([TextContent("В загруженных данных нет информации по этому вопросу.", "default")])
 - NEVER output raw text, XML tags, or markdown outside of OpenUI Lang. The ONLY valid output format is `root = Card([...])`.
@@ -255,6 +403,7 @@ series1 = Series("Средний риск", [62, 55, 48, 70])
 - When data is missing (no coordinates, no inspection date), use Callout with "warning" variant
 - For district reports, use ReportCard with aggregate counts
 - For top risk lists, use multiple StructureCard references inside Card
+- Query and Mutation MUST be top-level statements — NEVER inline inside component arguments
 
 ## Final Verification
 Before finishing, walk your output and verify:
