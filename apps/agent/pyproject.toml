@@ -1,0 +1,69 @@
+[project]
+name = "agent"
+version = "0.1.0"
+description = "SuJoly Inspector — Agentic RAG with LangGraph for hydraulic infrastructure"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "bs4>=0.0.2",
+    "langchain>=1.2.0",
+    "langchain-openai>=0.3.0",
+    "langchain-community>=0.4.1",
+    "langchain-text-splitters>=1.1.0",
+    "langgraph>=1.0.5",
+    "langgraph-checkpoint-sqlite>=2.0.0",
+    "langgraph-checkpoint-postgres>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "fastapi>=0.110.0",
+    "uvicorn>=0.27.0",
+    "langserve[all]>=0.1.0",
+    "pypdf>=5.0.0",
+    "pytest>=8.0.0",
+    "httpx>=0.27.0",
+    "structlog>=24.1.0",
+    "python-multipart>=0.0.9",
+    "aiosqlite==0.21.0",
+    "slowapi>=0.1.9",
+    "opentelemetry-api>=1.24.0",
+    "opentelemetry-sdk>=1.24.0",
+    "opentelemetry-instrumentation-fastapi>=0.45b0",
+    "python-json-logger>=2.0.7",
+    "pytest-asyncio>=0.23.5",
+    "rank-bm25>=0.2.2",
+    "langchain-experimental>=0.0.40",
+    "asyncpg>=0.29.0",
+    "sqlalchemy>=2.0.0",
+    "mem0ai>=0.1.20",
+    "protobuf>=6.0.0",
+    "python-dotenv>=1.2.1",
+    "psycopg[binary,pool]>=3.2.0",
+    "litellm>=1.55.0",
+    "psutil>=5.9.0",
+    "pymilvus>=2.4.0",
+    "langchain-milvus>=0.1.0",
+    "openai>=1.0.0",
+]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+
+[project.scripts]
+agent-cli = "agent.main:main"
+agent-server = "agent.server:main"
+agent-ingest = "agent.ingest:main"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "ruff>=0.14.10",
+]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.packages.find]
+where = ["src"]
