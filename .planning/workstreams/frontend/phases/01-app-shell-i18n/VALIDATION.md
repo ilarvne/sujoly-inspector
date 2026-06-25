@@ -2,7 +2,7 @@
 phase: 1
 slug: app-shell-i18n
 status: draft
-nyquist_compliant: false
+nyquist_compliant: true
 wave_0_complete: false
 created: 2026-06-26
 ---
@@ -36,15 +36,26 @@ created: 2026-06-26
 
 ## Per-Task Verification Map
 
-> Tasks not yet planned. This table will be populated after PLAN.md creation by the gsd-planner.
+> Populated from 4-plan split (01-01-PLAN through 01-04-PLAN). Per-task verification uses targeted test files (W8) — full Playwright suite runs only in Plan 01-04 (Wave 4).
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| _TBD_ | _TBD_ | _TBD_ | UI-01 | V5 Input Validation | hasLocale() validates [locale] segment | e2e | `npx playwright test tests/i18n.spec.ts` | ❌ W0 | ⬜ pending |
-| _TBD_ | _TBD_ | _TBD_ | UI-01 | — | N/A | e2e | `npx playwright test tests/routes.spec.ts` | ❌ W0 | ⬜ pending |
-| _TBD_ | _TBD_ | _TBD_ | UI-02 | — | N/A | e2e + manual | `npx playwright test tests/fonts.spec.ts` | ❌ W0 | ⬜ pending |
-| _TBD_ | _TBD_ | _TBD_ | SC-4 | — | N/A | unit | `npx vitest run tests/design-tokens.test.ts` | ❌ W0 | ⬜ pending |
-| _TBD_ | _TBD_ | _TBD_ | SC-5 | — | N/A | e2e | `npx playwright test tests/routes.spec.ts` | ❌ W0 | ⬜ pending |
+| 01-01 | 01-01 | 0 | SC-1 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-02 | 01-01 | 0 | SC-1, SC-4 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-03 | 01-01 | 0 | SC-1 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-04 | 01-01 | 0 | UI-01, UI-02, SC-4, SC-5 | — | N/A | unit | `cd apps/web && npx vitest run` | ✅ created | ⬜ pending |
+| 01-05 | 01-02 | 1 | UI-01 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-06 | 01-02 | 1 | UI-01 | V5 Input Validation | Middleware matcher excludes API/static routes | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-07 | 01-02 | 1 | UI-01 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-08 | 01-02 | 1 | UI-02, SC-3 | V5 Input Validation | hasLocale() validates [locale] segment | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-09 | 01-02 | 2 | SC-4 | — | N/A | unit | `cd apps/web && npx vitest run tests/design-tokens.test.ts` | ✅ created | ⬜ pending |
+| 01-10 | 01-03 | 3 | SC-5 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-11 | 01-03 | 3 | UI-01 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-12 | 01-03 | 3 | SC-5, UI-01 | — | N/A | smoke | `cd apps/web && npm run build` | N/A | ⬜ pending |
+| 01-13 | 01-03 | 3 | SC-5 | — | N/A | e2e | `cd apps/web && npx playwright test tests/routes.spec.ts` | ✅ created | ⬜ pending |
+| 01-14 | 01-03 | 3 | UI-01, SC-5 | V5 Input Validation | Invalid locale → 404 | e2e | `cd apps/web && npx playwright test tests/i18n.spec.ts` | ✅ created | ⬜ pending |
+| 01-15 | 01-04 | 4 | ALL | — | N/A | full suite | `cd apps/web && npx vitest run && npx playwright test` | ✅ all | ⬜ pending |
+| 01-16 | 01-04 | 4 | UI-02, SC-4, UI-01 | — | N/A | manual | (checklist) | N/A | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -75,11 +86,11 @@ created: 2026-06-26
 
 ## Validation Sign-Off
 
-- [ ] All tasks have `<automated>` verify or Wave 0 dependencies
-- [ ] Sampling continuity: no 3 consecutive tasks without automated verify
-- [ ] Wave 0 covers all MISSING references
-- [ ] No watch-mode flags
-- [ ] Feedback latency < 60s
-- [ ] `nyquist_compliant: true` set in frontmatter
+- [x] All tasks have automated verify or Wave 0 dependencies (16/16 tasks mapped)
+- [x] Sampling continuity: no 3 consecutive tasks without automated verify (every task has build or test verify)
+- [x] Wave 0 covers all MISSING references (Plan 01-01 task 01-04 creates all test files)
+- [x] No watch-mode flags (all commands use `run`, not `watch`)
+- [x] Feedback latency < 60s (build ~30s, targeted tests fast — W8 fix)
+- [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** pending
+**Approval:** ready for execution

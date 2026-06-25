@@ -687,19 +687,19 @@ export default async function DashboardPage({params}: {params: Promise<{locale: 
 
 **If this table is empty:** N/A — 6 assumptions identified that need user confirmation.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Default locale: `ru` or `kk`?**
+1. **Default locale: `ru` or `kk`?** — RESOLVED: ru (confirmed by user)
    - What we know: Data sources are primarily in Russian (AGENTS.md). UI must be trilingual. Kazakhstan's state language is Kazakh.
    - What's unclear: Whether the default locale (when no preference is detected) should be Russian or Kazakh.
    - Recommendation: Use `ru` as default (matches data source language, most users likely Russian-speaking). User can override via language switcher. The middleware will detect `Accept-Language` header for automatic locale selection.
 
-2. **Monorepo workspace configuration?**
+2. **Monorepo workspace configuration?** — RESOLVED: standalone apps/web/, no npm workspaces
    - What we know: Repo has `apps/agent/` (Python) and will have `apps/web/` (Next.js). No root `package.json` exists.
    - What's unclear: Whether a root `package.json` with npm workspaces should be created, or `apps/web/` should be standalone.
    - Recommendation: Standalone for Phase 1 (simplest). Add root workspace config in a later infrastructure phase if shared packages are needed. The shadcn/ui `--monorepo` flag creates a more complex structure with `packages/ui/` that isn't needed yet.
 
-3. **`--src-dir` flag for create-next-app?**
+3. **`--src-dir` flag for create-next-app?** — RESOLVED: no src directory
    - What we know: Next.js supports `src/` directory structure. shadcn/ui works with both patterns.
    - What's unclear: Whether the project should use `src/app/` or `app/` at the root of `apps/web/`.
    - Recommendation: Use `app/` at root (no `--src-dir`) — simpler structure, fewer nesting levels. Can migrate to `src/` later if needed.
