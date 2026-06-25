@@ -50,7 +50,17 @@ Plans:
   3. REST API endpoints operational for list, retrieve, search structures with multilingual FTS + pg_trgm fuzzy matching
   4. CRUD endpoints operational for the application frontend
 
-**Plans**: TBD
+**Plans**: 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Schema migration 0002 + Kazvodhoz ingestion pipeline (DATA-01, INT-03 ingestion)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 02-02-PLAN.md — REST CRUD + multilingual FTS/trigram search (DATA-08, INT-03 CRUD/search)
+- [ ] 02-03-PLAN.md — TiPG OGC API Features/Tiles container (INT-01)
 
 ### Phase 3: Risk Models & Inspection Logic
 
@@ -106,7 +116,7 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
-| 2. Data Ingestion & Spatial API | 0/TBD | Not started | - |
+| 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
 | 3. Risk Models & Inspection Logic | 0/TBD | Not started | - |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |
