@@ -778,22 +778,22 @@ settings = Settings()
 | A4 | `pg_trgm` extension should be installed in Phase 1 even though it's used in Phase 2 | Code Examples | If not installed now, Phase 2 needs a migration to add it. Minor — but installing now avoids a migration. |
 | A5 | The new API app should be at `apps/api/` following the `apps/agent/` pattern | Project Structure | If a different location is preferred, adjust paths. Low impact. [ASSUMED — based on existing `apps/` directory convention] |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Local vs Remote Infrastructure**
    - What we know: `.env` has remote alem.ai credentials for PostgreSQL, MinIO, Redis. Success criteria says "single Docker Compose command" for all services.
    - What's unclear: Should the team use remote services for development, or local Docker? The success criteria strongly implies local Docker.
-   - Recommendation: Build local Docker Compose stack. Keep remote credentials in `.env.remote` for deployment. This satisfies the success criteria and gives full control over extensions (PostGIS, pgvector).
+   - RESOLVED: Build local Docker Compose stack. Keep remote credentials in `.env.remote` for deployment. This satisfies the success criteria and gives full control over extensions (PostGIS, pgvector).
 
 2. **Shared Database with Agent App**
    - What we know: The agent app at `apps/agent/` uses the remote PostgreSQL at alem.ai. The new API will use a local PostgreSQL in Docker.
    - What's unclear: Will the agent eventually need to query the API's local database, or will they always be separate?
-   - Recommendation: Keep them separate for Phase 1. The agent has its own `documents` table. The API has its own `provenance` and `structures` tables. Integration between agent and API happens in Phase 5 via REST endpoints.
+   - RESOLVED: Keep them separate for Phase 1. The agent has its own `documents` table. The API has its own `provenance` and `structures` tables. Integration between agent and API happens in Phase 5 via REST endpoints.
 
 3. **MinIO Bucket Creation Timing**
    - What we know: MinIO buckets need to exist before presigned URLs work. FastAPI lifespan can create them on startup.
    - What's unclear: Should bucket creation be in the FastAPI lifespan, in an init script, or in a Celery task?
-   - Recommendation: FastAPI lifespan — it's the simplest and runs once on startup. The `ensure_bucket` method is idempotent.
+   - RESOLVED: FastAPI lifespan — it's the simplest and runs once on startup. The `ensure_bucket` method is idempotent.
 
 ## Environment Availability
 
