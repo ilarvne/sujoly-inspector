@@ -76,7 +76,26 @@ Plans:
   4. Document attachment endpoints operational (upload, download via MinIO presigned URLs)
   5. RBAC enforced (admin, engineer, inspector, viewer), engineer overrides logged with provenance, export endpoints (CSV/GeoJSON/PDF) in all three languages
 
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+**Wave 1** *(parallel)*
+
+- [ ] 03-01-PLAN.md — Risk Engine TDD: pure Python computation module (RISK-01, RISK-02, RISK-03, RISK-04, RISK-05)
+- [ ] 03-02-PLAN.md — Auth + RBAC + Infrastructure: JWT auth, users table, role dependencies, deps install (RISK-07)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-03-PLAN.md — Risk Assessment Persistence + Override + Celery recomputation (RISK-06)
+- [ ] 03-04-PLAN.md — Document Attachments: CRUD endpoints with MinIO presigned URLs (DATA-06)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-05-PLAN.md — Inspection History: CRUD with photos and risk recomputation trigger (DATA-05)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-06-PLAN.md — Trilingual Export Endpoints: CSV/GeoJSON/PDF with WeasyPrint (RISK-08)
 
 ### Phase 4: Discovery & Matching Backend
 
@@ -117,6 +136,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
-| 3. Risk Models & Inspection Logic | 0/TBD | Not started | - |
+| 3. Risk Models & Inspection Logic | 0/6 | Not started | - |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |
