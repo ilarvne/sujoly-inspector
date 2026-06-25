@@ -25,6 +25,9 @@ dependencies = [
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "integration: marks tests that require a running PostgreSQL/MinIO Docker stack",
+]
 
 [project.scripts]
 api-server = "api.main:main"
