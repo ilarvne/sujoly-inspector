@@ -111,56 +111,65 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| MAP-01 | — | Pending |
-| MAP-02 | — | Pending |
-| MAP-03 | — | Pending |
-| MAP-04 | — | Pending |
-| MAP-05 | — | Pending |
-| DATA-01 | — | Pending |
-| DATA-02 | — | Pending |
-| DATA-03 | — | Pending |
-| DATA-04 | — | Pending |
-| DATA-05 | — | Pending |
-| DATA-06 | — | Pending |
-| DATA-07 | — | Pending |
-| DATA-08 | — | Pending |
-| DISC-01 | — | Pending |
-| DISC-02 | — | Pending |
-| DISC-03 | — | Pending |
-| DISC-04 | — | Pending |
-| DISC-05 | — | Pending |
-| DISC-06 | — | Pending |
-| RISK-01 | — | Pending |
-| RISK-02 | — | Pending |
-| RISK-03 | — | Pending |
-| RISK-04 | — | Pending |
-| RISK-05 | — | Pending |
-| RISK-06 | — | Pending |
-| RISK-07 | — | Pending |
-| RISK-08 | — | Pending |
-| FIELD-01 | — | Pending |
-| FIELD-02 | — | Pending |
-| FIELD-03 | — | Pending |
-| FIELD-04 | — | Pending |
-| FIELD-05 | — | Pending |
-| AI-01 | — | Pending |
-| AI-02 | — | Pending |
-| AI-03 | — | Pending |
-| AI-04 | — | Pending |
-| AI-05 | — | Pending |
-| INT-01 | — | Pending |
-| INT-02 | — | Pending |
-| INT-03 | — | Pending |
-| INT-04 | — | Pending |
-| UI-01 | — | Pending |
-| UI-02 | — | Pending |
-| UI-03 | — | Pending |
+| MAP-01 | Phase 3 | Pending |
+| MAP-02 | Phase 3 | Pending |
+| MAP-03 | Phase 3 | Pending |
+| MAP-04 | Phase 3 | Pending |
+| MAP-05 | Phase 3 | Pending |
+| DATA-01 | Phase 2 | Pending |
+| DATA-02 | Phase 5 | Pending |
+| DATA-03 | Phase 5 | Pending |
+| DATA-04 | Phase 3 | Pending |
+| DATA-05 | Phase 4 | Pending |
+| DATA-06 | Phase 4 | Pending |
+| DATA-07 | Phase 1 | Pending |
+| DATA-08 | Phase 2 | Pending |
+| DISC-01 | Phase 5 | Pending |
+| DISC-02 | Phase 5 | Pending |
+| DISC-03 | Phase 5 | Pending |
+| DISC-04 | Phase 5 | Pending |
+| DISC-05 | Phase 5 | Pending |
+| DISC-06 | Phase 5 | Pending |
+| RISK-01 | Phase 4 | Pending |
+| RISK-02 | Phase 4 | Pending |
+| RISK-03 | Phase 4 | Pending |
+| RISK-04 | Phase 4 | Pending |
+| RISK-05 | Phase 4 | Pending |
+| RISK-06 | Phase 4 | Pending |
+| RISK-07 | Phase 4 | Pending |
+| RISK-08 | Phase 4 | Pending |
+| FIELD-01 | Phase 6 | Pending |
+| FIELD-02 | Phase 6 | Pending |
+| FIELD-03 | Phase 6 | Pending |
+| FIELD-04 | Phase 6 | Pending |
+| FIELD-05 | Phase 6 | Pending |
+| AI-01 | Phase 7 | Pending |
+| AI-02 | Phase 7 | Pending |
+| AI-03 | Phase 7 | Pending |
+| AI-04 | Phase 7 | Pending |
+| AI-05 | Phase 7 | Pending |
+| INT-01 | Phase 2 | Pending |
+| INT-02 | Phase 5 | Pending |
+| INT-03 | Phase 2 | Pending |
+| INT-04 | Phase 1 | Pending |
+| UI-01 | Phase 1 | Pending |
+| UI-02 | Phase 1 | Pending |
+| UI-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 44 total
-- Mapped to phases: 0
-- Unmapped: 44 ⚠️
+- Mapped to phases: 44
+- Unmapped: 0
+
+**Phase Distribution:**
+- Phase 1 (Foundation & Infrastructure): 4 requirements
+- Phase 2 (Data Ingestion & Spatial API): 4 requirements
+- Phase 3 (Map UI & Digital Passport): 6 requirements
+- Phase 4 (Inspection Lifecycle & Risk Models): 10 requirements
+- Phase 5 (Evidence-Fusion Discovery & Matching): 10 requirements
+- Phase 6 (PWA Field Mode): 5 requirements
+- Phase 7 (AI Copilot): 5 requirements
 
 ---
 *Requirements defined: 2026-06-25*
-*Last updated: 2026-06-25 after initial definition*
+*Last updated: 2026-06-25 after roadmap creation*
