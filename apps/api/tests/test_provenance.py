@@ -114,6 +114,30 @@ class TestProvenanceEndpoints:
         assert len(data) == 1
         assert data[0]["confidence_level"] == "HIGH"
 
+    def test_query_provenance_by_timestamp_range(self, test_client):
+        """GET /api/v1/provenance?recorded_after=...&recorded_before=... returns filtered list."""
+        from datetime import datetime, timezone
+
+        after = datetime(2026, 1, 1, tzinfo=timezone.utc)
+        before = datetime(2026, 12, 31, tzinfo=timezone.utc)
+        mock_list = [self._mock_provenance()]
+        with patch(
+            "api.routes.provenance.query_provenance",
+            AsyncMock(return_value=mock_list),
+        ) as mock_query:
+            response = test_client.get(
+                "/api/v1/provenance",
+                params={"recorded_after": after.isoformat(), "recorded_before": before.isoformat()},
+            )
+        assert response.status_code == 200
+        data = response.json()
+        assert isinstance(data, list)
+        assert len(data) == 1
+        # Verify the service was called with timestamp range params
+        call_kwargs = mock_query.call_args.kwargs
+        assert call_kwargs.get("recorded_after") is not None
+        assert call_kwargs.get("recorded_before") is not None
+
 
 class TestProvenanceFKEnforcement:
     """Test that provenance_id FK is enforced (DATA-07)."""

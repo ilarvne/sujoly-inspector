@@ -8,6 +8,7 @@ celery_app = Celery(
     "sujoly_api",
     broker=settings.redis_url,
     backend=settings.redis_url,
+    include=["api.tasks.celery_tasks"],
 )
 
 celery_app.conf.update(

@@ -93,6 +93,8 @@ async def get_provenance_endpoint(provenance_id: uuid.UUID) -> ProvenanceRespons
 async def list_provenance_endpoint(
     source_type: str | None = None,
     confidence_level: str | None = None,
+    recorded_after: datetime | None = None,
+    recorded_before: datetime | None = None,
     offset: int = 0,
     limit: int = 100,
 ) -> list[ProvenanceResponse]:
@@ -101,11 +103,15 @@ async def list_provenance_endpoint(
     Filters:
     - source_type: e.g., 'kazvodhoz_spreadsheet'
     - confidence_level: HIGH, MEDIUM, LOW
+    - recorded_after: only records with recorded_at >= this timestamp (ISO 8601)
+    - recorded_before: only records with recorded_at <= this timestamp (ISO 8601)
     - offset/limit: pagination
     """
     models = await query_provenance(
         source_type=source_type,
         confidence_level=confidence_level,
+        recorded_after=recorded_after,
+        recorded_before=recorded_before,
         offset=offset,
         limit=limit,
     )

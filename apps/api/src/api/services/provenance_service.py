@@ -10,6 +10,7 @@ confidence, and timestamp, stored as an immutable provenance record.
 """
 
 import uuid
+from datetime import datetime
 
 import structlog
 from sqlalchemy import select
@@ -72,6 +73,8 @@ async def get_provenance(provenance_id: uuid.UUID) -> ProvenanceModel | None:
 async def query_provenance(
     source_type: str | None = None,
     confidence_level: str | None = None,
+    recorded_after: datetime | None = None,
+    recorded_before: datetime | None = None,
     offset: int = 0,
     limit: int = 100,
 ) -> list[ProvenanceModel]:
@@ -80,6 +83,8 @@ async def query_provenance(
     Args:
         source_type: Filter by source_type (e.g., 'kazvodhoz_spreadsheet')
         confidence_level: Filter by confidence_level (HIGH, MEDIUM, LOW)
+        recorded_after: Only records with recorded_at >= this timestamp
+        recorded_before: Only records with recorded_at <= this timestamp
         offset: Pagination offset
         limit: Maximum number of records to return
 
@@ -94,6 +99,10 @@ async def query_provenance(
             stmt = stmt.where(
                 ProvenanceModel.confidence_level == confidence_level
             )
+        if recorded_after is not None:
+            stmt = stmt.where(ProvenanceModel.recorded_at >= recorded_after)
+        if recorded_before is not None:
+            stmt = stmt.where(ProvenanceModel.recorded_at <= recorded_before)
         stmt = stmt.offset(offset).limit(limit)
         result = await session.execute(stmt)
         return list(result.scalars().all())

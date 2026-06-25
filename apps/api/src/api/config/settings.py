@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     # Database (local Docker defaults, NOT remote alem.ai)
     database_url: str = "postgresql+asyncpg://sujoly:sujoly_dev@postgres:5432/sujoly"
     # Sync URL for Alembic migrations
-    sync_database_url: str = "postgresql://sujoly:sujoly_dev@postgres:5432/sujoly"
+    sync_database_url: str = "postgresql+psycopg://sujoly:sujoly_dev@postgres:5432/sujoly"
 
     # Redis (local Docker default)
     redis_url: str = "redis://redis:6379/0"
