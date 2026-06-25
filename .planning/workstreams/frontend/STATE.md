@@ -9,17 +9,17 @@ created: 2026-06-25
 
 **Status:** In Progress
 **Current Phase:** 01-app-shell-i18n
-**Last Activity:** 2026-06-25
-**Last Activity Description:** Completed 01-02-PLAN.md (Waves 1+2: i18n Foundation & Design System)
+**Last Activity:** 2026-06-26
+**Last Activity Description:** Completed 01-03-PLAN.md (Wave 3: App Shell & Routes)
 
 ## Progress
 
 **Phases Complete:** 0
-**Current Plan:** 01-02 (complete) → next: 01-03
+**Current Plan:** 01-03 (complete) → next: 01-04
 
 ## Session Continuity
 
-**Stopped At:** Completed 01-02-PLAN.md
+**Stopped At:** Completed 01-03-PLAN.md
 **Resume File:** None
 
 ## Decisions
@@ -33,3 +33,7 @@ created: 2026-06-25
 - Applied W6 fix: common.appTitle added to all 3 message files
 - Used both cyrillic AND cyrillic-ext subsets for Inter and Manrope fonts
 - OKLCH design system: primary oklch(0.42 0.08 230) ~#0b4f6c, 6 status color tokens
+- All async page components use await getTranslations() from next-intl/server — useTranslations() hook cannot run in async Server Components (B2 fix)
+- AppShell header uses t('appTitle') from common namespace via getTranslations — not hardcoded string (W6 fix)
+- Set fullyParallel=false in Playwright config — Turbopack dev server has race condition with concurrent page compilation
+- components.json style remains 'radix-nova' (not 'new-york') — deliberate decision from 01-01, radix-nova is v4.11.0 equivalent
