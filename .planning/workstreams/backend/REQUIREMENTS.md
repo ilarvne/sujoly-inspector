@@ -13,7 +13,7 @@
 - [ ] **DATA-03**: System can ingest scanned passport documents via OCR (Russian/Kazakh) with confidence scoring
 - [ ] **DATA-05**: System stores inspection history per structure (date, inspector, findings, photo URLs, condition at time of inspection)
 - [ ] **DATA-06**: System provides document attachment endpoints (scanned passports, inspection reports, photos) via MinIO presigned URLs
-- [ ] **DATA-07**: Every fact and status on every structure has a provenance record (source type, source reference, confidence level, timestamp, contributor)
+- [x] **DATA-07**: Every fact and status on every structure has a provenance record (source type, source reference, confidence level, timestamp, contributor)
 - [ ] **DATA-08**: System provides search and filter endpoints by name, type, condition, district, or location using multilingual full-text search (Russian, Kazakh, English) and fuzzy matching (pg_trgm)
 
 ### Discovery & Matching
@@ -40,7 +40,7 @@
 - [ ] **INT-01**: System exposes OGC API Features (Part 1 Core, Part 3 Filtering/CQL2) and OGC API Tiles (Part 1 Core) via TiPG for external GIS clients (QGIS, ArcGIS, government systems)
 - [ ] **INT-02**: System maintains a STAC catalog for Earth observation evidence (Sentinel-2 scenes, water index composites) with TiTiler dynamic raster serving from COGs
 - [ ] **INT-03**: System exposes a REST API for the application frontend (CRUD, search, copilot, ingestion, sync endpoints)
-- [ ] **INT-04**: System separates imagery evidence (STAC/COG in MinIO) from structure features (PostGIS) per the architecture principle
+- [x] **INT-04**: System separates imagery evidence (STAC/COG in MinIO) from structure features (PostGIS) per the architecture principle
 
 ### AI & Search (Backend)
 
@@ -60,8 +60,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-07 | Phase 1 | Pending |
-| INT-04 | Phase 1 | Pending |
+| DATA-07 | Phase 1 | Complete |
+| INT-04 | Phase 1 | Complete |
 | DATA-01 | Phase 2 | Pending |
 | DATA-08 | Phase 2 | Pending |
 | INT-01 | Phase 2 | Pending |

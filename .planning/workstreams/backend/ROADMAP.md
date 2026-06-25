@@ -35,7 +35,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Provenance schema + API + MinIO presigned URLs (DATA-07, INT-04)
+- [x] 01-02-PLAN.md — Provenance schema + API + MinIO presigned URLs (DATA-07, INT-04)
 
 ### Phase 2: Data Ingestion & Spatial API
 
@@ -105,7 +105,7 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 1/2 | Executing | - |
+| 1. Foundation & Infrastructure | 2/2 | Executing (pending verifier) | - |
 | 2. Data Ingestion & Spatial API | 0/TBD | Not started | - |
 | 3. Risk Models & Inspection Logic | 0/TBD | Not started | - |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
