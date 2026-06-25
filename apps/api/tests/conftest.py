@@ -1,6 +1,8 @@
 """Test configuration for the SuJoly Inspector API."""
 
 import sys
+import uuid
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -145,3 +147,54 @@ def mock_xlrd_sheet():
 
     sheet.cell_value = cell_value
     return sheet
+
+
+# ---------------------------------------------------------------------------
+# Fixtures for structure tests
+# ---------------------------------------------------------------------------
+
+
+def _make_mock_structure(**overrides):
+    """Create a mock StructureModel instance with all response fields."""
+    defaults = {
+        "id": uuid.uuid4(),
+        "name_ru": "Канал 1",
+        "name_kk": None,
+        "name_en": None,
+        "type": "canal",
+        "district": "Район 1",
+        "water_source": "р. Иртыш",
+        "technical_condition": "удовлетворительное",
+        "wear_percentage": 45.0,
+        "commissioning_year": 1973,
+        "cadastral_number": "01-001",
+        "structure_count": 5,
+        "geometry": None,
+        "provenance_id": uuid.uuid4(),
+        "status": "active",
+        "created_at": datetime.now(timezone.utc),
+        "updated_at": datetime.now(timezone.utc),
+    }
+    defaults.update(overrides)
+    mock = MagicMock()
+    for key, val in defaults.items():
+        setattr(mock, key, val)
+    return mock
+
+
+@pytest.fixture
+def mock_structure():
+    """Mock StructureModel with all response fields for structure endpoint tests."""
+    return _make_mock_structure()
+
+
+@pytest.fixture
+def mock_structure_list():
+    """List of 3 mock structures for pagination and list tests."""
+    return [_make_mock_structure(name_ru=f"Канал {i+1}") for i in range(3)]
+
+
+@pytest.fixture
+def mock_search_results():
+    """List of (mock_structure, 0.85) tuples for search endpoint tests."""
+    return [(_make_mock_structure(), 0.85)]
