@@ -87,15 +87,20 @@ def mock_failing_minio():
 
 
 # ---------------------------------------------------------------------------
-# TestClient fixture — patches MinIO in main.py for lifespan startup
+# TestClient fixture — patches MinIO in minio_client.py for lifespan startup
+# main.py uses MinIOService which imports Minio internally.
 # Health endpoint deps (async_session, Redis, Minio) are patched per-test
 # ---------------------------------------------------------------------------
 
 
 @pytest.fixture
 def test_client(mock_healthy_minio):
-    """FastAPI TestClient with MinIO mocked for lifespan."""
-    with patch("api.main.Minio", mock_healthy_minio):
+    """FastAPI TestClient with MinIO mocked for lifespan.
+
+    Patches Minio at the MinIOService import path so that lifespan startup
+    (which creates a MinIOService) uses the mock client.
+    """
+    with patch("api.services.minio_client.Minio", mock_healthy_minio):
         from api.main import app
         from fastapi.testclient import TestClient
 

@@ -1,6 +1,6 @@
 """SuJoly Inspector API — FastAPI application.
 
-Lifespan initializes MinIO client and ensures buckets exist on startup.
+Lifespan initializes MinIOService and ensures buckets exist on startup.
 Shutdown disposes the SQLAlchemy async engine.
 """
 
@@ -11,11 +11,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from minio import Minio
 
 from api.config.settings import settings
 from api.infrastructure.database import engine
-from api.routes import health
+from api.routes import health, minio, provenance
+from api.services.minio_client import MinIOService
 from api.utils.logging import configure_logging, get_logger
 
 logger = get_logger(__name__)
@@ -29,17 +29,16 @@ async def lifespan(app: FastAPI):
     configure_logging(level="DEBUG" if settings.debug else "INFO")
     logger.info("api_starting", environment=settings.environment)
 
-    # Initialize MinIO client and ensure buckets exist
-    client = Minio(
-        settings.minio_endpoint,
+    # Initialize MinIO service and ensure buckets exist
+    minio_service = MinIOService(
+        endpoint=settings.minio_endpoint,
         access_key=settings.minio_access_key,
         secret_key=settings.minio_secret_key,
         secure=settings.minio_use_ssl,
     )
     for bucket in _BUCKETS:
-        if not client.bucket_exists(bucket):
-            client.make_bucket(bucket)
-    app.state.minio = client
+        minio_service.ensure_bucket(bucket)
+    app.state.minio = minio_service
     logger.info("minio_buckets_ready", buckets=_BUCKETS)
 
     yield
@@ -123,6 +122,8 @@ app.add_middleware(
 )
 
 app.include_router(health.router)
+app.include_router(provenance.router)
+app.include_router(minio.router)
 
 
 @app.get("/health")
