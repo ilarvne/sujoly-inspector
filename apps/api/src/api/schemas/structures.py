@@ -113,7 +113,7 @@ class SearchResultResponse(StructureResponse):
     the blended FTS + trigram similarity score.
     """
 
-    match_score: float
+    match_score: float = 0.0
 
 
 class SearchListResponse(BaseModel):
