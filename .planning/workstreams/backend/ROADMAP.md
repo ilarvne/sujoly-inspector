@@ -24,7 +24,11 @@ Backend workstream: FastAPI + PostgreSQL/PostGIS + TiPG + TiTiler + MinIO + Redi
   2. Database schema includes provenance tracking on all structure records — developer can query source, confidence, and timestamp of any stored fact
   3. MinIO object storage configured and serves presigned URLs correctly
   4. Architecture separation established: imagery evidence in STAC/COG/MinIO, structure features in PostGIS
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Walking Skeleton: Docker stack + FastAPI health check (5 services, provenance-ready)
+- [ ] 01-02-PLAN.md — Provenance schema + API + MinIO presigned URLs (DATA-07, INT-04)
 
 ### Phase 2: Data Ingestion & Spatial API
 **Goal**: Kazvodhoz registry ingested into PostGIS with correct coordinates, searchable, accessible via OGC API and REST
@@ -82,7 +86,7 @@ Backend workstream: FastAPI + PostgreSQL/PostGIS + TiPG + TiTiler + MinIO + Redi
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation & Infrastructure | 0/TBD | Not started | - |
+| 1. Foundation & Infrastructure | 0/2 | Not started | - |
 | 2. Data Ingestion & Spatial API | 0/TBD | Not started | - |
 | 3. Risk Models & Inspection Logic | 0/TBD | Not started | - |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
