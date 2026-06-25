@@ -1,5 +1,5 @@
 # Docker Compose stack for Zhambyl Hydraulic Structures Catalog
-# 5 services: PostgreSQL/PostGIS/pgvector, Redis, MinIO, FastAPI, Celery worker
+# 6 services: PostgreSQL/PostGIS/pgvector, Redis, MinIO, FastAPI, Celery worker, TiPG (OGC API Features + Tiles)
 # All services have health checks; app services use depends_on with service_healthy.
 
 services:
@@ -111,6 +111,31 @@ services:
       timeout: 10s
       retries: 3
       start_period: 20s
+
+  tipg:
+    image: ghcr.io/developmentseed/tipg:latest
+    command: >
+      gunicorn -k uvicorn.workers.UvicornWorker tipg.main:app
+      --bind 0.0.0.0:8080 --workers 2
+    environment:
+      # CRITICAL: TiPG uses DATABASE_URL (not TIPG_DATABASE_URL) — Pitfall #4 from RESEARCH.md
+      DATABASE_URL: postgresql://${POSTGRES_USER:-sujoly}:${POSTGRES_PASSWORD:-sujoly_dev}@postgres:5432/${POSTGRES_DB:-sujoly}
+      TIPG_CORS_ORIGIN: "*"
+      TIPG_DEFAULT_FEATURES_LIMIT: "1000"
+      TIPG_MAX_FEATURES_PER_QUERY: "10000"
+      TIPG_CATALOG_TTL: "300"
+      TIPG_DB_SPATIAL_EXTENT: "false"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz.html"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
 
 volumes:
   pgdata:
