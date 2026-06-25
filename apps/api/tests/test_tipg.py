@@ -135,7 +135,7 @@ class TestTiPGIntegration:
 
     @pytest.mark.integration
     async def test_healthz(self):
-        """GET /healthz.html returns 200 — verifies the TiPG health check endpoint used by Docker."""
+        """GET /healthz returns 200 — verifies the TiPG health check endpoint used by Docker."""
         async with AsyncClient() as client:
-            response = await client.get(f"{TIPG_URL}/healthz.html")
+            response = await client.get(f"{TIPG_URL}/healthz")
         assert response.status_code == 200
