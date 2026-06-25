@@ -1,0 +1,111 @@
+# Roadmap: SuJoly Inspector — Frontend
+
+## Overview
+
+Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenUI + assistant-ui. Builds the map-first UI, digital passports, risk dashboards, discovery review, offline field mode, and AI copilot chat. 6 phases, each consuming backend APIs and delivering user-facing capabilities.
+
+## Phases
+
+- [ ] **Phase 1: App Shell & i18n** - Next.js project, trilingual (RU/KK/EN), cyrillic-ext fonts, Tailwind, shadcn/ui, design system
+- [ ] **Phase 2: Map UI & Digital Passport** - MapLibre map, structure markers, digital passport, portfolio dashboard, filtering — the MVP
+- [ ] **Phase 3: Inspection & Risk UI** - Inspection timeline, document upload, risk display, RBAC UI, export UI
+- [ ] **Phase 4: Discovery & Matching UI** - Candidate discovery view, side-by-side comparison, HITL review, confidence badges
+- [ ] **Phase 5: PWA Field Mode** - Offline capture, deferred sync, voice transcription, sync status UI
+- [ ] **Phase 6: AI Copilot UI** - OpenUI renderer, assistant-ui chat, copilot page, tool provider integration
+
+## Phase Details
+
+### Phase 1: App Shell & i18n
+**Goal**: Next.js project running with trilingual UI, design system, and app shell ready for feature development
+**Mode:** mvp
+**Depends on**: Nothing (can start in parallel with backend Phase 1)
+**Requirements**: UI-01, UI-02
+**Success Criteria** (what must be TRUE):
+  1. Next.js 16 project with App Router, Tailwind CSS 4, shadcn/ui configured and running
+  2. User can switch UI between Russian, Kazakh, and English with all interface text translated correctly
+  3. Kazakh-specific Cyrillic characters (ә, ғ, қ, ң, ө, ұ, ү, h, і) render correctly using cyrillic-ext font subset
+  4. Design system established: color palette (#0b4f6c primary, status colors green/yellow/orange/red/purple/gray), Inter/Manrope fonts, clean governmental style
+  5. App shell with navigation: /, /dashboard, /map, /objects, /copilot, /reports, /hydrofinder routes created
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 2: Map UI & Digital Passport
+**Goal**: Interactive map with clickable structures, digital passports, and portfolio dashboard — the MVP
+**Mode:** mvp
+**Depends on**: Backend Phase 2 (needs REST API + TiPG vector tiles)
+**Requirements**: MAP-01, MAP-02, MAP-03, MAP-04, MAP-05, DATA-04
+**Success Criteria** (what must be TRUE):
+  1. Interactive MapLibre map shows all structures with color-coded status symbology (green=normal, yellow=inspection, orange=repair, red=critical, gray=missing coords)
+  2. Click any structure → digital passport with identity, type, geometry, specs, status, provenance
+  3. Portfolio dashboard: condition distribution, repair queue, inspection coverage, geographic heatmap
+  4. Map and dashboard filterable by district, basin, type, condition, inspection status
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 3: Inspection & Risk UI
+**Goal**: Inspection history, document management, risk display, RBAC, and export UI all operational
+**Mode:** mvp
+**Depends on**: Backend Phase 3 (needs risk/inspection endpoints)
+**Requirements**: DATA-05-FE, DATA-06-FE, RISK-06-FE, RISK-07-FE, RISK-08-FE
+**Success Criteria** (what must be TRUE):
+  1. Inspection history timeline per structure (date, inspector, findings, photos, condition)
+  2. Document upload/download UI via MinIO presigned URLs
+  3. Risk score display with component breakdown and explanation
+  4. Engineer override UI for inspection intervals and repair statuses with provenance logging
+  5. Login/role gating (admin, engineer, inspector, viewer) and export UI (CSV/GeoJSON/PDF) in all three languages
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 4: Discovery & Matching UI
+**Goal**: Candidate discovery view with side-by-side comparison and human-in-the-loop review workflow
+**Mode:** mvp
+**Depends on**: Backend Phase 4 (needs discovery/matching endpoints)
+**Requirements**: DISC-04, UI-03
+**Success Criteria** (what must be TRUE):
+  1. Candidate list view showing found objects with confidence scores and source evidence
+  2. Side-by-side comparison: existing record vs candidate with evidence chips (name similarity, distance, type agreement)
+  3. Review workflow: accept (add to registry), link (merge), reject (false positive) with one-click actions
+  4. Confidence badges (HIGH/MEDIUM/LOW) and provenance source chips visible throughout UI
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 5: PWA Field Mode
+**Goal**: Installable PWA with offline capture, deferred sync, and voice transcription
+**Mode:** mvp
+**Depends on**: Backend Phase 3 (needs sync endpoints)
+**Requirements**: FIELD-01, FIELD-02, FIELD-03, FIELD-04, FIELD-05
+**Success Criteria** (what must be TRUE):
+  1. PWA installable on desktop/mobile, works offline with service worker (Serwist)
+  2. Offline capture: photos, voice notes (KK/RU), GPS correction, inspection forms via IndexedDB (Dexie)
+  3. Deferred sync with field-level merge conflict resolution (not last-write-wins)
+  4. Voice notes transcribed post-sync using Kazakh and Russian speech-to-text APIs
+  5. Per-record sync status (pending/syncing/confirmed/failed) with conflict resolution UI
+**Plans**: TBD
+**UI hint**: yes
+
+### Phase 6: AI Copilot UI
+**Goal**: AI copilot chat with OpenUI renderer, source citations, and trilingual support
+**Mode:** mvp
+**Depends on**: Backend Phase 5 (needs RAG agent SSE endpoint)
+**Requirements**: AI-01, AI-02, AI-05
+**Success Criteria** (what must be TRUE):
+  1. /copilot page with assistant-ui chat interface connected to RAG agent SSE stream
+  2. OpenUI renderer renders interactive cards (StructureCard, RiskBreakdownCard, charts, tables, forms) from agent output
+  3. Source citations displayed as clickable references under each answer
+  4. Trilingual queries supported (RU/KK/EN) — UI language matches query language
+  5. Custom SuJoly components (StructureCard, RiskBreakdownCard, InspectionCard, ReportCard) registered in OpenUI library
+**Plans**: TBD
+**UI hint**: yes
+
+## Progress
+
+**Execution Order:** 1 → 2 → 3 → (4, 5, 6 can parallelize after Phase 3)
+
+| Phase | Plans Complete | Status | Completed |
+|-------|----------------|--------|-----------|
+| 1. App Shell & i18n | 0/TBD | Not started | - |
+| 2. Map UI & Digital Passport | 0/TBD | Not started | - |
+| 3. Inspection & Risk UI | 0/TBD | Not started | - |
+| 4. Discovery & Matching UI | 0/TBD | Not started | - |
+| 5. PWA Field Mode | 0/TBD | Not started | - |
+| 6. AI Copilot UI | 0/TBD | Not started | - |
