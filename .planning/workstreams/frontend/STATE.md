@@ -7,19 +7,19 @@ created: 2026-06-25
 
 ## Current Position
 
-**Status:** In Progress
-**Current Phase:** 01-app-shell-i18n
+**Status:** Phase 01 Complete
+**Current Phase:** 01-app-shell-i18n (complete)
 **Last Activity:** 2026-06-26
-**Last Activity Description:** Completed 01-03-PLAN.md (Wave 3: App Shell & Routes)
+**Last Activity Description:** Completed 01-04-PLAN.md (Wave 4: Verification) — Phase 1 gate passed
 
 ## Progress
 
-**Phases Complete:** 0
-**Current Plan:** 01-03 (complete) → next: 01-04
+**Phases Complete:** 1
+**Current Plan:** 01-04 (complete) — Phase 1 fully complete, ready for /gsd-verify-work
 
 ## Session Continuity
 
-**Stopped At:** Completed 01-03-PLAN.md
+**Stopped At:** Completed 01-04-PLAN.md — Phase 1 verification gate passed
 **Resume File:** None
 
 ## Decisions
@@ -37,3 +37,6 @@ created: 2026-06-25
 - AppShell header uses t('appTitle') from common namespace via getTranslations — not hardcoded string (W6 fix)
 - Set fullyParallel=false in Playwright config — Turbopack dev server has race condition with concurrent page compilation
 - components.json style remains 'radix-nova' (not 'new-york') — deliberate decision from 01-01, radix-nova is v4.11.0 equivalent
+- Task 01-15 fix: added home.description field with Kazakh chars ә and ғ to KK messages — ensures all 9 Kazakh chars present on KK page for fonts.spec.ts
+- Task 01-16 manual verification automated via Playwright browser tools — 7/8 checks fully automated, 1/8 (design aesthetic) verified programmatically with objective criteria
+- Phase 1 verification gate passed: build 24 pages, Vitest 6/6, Playwright 30/30 all green
