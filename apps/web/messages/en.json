@@ -1,0 +1,47 @@
+{
+  "common": {
+    "appTitle": "Zhambyl Hydraulic Structures",
+    "locale": {
+      "ru": "Русский",
+      "kk": "Қазақша",
+      "en": "English"
+    }
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "map": "Map",
+    "objects": "Objects",
+    "copilot": "Copilot",
+    "reports": "Reports",
+    "hydrofinder": "HydroFinder"
+  },
+  "home": {
+    "title": "Zhambyl Hydraulic Structures Catalog",
+    "subtitle": "Digital operating system for hydraulic structure management"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "Portfolio analytics and overview"
+  },
+  "map": {
+    "title": "Map",
+    "subtitle": "Interactive map of hydraulic structures"
+  },
+  "objects": {
+    "title": "Objects",
+    "subtitle": "Structure catalog and registry"
+  },
+  "copilot": {
+    "title": "Copilot",
+    "subtitle": "AI assistant for hydraulic structure analysis"
+  },
+  "reports": {
+    "title": "Reports",
+    "subtitle": "Export and report generation"
+  },
+  "hydrofinder": {
+    "title": "HydroFinder",
+    "subtitle": "Structure discovery and candidate search"
+  }
+}
