@@ -39,7 +39,12 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
   2. Click any structure → digital passport with identity, type, geometry, specs, status, provenance
   3. Portfolio dashboard: condition distribution, repair queue, inspection coverage, geographic heatmap
   4. Map and dashboard filterable by district, basin, type, condition, inspection status
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 02-01-PLAN.md — Interactive map with color-coded structures, mock data layer, Zustand stores, TanStack Query
+- [ ] 02-02-PLAN.md — Digital passport side panel with identity, geometry, specs, status, provenance
+- [ ] 02-03-PLAN.md — Portfolio dashboard with condition donut, repair queue, inspection stats, heatmap
+- [ ] 02-04-PLAN.md — Filter panel with district, basin, type, condition, inspection status selectors
 **UI hint**: yes
 
 ### Phase 3: Inspection & Risk UI
@@ -104,7 +109,7 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. App Shell & i18n | 4/4 | Complete | 2026-06-26 |
-| 2. Map UI & Digital Passport | 0/TBD | Not started | - |
+| 2. Map UI & Digital Passport | 0/4 | Not started | - |
 | 3. Inspection & Risk UI | 0/TBD | Not started | - |
 | 4. Discovery & Matching UI | 0/TBD | Not started | - |
 | 5. PWA Field Mode | 0/TBD | Not started | - |
