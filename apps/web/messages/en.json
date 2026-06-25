@@ -18,7 +18,8 @@
   },
   "home": {
     "title": "Zhambyl Hydraulic Structures Catalog",
-    "subtitle": "Digital operating system for hydraulic structure management"
+    "subtitle": "Digital operating system for hydraulic structure management",
+    "description": "Complete information about reservoirs, dams, and canals"
   },
   "dashboard": {
     "title": "Dashboard",

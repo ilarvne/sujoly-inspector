@@ -18,6 +18,9 @@ export default async function HomePage({ params }: Props) {
       <p className="text-lg text-muted-foreground">
         {t('subtitle')}
       </p>
+      <p className="text-base text-muted-foreground">
+        {t('description')}
+      </p>
     </div>
   );
 }
