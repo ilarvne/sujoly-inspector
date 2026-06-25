@@ -7,6 +7,7 @@ import { Inter, Manrope } from 'next/font/google';
 import { routing } from '@/i18n/routing';
 import { getMessages } from 'next-intl/server';
 import { AppShell } from '@/components/layout/app-shell';
+import { QueryProvider } from '@/components/providers/query-provider';
 
 const inter = Inter({
   subsets: ['latin', 'cyrillic', 'cyrillic-ext'],
@@ -42,7 +43,9 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale} className={`${inter.variable} ${manrope.variable} antialiased`}>
       <body>
         <NextIntlClientProvider messages={messages}>
-          <AppShell>{children}</AppShell>
+          <QueryProvider>
+            <AppShell>{children}</AppShell>
+          </QueryProvider>
         </NextIntlClientProvider>
       </body>
     </html>

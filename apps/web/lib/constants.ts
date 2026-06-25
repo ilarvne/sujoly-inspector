@@ -9,3 +9,15 @@ export const navItems = [
 ] as const;
 
 export const locales = ['ru', 'kk', 'en'] as const;
+
+export const OSM_TILE_URL = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+
+export const ZHAMBYL_CENTER = { longitude: 72.6, latitude: 44.0, zoom: 7 };
+
+export const STATUS_COLORS_HEX: Record<string, string> = {
+  normal: '#22c55e',
+  inspection: '#eab308',
+  repair: '#f97316',
+  critical: '#ef4444',
+  missing: '#9ca3af',
+};
