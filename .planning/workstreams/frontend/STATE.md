@@ -7,19 +7,19 @@ created: 2026-06-25
 
 ## Current Position
 
-**Status:** Phase 06 Complete
-**Current Phase:** 06-ai-copilot-ui (complete)
+**Status:** Phase 05 Complete
+**Current Phase:** 05-pwa-field-mode (complete)
 **Last Activity:** 2026-06-26
-**Last Activity Description:** Completed Phase 6 AI Copilot UI — mock AI engine, chat store, 9 copilot components, trilingual i18n, 27 unit tests
+**Last Activity Description:** Completed Phase 5 PWA Field Mode — PWA foundation (Serwist SW, manifest, offline page), offline data layer (Dexie IndexedDB, sync engine, conflict resolution), field capture UI (inspection form, photos, voice notes, GPS), sync status UI (queue panel, conflict dialog, voice transcription status), 28 new unit tests
 
 ## Progress
 
-**Phases Complete:** 3 (1, 2, 6)
-**Current Plan:** 06-02 (complete)
+**Phases Complete:** 4 (1, 2, 5, 6)
+**Current Plan:** 05-04 (complete)
 
 ## Session Continuity
 
-**Stopped At:** Phase 6 complete — all plans executed, build passes, 106/106 tests pass
+**Stopped At:** Phase 5 complete — all 4 plans executed, build passes (33 pages), 134/134 tests pass
 **Resume File:** None
 
 ## Decisions
@@ -45,3 +45,12 @@ created: 2026-06-25
 - Phase 6: Chat store uses Zustand persist with partialize to strip isStreaming flags before localStorage save
 - Phase 6: Source citations navigate to /map with selectedId set via selection store
 - Phase 6: 4 interactive card types (StructureCard, RiskBreakdownCard, InspectionCard, ReportCard) render inline in chat messages
+- Phase 5: Serwist build plugin (@serwist/next webpack) not compatible with Next.js 16 Turbopack — used manual public/sw.js with vanilla Service Worker APIs instead
+- Phase 5: SerwistProvider replaced with simple useEffect-based SW registration (components/pwa/sw-register.tsx, prod only)
+- Phase 5: Dexie database (sujoly-field-db) with 4 tables: fieldInspections, fieldPhotos, fieldVoiceNotes, syncQueue — all typed with EntityTable
+- Phase 5: Sync engine uses mutex flag (isSyncing) to prevent concurrent sync runs on connectivity flicker
+- Phase 5: Voice transcription is mock — returns randomized KK/RU text, designed for easy swap to real API
+- Phase 5: Field mode store uses Zustand persist (key 'sujoly-field-mode') for field mode toggle + lastSyncAt
+- Phase 5: fake-indexeddb used for Dexie unit testing in jsdom environment
+- Phase 5: Conflict resolution is field-level (not last-write-wins) — detectConflicts compares 6 fields, applyResolution merges per-field
+- Phase 5: Build passes 33 pages, 134 unit tests (28 new for Phase 5)
