@@ -1,6 +1,27 @@
 const CACHE_NAME = 'sujoly-v1';
 const OFFLINE_CACHE = 'sujoly-offline-v1';
 
+if (self.location.hostname === 'localhost' || self.location.hostname === '127.0.0.1') {
+  self.addEventListener('install', (event) => {
+    event.waitUntil(
+      Promise.all([
+        caches.keys().then((keys) =>
+          Promise.all(keys.map((k) => caches.delete(k)))
+        ),
+        self.registration.unregister(),
+      ]).then(() => self.clients.matchAll()).then((clients) => {
+        clients.forEach((c) => c.navigate(c.url));
+      })
+    );
+  });
+  self.addEventListener('activate', (event) => {
+    event.waitUntil(self.clients.claim());
+  });
+  self.addEventListener('fetch', (event) => {
+    return;
+  });
+} else {
+
 self.addEventListener('install', (event) => {
   self.skipWaiting();
   event.waitUntil(
@@ -87,4 +108,6 @@ self.addEventListener('fetch', (event) => {
       })
       .catch(() => caches.match(request))
   );
-});
+}
+
+}
