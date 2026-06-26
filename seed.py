@@ -33,7 +33,7 @@ async def seed_data():
     print(">>> Seeding data from Excel...")
     try:
         from api.services.ingestion_service import bulk_insert_structures
-        count = await bulk_insert_structures(filepath="/app/датасет.xls", force=True)
+        count = await bulk_insert_structures(filepath="/app/dataset.xls", force=True)
         print(f">>> Seeded {count} structures.")
     except Exception as e:
         print(f"SEED WARNING: {e}")

@@ -10,7 +10,7 @@ type Locale = 'ru' | 'kk' | 'en';
 // Backend configuration & auth (mirrors lib/api/client.ts)
 // ---------------------------------------------------------------------------
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '/api/v1';
 const API_KEY = 'dev-admin-key';
 
 let cachedToken: string | null = null;
@@ -127,7 +127,7 @@ export const useChatStore = create<ChatState>()(
           isStreaming: true,
         }));
 
-        // Call the real backend copilot API
+        // Call the agent SSE endpoint (LangGraph agentic RAG with alemllm)
         (async () => {
           let fullText: string;
           let sources: CopilotSource[];
@@ -135,52 +135,62 @@ export const useChatStore = create<ChatState>()(
 
           try {
             const token = await getToken();
-            const res = await fetch(`${API_BASE_URL}/copilot/chat`, {
+            const res = await fetch(`${API_BASE_URL}/chat/stream`, {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
               },
               body: JSON.stringify({
-                message: trimmed,
-                conversation_id: get()._conversationId,
-                context: { locale },
+                messages: [{ type: 'human', content: trimmed }],
               }),
             });
 
-            if (!res.ok) {
-              // Token may have expired — refresh and retry once
-              if (res.status === 401) {
-                cachedToken = null;
-                const newToken = await getToken();
-                const retryRes = await fetch(`${API_BASE_URL}/copilot/chat`, {
-                  method: 'POST',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${newToken}`,
-                  },
-                  body: JSON.stringify({
-                    message: trimmed,
-                    conversation_id: get()._conversationId,
-                    context: { locale },
-                  }),
-                });
-                if (!retryRes.ok) throw new Error(`Copilot API ${retryRes.status}`);
-                const data: CopilotApiResponse = await retryRes.json();
-                fullText = data.message;
-                sources = mapEvidenceToSources(data.evidence);
-                conversationId = data.conversation_id;
-              } else {
-                throw new Error(`Copilot API ${res.status}`);
+            if (!res.ok) throw new Error(`Agent API ${res.status}`);
+
+            // Parse SSE stream and accumulate text
+            const reader = res.body?.getReader();
+            if (!reader) throw new Error('No response body');
+
+            const decoder = new TextDecoder();
+            let buffer = '';
+            let accumulated = '';
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              buffer += decoder.decode(value, { stream: true });
+              const lines = buffer.split('\n');
+              buffer = lines.pop() || '';
+
+              for (const line of lines) {
+                if (line.startsWith('event: messages')) {
+                  // Next data line has the content
+                } else if (line.startsWith('data: ') && accumulated !== '__WAITING__') {
+                  try {
+                    const payload = JSON.parse(line.slice(6));
+                    if (payload.content) {
+                      accumulated += payload.content;
+                      set((state) => ({
+                        messages: state.messages.map((m) =>
+                          m.id === assistantId
+                            ? { ...m, content: accumulated }
+                            : m,
+                        ),
+                      }));
+                    }
+                  } catch {
+                    // skip non-JSON data lines
+                  }
+                }
               }
-            } else {
-              const data: CopilotApiResponse = await res.json();
-              fullText = data.message;
-              sources = mapEvidenceToSources(data.evidence);
-              conversationId = data.conversation_id;
             }
+
+            fullText = accumulated || (locale === 'ru' ? 'Нет ответа от агента.' : 'No response from agent.');
+            sources = [];
+            conversationId = get()._conversationId;
           } catch (err) {
-            console.error('[chat] Copilot API error:', err);
+            console.error('[chat] Agent API error:', err);
             fullText =
               locale === 'ru'
                 ? 'Извините, не удалось получить ответ от сервера. Проверьте подключение к бэкенду.'
@@ -194,42 +204,21 @@ export const useChatStore = create<ChatState>()(
           // Store conversation ID for continuity
           set({ _conversationId: conversationId });
 
-          // Word-by-word streaming animation (same UX as before)
-          const words = fullText.split(' ');
-          let wordIndex = 0;
-
-          const streamInterval = setInterval(() => {
-            wordIndex += 2;
-            const partialText = words.slice(0, wordIndex).join(' ');
-
-            set((state) => ({
-              messages: state.messages.map((m) =>
-                m.id === assistantId
-                  ? { ...m, content: partialText }
-                  : m,
-              ),
-            }));
-
-            if (wordIndex >= words.length) {
-              clearInterval(streamInterval);
-              set((state) => ({
-                _streamInterval: null,
-                messages: state.messages.map((m) =>
-                  m.id === assistantId
-                    ? {
-                        ...m,
-                        content: fullText,
-                        sources,
-                        isStreaming: false,
-                      }
-                    : m,
-                ),
-                isStreaming: false,
-              }));
-            }
-          }, 50);
-
-          set({ _streamInterval: streamInterval });
+          // Finalize the message
+          set((state) => ({
+            _streamInterval: null,
+            messages: state.messages.map((m) =>
+              m.id === assistantId
+                ? {
+                    ...m,
+                    content: fullText,
+                    sources,
+                    isStreaming: false,
+                  }
+                : m,
+            ),
+            isStreaming: false,
+          }));
         })();
       },
 

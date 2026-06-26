@@ -47,9 +47,15 @@ COPY --from=web-builder /app/web/public ./public
 WORKDIR /app/api
 COPY --from=api-builder /app/api/ ./
 
+# Copy agent app
+WORKDIR /app/agent
+COPY apps/agent/src/ ./src/
+COPY apps/agent/pyproject.toml ./
+RUN pip install --no-cache-dir langchain-openai langchain-community langgraph langgraph-checkpoint-postgres psycopg_pool pymilvus structlog python-dotenv pydantic-settings
+
 # Copy seed script and Excel dataset
 COPY seed.py /app/seed.py
-COPY датасет.xls /app/датасет.xls
+COPY dataset.xls /app/dataset.xls
 
 # Setup PostgreSQL: create user, db, extensions
 RUN pg_createcluster 17 main --start 2>/dev/null || true
@@ -89,6 +95,15 @@ autostart=true
 autorestart=true
 stdout_logfile=/applogs/web.log
 stderr_logfile=/applogs/web-err.log
+
+[program:agent]
+command=python -m uvicorn agent.server:app --host 0.0.0.0 --port 5555
+directory=/app/agent
+environment=PYTHONPATH="/app/agent/src",AGENT_LLM_MODEL="alemllm",AGENT_LLM_API_KEY="sk-VOqLlzi2lsbeK8uDtnpCtQ",AGENT_LLM_BASE_URL="https://llm.alem.ai/v1",AGENT_EMBEDDING_MODEL="text-1024",AGENT_EMBEDDING_API_KEY="sk-gjHJ15q4DvGwp2eZGS_nhA",AGENT_EMBEDDING_BASE_URL="https://llm.alem.ai/v1",AGENT_RERANKER_API_KEY="sk-9onHa7kJEwfTbZWuJEPMig",AGENT_RERANKER_URL="https://llm.alem.ai/v1/rerank",AGENT_DATABASE_URL="postgresql+asyncpg://sujoly:sujoly_dev@localhost:5432/sujoly",AGENT_POSTGRES_URL="postgresql://sujoly:sujoly_dev@localhost:5432/sujoly",AGENT_MILVUS_URI="https://a1-milvus1.alem.ai:30130",AGENT_MILVUS_USER="ilarvne",AGENT_MILVUS_PASSWORD="Gv939iwXgg",AGENT_MILVUS_DB="alemplusvector",AGENT_SUJOLY_API_URL="http://localhost:8000",AGENT_ALLOWED_ORIGINS="*",AGENT_ENVIRONMENT="development"
+autostart=true
+autorestart=true
+stdout_logfile=/applogs/agent.log
+stderr_logfile=/applogs/agent-err.log
 EOF
 
 # Start script: start postgres, pre-seed, start services, post-seed, tail logs
