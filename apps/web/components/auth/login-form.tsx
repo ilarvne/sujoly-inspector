@@ -43,18 +43,27 @@ export function LoginForm() {
           <Card
             key={role}
             data-testid={`role-card-${role}`}
-            className={`cursor-pointer transition-all ${
+            role="radio"
+            aria-checked={selectedRole === role}
+            tabIndex={0}
+            className={`cursor-pointer transition-all focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none ${
               selectedRole === role
                 ? 'border-primary ring-2 ring-primary/20'
                 : 'hover:border-primary/50'
             }`}
             onClick={() => setSelectedRole(role)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedRole(role);
+              }
+            }}
           >
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="text-base">{t(roleLabelKeys[role])}</CardTitle>
                 <Badge variant={selectedRole === role ? 'default' : 'secondary'}>
-                  {role}
+                  {t(roleLabelKeys[role])}
                 </Badge>
               </div>
             </CardHeader>

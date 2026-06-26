@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { FileTextIcon, MapIcon, FileSpreadsheetIcon, DownloadIcon } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -29,6 +29,7 @@ type ExportFormat = 'csv' | 'geojson' | 'pdf';
 
 export function ExportPanel() {
   const t = useTranslations('exportNs');
+  const locale = useLocale();
   const filters = useFilterStore();
   const { data: geojsonData } = useStructuresGeoJSON(filters);
   const [selectedStructureId, setSelectedStructureId] = useState<string | null>(null);
@@ -147,7 +148,7 @@ export function ExportPanel() {
               <SelectContent className="max-h-60">
                 {allStructures.features.map((f) => (
                   <SelectItem key={f.properties.id} value={f.properties.id}>
-                    {f.properties.id} — {f.properties.name.ru}
+                    {f.properties.id} — {f.properties.name[locale as keyof typeof f.properties.name] || f.properties.name.ru}
                   </SelectItem>
                 ))}
               </SelectContent>

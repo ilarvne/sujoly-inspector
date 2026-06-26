@@ -10,6 +10,7 @@ type Locale = 'ru' | 'kk' | 'en';
 interface ChatState {
   messages: CopilotMessage[];
   isStreaming: boolean;
+  _streamInterval: ReturnType<typeof setInterval> | null;
   sendMessage: (content: string, locale: Locale) => void;
   clearChat: () => void;
 }
@@ -23,6 +24,7 @@ export const useChatStore = create<ChatState>()(
     (set, get) => ({
       messages: [],
       isStreaming: false,
+      _streamInterval: null,
 
       sendMessage: (content: string, locale: Locale) => {
         const trimmed = content.trim();
@@ -68,6 +70,7 @@ export const useChatStore = create<ChatState>()(
           if (wordIndex >= words.length) {
             clearInterval(streamInterval);
             set((state) => ({
+              _streamInterval: null,
               messages: state.messages.map((m) =>
                 m.id === assistantId
                   ? {
@@ -83,10 +86,14 @@ export const useChatStore = create<ChatState>()(
             }));
           }
         }, 50);
+
+        set({ _streamInterval: streamInterval });
       },
 
       clearChat: () => {
-        set({ messages: [], isStreaming: false });
+        const interval = get()._streamInterval;
+        if (interval) clearInterval(interval);
+        set({ messages: [], isStreaming: false, _streamInterval: null });
       },
     }),
     {

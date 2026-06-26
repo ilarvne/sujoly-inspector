@@ -9,6 +9,21 @@ import { useSelectionStore } from '@/lib/stores/selection-store';
 import { useStructuresGeoJSON } from '@/lib/api/client';
 import { OSM_TILE_URL, ZHAMBYL_CENTER, STATUS_COLORS_HEX } from '@/lib/constants';
 
+const MAP_STYLE = {
+  version: 8 as const,
+  sources: {
+    osm: {
+      type: 'raster' as const,
+      tiles: [OSM_TILE_URL],
+      tileSize: 256,
+      attribution: '© OpenStreetMap contributors',
+    },
+  },
+  layers: [
+    { id: 'osm', type: 'raster' as const, source: 'osm' },
+  ],
+};
+
 export function MapView() {
   const setViewport = useMapStore((s) => s.setViewport);
   const filters = useFilterStore();
@@ -33,20 +48,7 @@ export function MapView() {
     <Map
       initialViewState={ZHAMBYL_CENTER}
       style={{ width: '100%', height: '100%' }}
-      mapStyle={{
-        version: 8,
-        sources: {
-          osm: {
-            type: 'raster',
-            tiles: [OSM_TILE_URL],
-            tileSize: 256,
-            attribution: '© OpenStreetMap contributors',
-          },
-        },
-        layers: [
-          { id: 'osm', type: 'raster', source: 'osm' },
-        ],
-      }}
+      mapStyle={MAP_STYLE}
       interactiveLayerIds={['structures']}
       onLoad={(e) => {
         (window as Window & { __maplibreMap?: unknown }).__maplibreMap = e.target;

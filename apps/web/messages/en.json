@@ -5,7 +5,8 @@
       "ru": "Русский",
       "kk": "Қазақша",
       "en": "English"
-    }
+    },
+    "languageSwitcher": "Select language"
   },
   "nav": {
     "home": "Home",

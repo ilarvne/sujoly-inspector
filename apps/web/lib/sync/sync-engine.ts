@@ -1,5 +1,5 @@
 import { db } from '@/lib/db/field-db';
-import { useConnectivityStore } from '@/lib/stores/connectivity-store';
+import { useConnectivityStore, initConnectivity } from '@/lib/stores/connectivity-store';
 import { useFieldModeStore } from '@/lib/stores/field-mode-store';
 import { detectConflicts } from './conflict-resolution';
 import { transcribeVoiceNote } from './voice-transcription';
@@ -33,6 +33,8 @@ export async function processSyncQueue(): Promise<void> {
 
     useConnectivityStore.getState().setPendingSyncCount(remainingPending);
     useFieldModeStore.getState().setLastSyncAt(new Date().toISOString());
+  } catch (error) {
+    console.error('processSyncQueue error:', error);
   } finally {
     isSyncing = false;
   }
@@ -96,25 +98,33 @@ async function syncEntry(entry: SyncQueueEntry): Promise<void> {
 }
 
 async function processPendingTranscriptions(): Promise<void> {
-  const voiceNotes = await db.fieldVoiceNotes
-    .where('transcriptionStatus')
-    .equals('pending')
-    .toArray();
+  try {
+    const voiceNotes = await db.fieldVoiceNotes
+      .where('transcriptionStatus')
+      .equals('pending')
+      .toArray();
 
-  for (const note of voiceNotes) {
-    try {
-      const transcription = await transcribeVoiceNote(note.blob, note.language);
-      await db.fieldVoiceNotes.update(note.id!, {
-        transcriptionStatus: 'complete',
-        transcriptionText: transcription,
-        transcribedAt: new Date().toISOString(),
-      });
-    } catch (error) {
-      await db.fieldVoiceNotes.update(note.id!, {
-        transcriptionStatus: 'failed',
-        transcriptionError: error instanceof Error ? error.message : 'Unknown error',
-      });
+    for (const note of voiceNotes) {
+      try {
+        const transcription = await transcribeVoiceNote(note.blob, note.language);
+        await db.fieldVoiceNotes.update(note.id!, {
+          transcriptionStatus: 'complete',
+          transcriptionText: transcription,
+          transcribedAt: new Date().toISOString(),
+        });
+      } catch (error) {
+        try {
+          await db.fieldVoiceNotes.update(note.id!, {
+            transcriptionStatus: 'failed',
+            transcriptionError: error instanceof Error ? error.message : 'Unknown error',
+          });
+        } catch (updateError) {
+          console.error('Failed to update voice note error status:', updateError);
+        }
+      }
     }
+  } catch (error) {
+    console.error('processPendingTranscriptions error:', error);
   }
 }
 
@@ -122,6 +132,8 @@ export function initSyncEngine(): void {
   if (typeof window === 'undefined') return;
   if (syncEngineInitialized) return;
   syncEngineInitialized = true;
+
+  initConnectivity();
 
   window.addEventListener('online', () => {
     useConnectivityStore.getState().setOnline(true);
@@ -136,7 +148,8 @@ export function initSyncEngine(): void {
     .where('status')
     .anyOf(['pending', 'failed', 'conflict'])
     .count()
-    .then((count) => useConnectivityStore.getState().setPendingSyncCount(count));
+    .then((count) => useConnectivityStore.getState().setPendingSyncCount(count))
+    .catch((error) => console.error('Failed to get pending sync count:', error));
 
   if (navigator.onLine) {
     processSyncQueue();
