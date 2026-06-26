@@ -9,10 +9,11 @@ Provides:
 - SearchListResponse: paginated search results envelope
 """
 
+import struct
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class StructureCreate(BaseModel):
@@ -92,6 +93,41 @@ class StructureResponse(BaseModel):
     status: str
     created_at: datetime
     updated_at: datetime
+
+    @field_validator("geometry", mode="before")
+    @classmethod
+    def convert_wkb_geometry(cls, v):
+        """Convert GeoAlchemy2 WKBElement to GeoJSON dict (Rule 3 fix).
+
+        PostGIS geometry columns load as ``WKBElement`` (raw EWKB bytes) when
+        accessed via SQLAlchemy ORM. Pydantic cannot serialise ``WKBElement``
+        to ``dict`` directly, causing a validation error on every list/detail
+        endpoint. This validator parses the EWKB binary to a GeoJSON dict for
+        Point geometries (the only geometry type used in this project) without
+        requiring the ``shapely`` dependency.
+        """
+        if v is None or isinstance(v, dict):
+            return v
+
+        # WKBElement from GeoAlchemy2 — parse EWKB to GeoJSON dict
+        if hasattr(v, "data"):
+            data = v.data
+            if isinstance(data, str):
+                data = bytes.fromhex(data)
+            if not data or len(data) < 5:
+                return None
+            endian = "<" if data[0] == 1 else ">"
+            geom_type = struct.unpack_from(endian + "I", data, 1)[0]
+            has_srid = bool(geom_type & 0x20000000)
+            base_type = (geom_type & 0x0FFFFFFF) % 1000
+            offset = 5 + (4 if has_srid else 0)
+            if base_type == 1:  # Point
+                if len(data) < offset + 16:
+                    return None
+                x = struct.unpack_from(endian + "d", data, offset)[0]
+                y = struct.unpack_from(endian + "d", data, offset + 8)[0]
+                return {"type": "Point", "coordinates": [x, y]}
+        return None
 
 
 class StructureListResponse(BaseModel):
