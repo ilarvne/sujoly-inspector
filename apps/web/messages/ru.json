@@ -1,6 +1,6 @@
 {
   "common": {
-    "appTitle": "Жамбыл ГТС",
+    "appTitle": "SuJoly Inspector",
     "locale": {
       "ru": "Русский",
       "kk": "Қазақша",
@@ -19,9 +19,27 @@
     "hydrofinder": "Гидропоиск"
   },
   "home": {
-    "title": "Каталог гидротехнических сооружений Жамбылской области",
-    "subtitle": "Цифровая операционная система для управления гидротехническими сооружениями",
-    "description": "Полная информация о водохранилищах, плотинах и каналах"
+    "title": "SuJoly Inspector",
+    "subtitle": "Цифровая платформа управления гидротехническими сооружениями Жамбылской области",
+    "description": "Карта, паспорта сооружений, осмотры, оценка рисков и AI-помощник в одной системе",
+    "statsStructures": "Сооружений",
+    "statsInspections": "Осмотров проведено",
+    "statsCritical": "Требуют внимания",
+    "statsDistricts": "Районов покрыто",
+    "featureMapTitle": "Интерактивная карта",
+    "featureMapDesc": "Карта всех сооружений с цветовой индикацией состояния",
+    "featureDashboardTitle": "Аналитика",
+    "featureDashboardDesc": "Сводная статистика и распределение по районам",
+    "featureCopilotTitle": "AI-помощник",
+    "featureCopilotDesc": "Задавайте вопросы о сооружениях на трёх языках",
+    "featureFieldTitle": "Полевой режим",
+    "featureFieldDesc": "Сбор данных на объекте без подключения к сети",
+    "featureDiscoveryTitle": "Гидропоиск",
+    "featureDiscoveryDesc": "Обнаружение новых сооружений из открытых источников",
+    "featureReportsTitle": "Экспорт данных",
+    "featureReportsDesc": "Выгрузка в CSV, GeoJSON и PDF форматах",
+    "getStarted": "Перейти к карте",
+    "learnMore": "Узнать больше"
   },
   "dashboard": {
     "title": "Панель управления",
@@ -131,7 +149,19 @@
   },
   "objects": {
     "title": "Объекты",
-    "subtitle": "Каталог и реестр сооружений"
+    "subtitle": "Каталог и реестр сооружений",
+    "search": "Поиск по названию...",
+    "noResults": "Сооружения не найдены",
+    "loading": "Загрузка...",
+    "colName": "Название",
+    "colId": "ID",
+    "colType": "Тип",
+    "colDistrict": "Район",
+    "colCondition": "Состояние",
+    "colInspection": "Инспекция",
+    "colYear": "Год",
+    "openPassport": "Открыть паспорт",
+    "resultsCount": "Найдено: {count}"
   },
   "copilot": {
     "title": "ИИ-помощник",

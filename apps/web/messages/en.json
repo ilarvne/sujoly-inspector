@@ -1,6 +1,6 @@
 {
   "common": {
-    "appTitle": "Zhambyl Hydraulic Structures",
+    "appTitle": "SuJoly Inspector",
     "locale": {
       "ru": "Русский",
       "kk": "Қазақша",
@@ -19,9 +19,27 @@
     "hydrofinder": "HydroFinder"
   },
   "home": {
-    "title": "Zhambyl Hydraulic Structures Catalog",
-    "subtitle": "Digital operating system for hydraulic structure management",
-    "description": "Complete information about reservoirs, dams, and canals"
+    "title": "SuJoly Inspector",
+    "subtitle": "Digital platform for managing hydraulic structures in Zhambyl Oblast",
+    "description": "Map, structure passports, inspections, risk assessment, and AI copilot in one system",
+    "statsStructures": "Structures",
+    "statsInspections": "Inspections done",
+    "statsCritical": "Need attention",
+    "statsDistricts": "Districts covered",
+    "featureMapTitle": "Interactive Map",
+    "featureMapDesc": "Map of all structures with color-coded condition status",
+    "featureDashboardTitle": "Analytics",
+    "featureDashboardDesc": "Summary statistics and distribution by district",
+    "featureCopilotTitle": "AI Copilot",
+    "featureCopilotDesc": "Ask questions about structures in three languages",
+    "featureFieldTitle": "Field Mode",
+    "featureFieldDesc": "Collect data on-site without internet connection",
+    "featureDiscoveryTitle": "HydroFinder",
+    "featureDiscoveryDesc": "Discover new structures from open data sources",
+    "featureReportsTitle": "Data Export",
+    "featureReportsDesc": "Export to CSV, GeoJSON, and PDF formats",
+    "getStarted": "Go to Map",
+    "learnMore": "Learn more"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -131,7 +149,19 @@
   },
   "objects": {
     "title": "Objects",
-    "subtitle": "Structure catalog and registry"
+    "subtitle": "Structure catalog and registry",
+    "search": "Search by name...",
+    "noResults": "No structures found",
+    "loading": "Loading...",
+    "colName": "Name",
+    "colId": "ID",
+    "colType": "Type",
+    "colDistrict": "District",
+    "colCondition": "Condition",
+    "colInspection": "Inspection",
+    "colYear": "Year",
+    "openPassport": "Open passport",
+    "resultsCount": "Found: {count}"
   },
   "copilot": {
     "title": "AI Copilot",

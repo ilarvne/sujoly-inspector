@@ -1,6 +1,6 @@
 {
   "common": {
-    "appTitle": "Жамбыл СҚ",
+    "appTitle": "SuJoly Inspector",
     "locale": {
       "ru": "Русский",
       "kk": "Қазақша",
@@ -19,9 +19,27 @@
     "hydrofinder": "Гидроіздеу"
   },
   "home": {
-    "title": "Жамбыл облысының гидротехникалық құрылымдар каталогы",
-    "subtitle": "Гидротехникалық құрылымдарды жаһандық басқару үшін цифрлық операциялық жүйе",
-    "description": "Тоғандар, бөгеттер және каналдар туралы толыққанды ақпарат"
+    "title": "SuJoly Inspector",
+    "subtitle": "Жамбыл облысының гидротехникалық құрылымдарын басқарудың цифрлық платформасы",
+    "description": "Карта, нысан паспорттары, қарап шығулар, тәуекелдерді бағалау және AI-көмекші бір жүйеде",
+    "statsStructures": "Құрылымдар",
+    "statsInspections": "Қарап шығулар",
+    "statsCritical": "Назар қажет",
+    "statsDistricts": "Аудандар",
+    "featureMapTitle": "Интерактивті карта",
+    "featureMapDesc": "Күйі бойынша түсті белгілермен барлық құрылымдардың картасы",
+    "featureDashboardTitle": "Аналитика",
+    "featureDashboardDesc": "Жиынтық статистика және аудандар бойынша таралуы",
+    "featureCopilotTitle": "AI-көмекші",
+    "featureCopilotDesc": "Үш тілде құрылымдар туралы сұрақ қойыңыз",
+    "featureFieldTitle": "Дала режимі",
+    "featureFieldDesc": "Интернет қосылымынсыз нысанда деректер жинау",
+    "featureDiscoveryTitle": "Гидроіздеу",
+    "featureDiscoveryDesc": "Ашық дереккөздерден жаңа құрылымдарды анықтау",
+    "featureReportsTitle": "Деректерді экспорттау",
+    "featureReportsDesc": "CSV, GeoJSON және PDF форматтарына экспорттау",
+    "getStarted": "Картага өту",
+    "learnMore": "Толығырақ"
   },
   "dashboard": {
     "title": "Басқару панелі",
@@ -131,7 +149,19 @@
   },
   "objects": {
     "title": "Нысандар",
-    "subtitle": "Құрылымдар каталогы мен тізілімі"
+    "subtitle": "Құрылымдар каталогы мен тізілімі",
+    "search": "Атауы бойынша іздеу...",
+    "noResults": "Құрылымдар табылмады",
+    "loading": "Жүктелуде...",
+    "colName": "Атауы",
+    "colId": "ID",
+    "colType": "Түрі",
+    "colDistrict": "Аудан",
+    "colCondition": "Күйі",
+    "colInspection": "Қарап шығу",
+    "colYear": "Жылы",
+    "openPassport": "Паспортты ашу",
+    "resultsCount": "Табылды: {count}"
   },
   "copilot": {
     "title": "ЖИ көмекші",
