@@ -255,6 +255,12 @@ async def recompute_risk_for_structure(
         if structure is None:
             raise ValueError(f"Structure '{structure_id}' not found")
 
+        # Load provenance for confidence level (D-09 weak-evidence floor)
+        prov_result = await session.execute(
+            select(ProvenanceModel).where(ProvenanceModel.id == structure.provenance_id)
+        )
+        provenance = prov_result.scalar_one_or_none()
+
         # Load current facts (valid_to IS NULL)
         facts_result = await session.execute(
             select(StructureFactModel).where(
@@ -296,7 +302,7 @@ async def recompute_risk_for_structure(
             "type": structure.type,
             "wear_percentage": structure.wear_percentage,
             "technical_condition": structure.technical_condition,
-            "provenance_confidence": None,  # TODO: derive from provenance
+            "provenance_confidence": provenance.confidence_level if provenance else None,
         }
 
         # Compute risk using pure Python risk engine
