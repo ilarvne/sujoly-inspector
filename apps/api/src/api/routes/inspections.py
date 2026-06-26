@@ -127,6 +127,13 @@ async def get_inspection_endpoint(
             detail=f"Inspection '{inspection_id}' not found",
         )
 
+    # Verify inspection belongs to the requested structure (T-03-09a mitigation)
+    if model.structure_id != structure_id:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Inspection '{inspection_id}' not found for structure '{structure_id}'",
+        )
+
     resp = InspectionResponse.model_validate(model)
 
     # Generate presigned download URLs for photos (T-03-14 mitigation)

@@ -263,6 +263,27 @@ class TestInspectionEndpoints:
             )
         assert response.status_code == 404
 
+    def test_get_inspection_cross_structure_returns_404(self, test_client):
+        """GET /api/v1/structures/{id}/inspections/{inspection_id} returns 404
+        when inspection belongs to a different structure (T-03-09a mitigation)."""
+        structure_a = uuid.uuid4()
+        structure_b = uuid.uuid4()
+        inspection_id = uuid.uuid4()
+        mock_inspection = self._mock_inspection(
+            id=inspection_id,
+            structure_id=structure_b,  # inspection belongs to structure B
+        )
+        mock_inspection.photos = []
+        with patch(
+            "api.routes.inspections.inspection_service.get_inspection",
+            AsyncMock(return_value=mock_inspection),
+        ):
+            # Request inspection via structure A's path → should return 404
+            response = test_client.get(
+                f"/api/v1/structures/{structure_a}/inspections/{inspection_id}",
+            )
+        assert response.status_code == 404
+
     # ------------------------------------------------------------------
     # Provenance test
     # ------------------------------------------------------------------
