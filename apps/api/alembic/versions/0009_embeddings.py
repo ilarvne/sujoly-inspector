@@ -6,12 +6,14 @@ Create Date: 2026-06-26
 
 Creates the embeddings table per AI-03:
 - id (UUID PK), source_type (String 50), source_id (UUID)
-- content_text (Text), embedding (Vector 1536), created_at (DateTime timezone)
+- content_text (Text), embedding (Vector 1024), created_at (DateTime timezone)
 - Index on (source_type, source_id) for source lookup
 - HNSW index on embedding column with vector_cosine_ops for fast similarity search
 
 Extensions:
 - vector extension for pgvector Vector column type
+
+Note: Vector dimension is 1024 to match Alem text-1024 embedding model.
 """
 
 from collections.abc import Sequence
@@ -52,9 +54,9 @@ def upgrade() -> None:
         "ix_embeddings_source", "embeddings", ["source_type", "source_id"]
     )
 
-    # Alter embedding column to pgvector Vector(1536) type
+    # Alter embedding column to pgvector Vector(1024) type (Alem text-1024 model)
     # Using raw SQL since Alembic doesn't natively support pgvector DDL
-    op.execute("ALTER TABLE embeddings ALTER COLUMN embedding TYPE vector(1536) USING embedding::vector")
+    op.execute("ALTER TABLE embeddings ALTER COLUMN embedding TYPE vector(1024) USING embedding::vector")
 
     # HNSW index on embedding for fast cosine similarity search (AI-03)
     op.execute(

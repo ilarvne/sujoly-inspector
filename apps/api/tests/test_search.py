@@ -157,11 +157,36 @@ class TestSearchServiceUnit:
         return SearchService()
 
     @pytest.mark.asyncio
-    async def test_vector_search_returns_empty_for_mvp(self, service):
-        """SearchService._vector_search returns empty list for MVP (no embedding pipeline)."""
-        results = await service._vector_search("test query", 10)
+    async def test_vector_search_returns_empty_on_embedding_failure(self, service):
+        """SearchService._vector_search returns empty list when embedding generation fails."""
+        with patch("api.services.embedding_service.embedding_service") as mock_emb_svc:
+            mock_emb_svc.embed_text = AsyncMock(side_effect=Exception("API down"))
+            results = await service._vector_search("test query", 10)
         assert results == []
         assert isinstance(results, list)
+
+    @pytest.mark.asyncio
+    async def test_vector_search_returns_results_with_embeddings(self, service):
+        """SearchService._vector_search returns results when embeddings are available."""
+        fake_embedding = [0.1] * 1024
+
+        mock_row = ("structure", uuid.uuid4(), "Test content", 0.15)
+        mock_result = MagicMock()
+        mock_result.all.return_value = [mock_row]
+
+        mock_session = MagicMock()
+        mock_session.execute = AsyncMock(return_value=mock_result)
+        mock_cm = MagicMock()
+        mock_cm.__aenter__ = AsyncMock(return_value=mock_session)
+        mock_cm.__aexit__ = AsyncMock(return_value=None)
+
+        with patch("api.services.embedding_service.embedding_service") as mock_emb_svc, \
+             patch("api.services.search_service.async_session", return_value=mock_cm):
+            mock_emb_svc.embed_text = AsyncMock(return_value=fake_embedding)
+            results = await service._vector_search("test query", 10)
+
+        assert len(results) == 1
+        assert results[0]["source_type"] == "structure"
 
     @pytest.mark.asyncio
     async def test_fulltext_search_returns_structured_results(self, service):

@@ -118,6 +118,21 @@ async def create_inspection(
             structure_id=str(structure_id),
         )
 
+    # AI-03: dispatch embedding generation after inspection creation
+    try:
+        from api.tasks.celery_tasks import generate_structure_embedding
+        generate_structure_embedding.delay("inspection", str(inspection.id))
+        logger.info(
+            "embedding_dispatched",
+            inspection_id=str(inspection.id),
+            trigger="inspection_created",
+        )
+    except Exception:
+        logger.warning(
+            "embedding_dispatch_failed",
+            inspection_id=str(inspection.id),
+        )
+
     return inspection
 
 

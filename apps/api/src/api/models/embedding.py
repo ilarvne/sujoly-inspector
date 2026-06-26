@@ -1,8 +1,8 @@
 """Embedding ORM model for vector similarity search.
 
 EmbeddingModel: Stores text embeddings for structures, inspections,
-documents, and candidates. Uses pgvector Vector(1536) column for
-OpenAI ada-002 compatible embeddings.
+documents, and candidates. Uses pgvector Vector(1024) column for
+Alem text-1024 model embeddings (1024 dimensions).
 
 Architecture (AI-03): Hybrid search combines full-text + pg_trgm + pgvector
 cosine similarity with RRF fusion. This model is the vector component.
@@ -43,8 +43,8 @@ class EmbeddingModel(Base):
         comment="The text that was embedded",
     )
     embedding = mapped_column(
-        Vector(1536), nullable=True,
-        comment="OpenAI ada-002 compatible 1536-dim embedding vector",
+        Vector(1024), nullable=True,
+        comment="Alem text-1024 1024-dim embedding vector",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False,

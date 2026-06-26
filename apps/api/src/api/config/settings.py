@@ -59,5 +59,11 @@ class Settings(BaseSettings):
     llm_temperature: float = 0.6
     llm_max_tokens: int = 2048
 
+    # Embeddings (Alem API — OpenAI-compatible /v1/embeddings)
+    embedding_base_url: str = "https://llm.alem.ai/v1"
+    embedding_model: str = "text-1024"
+    embedding_api_key: str = ""  # Filled from .env EMBEDDINGS_API_KEY
+    embedding_dimensions: int = 1024
+
 
 settings = Settings()

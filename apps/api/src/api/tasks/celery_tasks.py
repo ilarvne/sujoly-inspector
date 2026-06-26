@@ -6,6 +6,8 @@ Tasks:
 - recompute_structure_risk: event-driven risk recomputation for one structure (D-05)
 - recompute_all_risks: daily bulk recomputation for all structures (D-05 trigger 3)
 - run_discovery_pipeline: discover candidates from OSM and auto-match against registry
+- generate_structure_embedding: generate embedding for a single structure (AI-03)
+- generate_all_embeddings: batch generate embeddings for all unembedded records (AI-03)
 """
 
 import asyncio
@@ -183,5 +185,78 @@ def run_discovery_pipeline(bbox: str, source: str = "osm"):
         "discovery_pipeline_complete",
         discovered=result["discovered"],
         matched_summary=result["matched_summary"],
+    )
+    return result
+
+
+@celery_app.task(name="embeddings.generate_structure")
+def generate_structure_embedding(source_type: str, source_id: str):
+    """Generate embedding for a single record (structure, inspection, or document).
+
+    Triggered automatically after structure/inspection/document creation.
+
+    Args:
+        source_type: One of "structure", "inspection", "document".
+        source_id: UUID string of the source record.
+
+    Returns:
+        dict with source_type, source_id, and embedding_id or error.
+    """
+    from api.services.embedding_service import embedding_service
+
+    async def _embed():
+        if source_type == "structure":
+            result = await embedding_service.embed_structure(uuid.UUID(source_id))
+        elif source_type == "inspection":
+            result = await embedding_service.embed_inspection(uuid.UUID(source_id))
+        elif source_type == "document":
+            result = await embedding_service.embed_document(uuid.UUID(source_id))
+        else:
+            logger.error("unknown_embedding_source_type", source_type=source_type)
+            return {"source_type": source_type, "source_id": source_id, "error": "unknown_source_type"}
+
+        if result is not None:
+            return {
+                "source_type": source_type,
+                "source_id": source_id,
+                "embedding_id": str(result.id),
+            }
+        return {"source_type": source_type, "source_id": source_id, "error": "not_found_or_empty"}
+
+    result = asyncio.run(_embed())
+    logger.info(
+        "embedding_generated",
+        source_type=source_type,
+        source_id=source_id,
+        result=result,
+    )
+    return result
+
+
+@celery_app.task(name="embeddings.generate_all")
+def generate_all_embeddings():
+    """Batch generate embeddings for all unembedded records.
+
+    Runs embed_all_structures and embed_all_inspections sequentially.
+
+    Returns:
+        dict with counts of newly embedded structures and inspections.
+    """
+    from api.services.embedding_service import embedding_service
+
+    async def _embed_all():
+        structures_count = await embedding_service.embed_all_structures()
+        inspections_count = await embedding_service.embed_all_inspections()
+        return {
+            "structures_embedded": structures_count,
+            "inspections_embedded": inspections_count,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+
+    result = asyncio.run(_embed_all())
+    logger.info(
+        "all_embeddings_generated",
+        structures=result["structures_embedded"],
+        inspections=result["inspections_embedded"],
     )
     return result

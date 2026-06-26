@@ -228,29 +228,56 @@ class SearchService:
     async def _vector_search(
         self, query: str, limit: int
     ) -> list[dict]:
-        """pgvector cosine similarity search on embeddings.
+        """pgvector cosine similarity search on embeddings (AI-03).
 
-        For MVP/hackathon: returns empty list since we don't have
-        an embedding generation pipeline yet. In production, this
-        would generate an embedding via OpenAI API and query pgvector.
+        Generates an embedding for the query text via EmbeddingService,
+        then searches for the closest embeddings using cosine distance.
 
         Args:
-            query: search query string (unused in MVP placeholder)
-            limit: max number of results
+            query: search query string to embed and search.
+            limit: max number of results.
 
         Returns:
-            Empty list for MVP — no query embedding available.
+            List of dicts with source_type, source_id, score, snippet.
         """
-        # MVP: no embedding generation pipeline — skip vector search
-        # In production: generate embedding, then:
-        #   stmt = select(
-        #       EmbeddingModel.source_type,
-        #       EmbeddingModel.source_id,
-        #       EmbeddingModel.content_text,
-        #       EmbeddingModel.embedding.cosine_distance(query_embedding).label("distance"),
-        #   ).order_by(EmbeddingModel.embedding.cosine_distance(query_embedding)).limit(limit)
-        logger.debug("vector_search_skipped", reason="no_embedding_pipeline")
-        return []
+        from api.services.embedding_service import embedding_service
+
+        try:
+            query_embedding = await embedding_service.embed_text(query)
+        except Exception as exc:
+            logger.warning("vector_search_embedding_failed", error=str(exc))
+            return []
+
+        # Check if query embedding is all zeros (empty/fallback)
+        if all(v == 0.0 for v in query_embedding):
+            logger.debug("vector_search_skipped", reason="zero_embedding")
+            return []
+
+        async with async_session() as session:
+            stmt = (
+                select(
+                    EmbeddingModel.source_type,
+                    EmbeddingModel.source_id,
+                    EmbeddingModel.content_text,
+                    EmbeddingModel.embedding.cosine_distance(query_embedding).label("distance"),
+                )
+                .where(EmbeddingModel.embedding.isnot(None))
+                .order_by(EmbeddingModel.embedding.cosine_distance(query_embedding))
+                .limit(limit)
+            )
+
+            result = await session.execute(stmt)
+            rows = result.all()
+
+            return [
+                {
+                    "source_type": row[0],
+                    "source_id": str(row[1]),
+                    "snippet": row[2][:200] if row[2] else "",
+                    "score": 1.0 - float(row[3]),  # cosine distance → similarity
+                }
+                for row in rows
+            ]
 
 
 # Module-level singleton for route handlers

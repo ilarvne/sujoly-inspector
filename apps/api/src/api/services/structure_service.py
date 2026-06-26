@@ -79,6 +79,8 @@ async def create_structure(
 ) -> StructureModel:
     """Create a new structure record and return it.
 
+    After creation, dispatches embedding generation Celery task (AI-03).
+
     Args:
         data: StructureCreate with structure fields
         provenance_id: UUID of the provenance record for this structure
@@ -106,7 +108,17 @@ async def create_structure(
             session.add(model)
             await session.flush()
             await session.refresh(model)
-            return model
+            structure_id = model.id
+
+    # AI-03: dispatch embedding generation after structure creation
+    try:
+        from api.tasks.celery_tasks import generate_structure_embedding
+        generate_structure_embedding.delay("structure", str(structure_id))
+        logger.info("embedding_dispatched", structure_id=str(structure_id), trigger="structure_created")
+    except Exception:
+        logger.warning("embedding_dispatch_failed", structure_id=str(structure_id))
+
+    return model
 
 
 async def get_structure(structure_id: uuid.UUID) -> StructureModel | None:
@@ -355,6 +367,13 @@ async def update_structure(
                 recompute_structure_risk.delay(str(structure_id))
             except Exception:
                 logger.warning("risk_recompute_dispatch_failed", structure_id=str(structure_id))
+
+            # AI-03: dispatch embedding generation after structure creation
+            try:
+                from api.tasks.celery_tasks import generate_structure_embedding
+                generate_structure_embedding.delay("structure", str(structure_id))
+            except Exception:
+                logger.warning("embedding_dispatch_failed", structure_id=str(structure_id))
 
             return structure
 
