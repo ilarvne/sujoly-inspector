@@ -88,8 +88,18 @@ class CopilotService:
     def _get_api_key(self) -> str:
         """Resolve LLM API key from environment (Alem API).
 
-        Priority: CHAT_QWEN_API_KEY env var → settings.llm_api_key → LLM_DEFAULT_API_KEY env var
+        Priority: model-specific key (CHAT_ALEM_API_KEY for alemllm) → CHAT_QWEN_API_KEY → settings.llm_api_key → LLM_DEFAULT_API_KEY
         """
+        # Use the correct key for the model
+        if self._model == "alemllm":
+            key = os.environ.get("CHAT_ALEM_API_KEY", "")
+            if key:
+                return key
+        elif self._model == "gemma4":
+            key = os.environ.get("CHAT_GEMMA_API_KEY", "")
+            if key:
+                return key
+        # Fall back to qwen key, then settings, then default
         key = os.environ.get("CHAT_QWEN_API_KEY", "")
         if not key:
             key = settings.llm_api_key

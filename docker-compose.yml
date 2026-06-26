@@ -76,6 +76,18 @@ services:
       API_JWT_EXPIRY_HOURS: "24"
       API_INITIAL_ADMIN_USERNAME: ${API_INITIAL_ADMIN_USERNAME:-admin}
       API_INITIAL_ADMIN_API_KEY: ${API_INITIAL_ADMIN_API_KEY:-dev-admin-key}
+      # Alem LLM API keys for copilot
+      API_LLM_BASE_URL: https://llm.alem.ai/v1
+      API_LLM_MODEL: alemllm
+      CHAT_ALEM_API_KEY: sk-VOqLlzi2lsbeK8uDtnpCtQ
+      CHAT_QWEN_API_KEY: sk-2Qp0gTxxnhQ2SitBXLKfeg
+      LLM_DEFAULT_API_KEY: sk-VOqLlzi2lsbeK8uDtnpCtQ
+      # Embedding API keys
+      API_EMBEDDING_BASE_URL: https://llm.alem.ai/v1
+      API_EMBEDDING_MODEL: text-1024
+      API_EMBEDDING_API_KEY: sk-gjHJ15q4DvGwp2eZGS_nhA
+      API_EMBEDDING_DIMENSIONS: "1024"
+      EMBEDDINGS_API_KEY: sk-gjHJ15q4DvGwp2eZGS_nhA
     depends_on:
       postgres:
         condition: service_healthy

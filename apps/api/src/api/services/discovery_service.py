@@ -164,6 +164,10 @@ class DiscoveryService:
             response = await client.post(
                 _OVERPASS_API_URL,
                 data={"data": query},
+                headers={
+                    "User-Agent": "SuJolyInspector/1.0 (hydraulic structures catalog)",
+                    "Accept": "application/json",
+                },
             )
             response.raise_for_status()
             data = response.json()
