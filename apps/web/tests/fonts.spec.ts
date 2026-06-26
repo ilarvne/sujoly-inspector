@@ -1,7 +1,8 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth-fixture';
 
 test('Kazakh-specific characters are present on KK page', async ({ page }) => {
   await page.goto('/kk');
+  await page.locator('h1').waitFor({ state: 'visible', timeout: 10000 });
   const bodyText = await page.locator('body').innerText();
   const kazakhChars = ['ә', 'ғ', 'қ', 'ң', 'ө', 'ұ', 'ү', 'һ', 'і'];
   for (const char of kazakhChars) {

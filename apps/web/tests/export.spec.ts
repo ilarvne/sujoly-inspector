@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth-fixture';
 
 test('Reports page renders export panel', async ({ page }) => {
   await page.goto('/ru/reports');

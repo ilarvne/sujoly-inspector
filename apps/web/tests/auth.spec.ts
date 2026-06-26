@@ -68,9 +68,9 @@ test('Login page works in English', async ({ page }) => {
   await expect(page.locator('[data-testid="role-card-viewer"]')).toBeVisible();
 });
 
-test('Not logged in shows sign-in link', async ({ page }) => {
+test('Not logged in redirects to login', async ({ page }) => {
   await page.goto('/ru');
   await page.evaluate(() => localStorage.clear());
   await page.goto('/ru/map');
-  await expect(page.locator('[data-testid="signin-link"]')).toBeVisible();
+  await expect(page).toHaveURL(/\/ru\/login/);
 });

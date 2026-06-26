@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from './auth-fixture';
+import type { Page } from '@playwright/test';
 
 async function waitForMapReady(page: Page) {
   await page.waitForSelector('.maplibregl-canvas', { timeout: 15000 });
@@ -98,7 +99,13 @@ test('Risk tab shows score and components', async ({ page }) => {
   await expect(sheet).toContainText('Конструктивная целостность');
 });
 
-test('Override button hidden without login, visible for engineer', async ({ page }) => {
+test('Override button hidden for viewer, visible for engineer', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('sujoly-auth', JSON.stringify({
+      state: { user: { id: 'u-viewer', name: 'Viewer', role: 'viewer' } },
+      version: 0,
+    }));
+  });
   await page.goto('/ru/map');
   await waitForMapReady(page);
   const opened = await openPassport(page);
@@ -111,7 +118,12 @@ test('Override button hidden without login, visible for engineer', async ({ page
   const overrideButton = page.getByRole('button', { name: 'Инженерное решение' });
   await expect(overrideButton).not.toBeVisible({ timeout: 3000 });
 
-  await setEngineerAuth(page);
+  await page.addInitScript(() => {
+    localStorage.setItem('sujoly-auth', JSON.stringify({
+      state: { user: { id: 'u-engineer', name: 'Engineer', role: 'engineer' } },
+      version: 0,
+    }));
+  });
   await page.reload();
   await waitForMapReady(page);
   const opened2 = await openPassport(page);

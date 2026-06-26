@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth-fixture';
 
 const routes = ['', '/dashboard', '/map', '/objects', '/copilot', '/reports', '/hydrofinder', '/login'];
 const locales = ['ru', 'kk', 'en'];

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth-fixture';
 
 test('/ru/map renders map canvas', async ({ page }) => {
   await page.goto('/ru/map');

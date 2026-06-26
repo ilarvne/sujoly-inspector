@@ -1,17 +1,20 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './auth-fixture';
 
 test('RU locale renders Russian text', async ({ page }) => {
   await page.goto('/ru');
+  await page.locator('h1').waitFor({ state: 'visible', timeout: 10000 });
   await expect(page.locator('h1')).toContainText(/Каталог/i);
 });
 
 test('KK locale renders Kazakh text', async ({ page }) => {
   await page.goto('/kk');
+  await page.locator('h1').waitFor({ state: 'visible', timeout: 10000 });
   await expect(page.locator('h1')).toContainText(/каталогы/i);
 });
 
 test('EN locale renders English text', async ({ page }) => {
   await page.goto('/en');
+  await page.locator('h1').waitFor({ state: 'visible', timeout: 10000 });
   await expect(page.locator('h1')).toContainText(/Catalog/i);
 });
 

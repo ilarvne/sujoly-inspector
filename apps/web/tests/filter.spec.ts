@@ -1,4 +1,5 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect } from './auth-fixture';
+import type { Page } from '@playwright/test';
 
 async function waitForMap(page: Page) {
   await page.waitForSelector('.maplibregl-canvas', { timeout: 15000 });

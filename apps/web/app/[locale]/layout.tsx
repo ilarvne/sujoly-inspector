@@ -10,6 +10,7 @@ import { getMessages } from 'next-intl/server';
 import { AppShell } from '@/components/layout/app-shell';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { SWRegister } from '@/components/pwa/sw-register';
+import { AuthGuard } from '@/components/auth/auth-guard';
 
 const inter = Inter({
   subsets: ['latin', 'cyrillic', 'cyrillic-ext'],
@@ -66,7 +67,9 @@ export default async function LocaleLayout({ children, params }: Props) {
         <SWRegister>
           <NextIntlClientProvider messages={messages}>
             <QueryProvider>
-              <AppShell>{children}</AppShell>
+              <AuthGuard>
+                <AppShell>{children}</AppShell>
+              </AuthGuard>
             </QueryProvider>
           </NextIntlClientProvider>
         </SWRegister>
