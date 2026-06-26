@@ -163,7 +163,7 @@ class TestInspectionEndpoints:
             "api.routes.inspections.inspection_service.create_inspection",
             AsyncMock(return_value=mock_inspection),
         ), patch(
-            "api.services.inspection_service.recompute_structure_risk"
+            "api.tasks.celery_tasks.recompute_structure_risk"
         ) as mock_recompute:
             mock_recompute.delay = MagicMock()
             response = test_client.post(
