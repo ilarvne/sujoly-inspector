@@ -2,17 +2,17 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 03
-current_plan: 1
-status: completed
-stopped_at: Completed 03-09-PLAN.md
-last_updated: "2026-06-26T03:31:16.358Z"
+current_phase: 04
+current_plan: 2
+status: executing
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-06-26T03:44:41.205Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 5
   completed_phases: 2
-  total_plans: 14
-  completed_plans: 13
+  total_plans: 18
+  completed_plans: 14
   percent: 40
 ---
 
@@ -20,21 +20,21 @@ progress:
 
 ## Current Position
 
-Phase: 03 — COMPLETE
-Plan: 5 of 9
-**Status:** Phase 03 complete
-**Current Phase:** 03
-**Current Plan:** 1
+Phase: 04 (discovery-matching-backend) — EXECUTING
+Plan: 2 of 4
+**Status:** Executing Phase 04, Plan 01 complete
+**Current Phase:** 04
+**Current Plan:** 2
 **Last Activity:** 2026-06-26
-**Last Activity Description:** Phase 03 marked complete
+**Last Activity Description:** Completed 04-01-PLAN.md (CandidateModel)
 
 ## Progress
 
 **Phases Complete:** 2
-**Current Plan:** 3 of 6 in Phase 03
-**Plans Complete:** 7/11
+**Current Plan:** 1 of 4 in Phase 04
+**Plans Complete:** 14/18
 
-Progress: [██████░░░░] 64%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
@@ -48,6 +48,7 @@ Progress: [██████░░░░] 64%
 | Phase 03 P06 | 5min | 2 tasks | 7 files |
 | Phase 03 P08 | 2min | 2 tasks | 7 files |
 | Phase 03 P09 | 4min | 2 tasks | 4 files |
+| 04 | 01 | 3min | 1 | 5 |
 
 ## Accumulated Context
 
@@ -73,6 +74,8 @@ Progress: [██████░░░░] 64%
 - [Phase 03]: Provenance confidence wired via real DB query instead of hardcoded None
 - [Phase 03]: Used to_shape + shapely .geojson for GeoJSON serialization instead of raw WKB — GeoJSON needs JSON-serializable dict
 - [Phase 03]: Return 404 (not 403) on structure_id mismatch to avoid disclosing inspection existence — 403 would disclose inspection existence in another structure
+- [Phase 04]: ORM defaults (match_status, confidence) are SQL INSERT defaults — service layer sets them explicitly
+- [Phase 04]: Migration 0008 branches from 0006 as latest in chain; no 0007 exists
 
 ### Blockers/Concerns
 
@@ -80,6 +83,6 @@ None current.
 
 ## Session Continuity
 
-**Last Session:** 2026-06-26T03:16:06.589Z
-**Stopped At:** Completed 03-09-PLAN.md
+**Last Session:** 2026-06-26T03:44:41.199Z
+**Stopped At:** Completed 04-01-PLAN.md
 **Resume File:** None
