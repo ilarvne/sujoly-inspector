@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Sidebar } from './sidebar';
 import { LanguageSwitcher } from './language-switcher';
+import { UserMenu } from '@/components/auth/user-menu';
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const t = await getTranslations('common');
@@ -11,7 +12,10 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
         <span className="font-display text-lg font-semibold">
           {t('appTitle')}
         </span>
-        <LanguageSwitcher />
+        <div className="flex items-center gap-3">
+          <LanguageSwitcher />
+          <UserMenu />
+        </div>
       </header>
       <div className="flex flex-1">
         <Sidebar />
