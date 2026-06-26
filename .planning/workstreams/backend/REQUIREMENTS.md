@@ -11,8 +11,8 @@
 - [ ] **DATA-01**: System can ingest the Kazvodhoz canal registry spreadsheet (444 records, 22 columns, Russian) into PostGIS with coordinate transformation (QazTRF-23 / EPSG:10941)
 - [ ] **DATA-02**: System can ingest data from OpenStreetMap (water/hydraulic features via Overpass API) with provenance tracking
 - [ ] **DATA-03**: System can ingest scanned passport documents via OCR (Russian/Kazakh) with confidence scoring
-- [ ] **DATA-05**: System stores inspection history per structure (date, inspector, findings, photo URLs, condition at time of inspection)
-- [ ] **DATA-06**: System provides document attachment endpoints (scanned passports, inspection reports, photos) via MinIO presigned URLs
+- [x] **DATA-05**: System stores inspection history per structure (date, inspector, findings, photo URLs, condition at time of inspection)
+- [x] **DATA-06**: System provides document attachment endpoints (scanned passports, inspection reports, photos) via MinIO presigned URLs
 - [x] **DATA-07**: Every fact and status on every structure has a provenance record (source type, source reference, confidence level, timestamp, contributor)
 - [ ] **DATA-08**: System provides search and filter endpoints by name, type, condition, district, or location using multilingual full-text search (Russian, Kazakh, English) and fuzzy matching (pg_trgm)
 
@@ -74,8 +74,8 @@
 | RISK-06 | Phase 3 | Complete |
 | RISK-07 | Phase 3 | Complete |
 | RISK-08 | Phase 3 | Pending |
-| DATA-05 | Phase 3 | Pending |
-| DATA-06 | Phase 3 | Pending |
+| DATA-05 | Phase 3 | Complete |
+| DATA-06 | Phase 3 | Complete |
 | DATA-02 | Phase 4 | Pending |
 | DATA-03 | Phase 4 | Pending |
 | DISC-01 | Phase 4 | Pending |

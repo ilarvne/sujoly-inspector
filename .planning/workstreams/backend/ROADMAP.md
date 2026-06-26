@@ -91,7 +91,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 03-05-PLAN.md — Inspection History: CRUD with photos and risk recomputation trigger (DATA-05)
+- [x] 03-05-PLAN.md — Inspection History: CRUD with photos and risk recomputation trigger (DATA-05)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -136,6 +136,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
-| 3. Risk Models & Inspection Logic | 4/6 | In Progress|  |
+| 3. Risk Models & Inspection Logic | 5/6 | In Progress|  |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |
