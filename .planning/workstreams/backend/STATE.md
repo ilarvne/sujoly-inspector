@@ -5,14 +5,14 @@ milestone_name: milestone
 current_phase: 05
 current_plan: 1
 status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-06-26T04:06:41.335Z"
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-06-26T04:11:06.397Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 5
   completed_phases: 3
   total_plans: 21
-  completed_plans: 17
+  completed_plans: 18
   percent: 60
 ---
 
@@ -21,8 +21,8 @@ progress:
 ## Current Position
 
 Phase: 05 (rag-agent-integration) — EXECUTING
-Plan: 1 of 3
-**Status:** Executing Phase 05
+Plan: 2 of 3
+**Status:** Ready to execute
 **Current Phase:** 05
 **Current Plan:** 1
 **Last Activity:** 2026-06-26
@@ -52,6 +52,7 @@ Progress: [████████░░] 78%
 | Phase 04 P02 | 4min | 2 tasks | 5 files |
 | Phase 04 P03 | 4min | 2 tasks | 6 files |
 | Phase 04 P04 | 3min | 1 tasks | 4 files |
+| Phase 05 P01 | 2min | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -83,6 +84,8 @@ Progress: [████████░░] 78%
 - [Phase 04]: OCR uses pattern-matching stub (not Tesseract/EasyOCR), Russian/Kazakh bilingual entity extraction — Upgrade path to real OCR preserved; confidence=LOW for images until Tesseract/EasyOCR integrated
 - [Phase 04]: Late imports in Celery task/route handlers for clean test patching at source module level — Late imports avoid AttributeError when patching at module level and prevent circular dependencies
 - [Phase 04]: Late imports in Celery task/route handlers for clean test patching at source module level — Late imports avoid AttributeError when patching at module level and prevent circular dependencies
+- [Phase 05]: Vector search placeholder returns empty for MVP — No embedding generation pipeline yet; RRF still works with fulltext + trigram
+- [Phase 05]: Route imports search_service singleton directly to avoid module/instance name collision — from api.services.search_service import search_service instead of from api.services import search_service
 
 ### Blockers/Concerns
 
@@ -90,6 +93,6 @@ None current.
 
 ## Session Continuity
 
-**Last Session:** 2026-06-26T04:01:52.508Z
-**Stopped At:** Completed 04-04-PLAN.md
+**Last Session:** 2026-06-26T04:11:06.389Z
+**Stopped At:** Completed 05-01-PLAN.md
 **Resume File:** None
