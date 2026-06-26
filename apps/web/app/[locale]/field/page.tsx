@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
 import { FieldInspectionForm } from '@/components/field/field-inspection-form';
+import { SyncQueuePanel } from '@/components/field/sync-queue-panel';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { LoginForm } from '@/components/auth/login-form';
 
@@ -33,7 +34,10 @@ export default async function FieldPage({ params }: Props) {
           </div>
         }
       >
-        <FieldInspectionForm />
+        <div className="space-y-6">
+          <FieldInspectionForm />
+          <SyncQueuePanel />
+        </div>
       </PermissionGuard>
     </div>
   );
