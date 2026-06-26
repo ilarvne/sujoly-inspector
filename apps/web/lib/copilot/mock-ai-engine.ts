@@ -10,12 +10,12 @@ import type {
 type Locale = 'ru' | 'kk' | 'en';
 
 const intentKeywords: Record<ChatIntent, string[]> = {
+  explain_condition: ['почему', 'неге', 'why', 'почем'],
+  summarize_inspections: ['сводк', 'summarize', 'summari', 'histor', 'истор', 'тарих', 'барлық', 'все осмотр', 'all inspection'],
   list_critical: ['критическ', 'critical', 'критикалық', 'критикал'],
   list_repair: ['ремонт', 'repair', 'жөндеу', 'жөнде'],
   list_inspection: ['инспекц', 'осмотр', 'тексер', 'inspection', 'inspect'],
   show_risk: ['риск', 'тәуекел', 'risk'],
-  summarize_inspections: ['сводк', ' summarize', 'summari', 'histor', 'истор', 'тарих', 'барлық осмотр', 'все осмотры', 'all inspection'],
-  explain_condition: ['почему', 'неге', 'why', 'почем', 'состояни', 'жағдай', 'condition'],
   list_by_district: ['район', 'аудан', 'district'],
   list_by_basin: ['бассейн', 'алқап', 'basin'],
   general: [],
@@ -24,12 +24,12 @@ const intentKeywords: Record<ChatIntent, string[]> = {
 export function detectIntent(query: string): ChatIntent {
   const q = query.toLowerCase();
   const intentOrder: ChatIntent[] = [
+    'explain_condition',
+    'summarize_inspections',
     'list_critical',
     'list_repair',
     'list_inspection',
     'show_risk',
-    'summarize_inspections',
-    'explain_condition',
     'list_by_district',
     'list_by_basin',
   ];
