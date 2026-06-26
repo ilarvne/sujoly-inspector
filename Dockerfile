@@ -5,7 +5,7 @@
 FROM node:22-alpine AS web-builder
 WORKDIR /app/web
 COPY apps/web/package.json apps/web/package-lock.json ./
-RUN npm ci
+RUN npm install --legacy-peer-deps
 COPY apps/web/ ./
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
@@ -15,8 +15,9 @@ FROM python:3.12-slim AS api-builder
 WORKDIR /app/api
 RUN pip install --no-cache-dir uv
 COPY apps/api/pyproject.toml apps/api/uv.lock ./
-RUN uv sync --frozen --no-dev
+RUN uv sync --frozen --no-dev --no-install-project
 COPY apps/api/ ./
+RUN uv sync --frozen --no-dev
 
 # ── Stage 3: Runtime — both services ──
 FROM node:22-alpine AS runtime
