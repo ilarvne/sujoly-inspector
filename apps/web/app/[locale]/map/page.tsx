@@ -14,12 +14,12 @@ export default async function MapPage({ params }: Props) {
   const t = await getTranslations('map');
 
   return (
-    <div className="flex h-[calc(100vh-7.5rem)] flex-col gap-4">
+    <div className="flex h-[calc(100vh-6rem)] flex-col gap-2 sm:h-[calc(100vh-7.5rem)] sm:gap-4">
       <div>
-        <h1 className="font-display text-3xl font-bold text-primary">
+        <h1 className="font-display text-xl font-bold text-primary sm:text-2xl lg:text-3xl">
           {t('title')}
         </h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-sm text-muted-foreground sm:text-base lg:text-lg">
           {t('subtitle')}
         </p>
       </div>

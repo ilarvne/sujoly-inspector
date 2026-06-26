@@ -51,7 +51,7 @@ export function PassportPanel() {
 
   return (
     <Sheet open={!!selectedId} onOpenChange={(open) => { if (!open) setSelectedId(null); }}>
-      <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto">
+      <SheetContent side="right" className="w-full overflow-y-auto sm:w-[400px] sm:max-w-[540px]">
         <SheetHeader>
           <SheetTitle>
             {structure ? nameInLocale(structure.name) : t('title')}

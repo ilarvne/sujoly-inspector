@@ -37,7 +37,7 @@ export function CopilotChat() {
   const isEmpty = messages.length === 0;
 
   return (
-    <div className="flex h-[calc(100vh-180px)] flex-col rounded-xl border bg-background">
+    <div className="flex h-[calc(100vh-7rem)] flex-col rounded-xl border bg-background sm:h-[calc(100vh-8rem)] lg:h-[calc(100vh-180px)]">
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div className="flex items-center gap-2">
           <SparklesIcon className="size-5 text-primary" />
