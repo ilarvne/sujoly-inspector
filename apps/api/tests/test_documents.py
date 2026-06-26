@@ -37,6 +37,7 @@ class TestDocumentEndpoints:
             "uploaded_by": "inspector",
             "provenance_id": uuid.uuid4(),
             "created_at": datetime.now(timezone.utc),
+            "presigned_download_url": None,
         }
         defaults.update(overrides)
         mock = MagicMock()
@@ -63,7 +64,7 @@ class TestDocumentEndpoints:
         struct_id = uuid.uuid4()
         mock_doc = self._mock_document(structure_id=struct_id)
         with patch(
-            "api.routes.documents.register_document",
+            "api.services.document_service.register_document",
             AsyncMock(return_value=mock_doc),
         ):
             response = test_client.post(
@@ -138,7 +139,7 @@ class TestDocumentEndpoints:
         struct_id = uuid.uuid4()
         mock_docs = [self._mock_document(structure_id=struct_id)]
         with patch(
-            "api.routes.documents.list_documents",
+            "api.services.document_service.list_documents",
             AsyncMock(return_value=mock_docs),
         ):
             response = test_client.get(
@@ -158,7 +159,7 @@ class TestDocumentEndpoints:
         mock_minio = self._mock_minio_service()
 
         with patch(
-            "api.routes.documents.list_documents",
+            "api.services.document_service.list_documents",
             AsyncMock(return_value=[mock_doc]),
         ), patch.object(
             test_client.app.state, "minio", mock_minio
@@ -182,7 +183,7 @@ class TestDocumentEndpoints:
         mock_minio = self._mock_minio_service()
 
         with patch(
-            "api.routes.documents.delete_document",
+            "api.services.document_service.delete_document",
             AsyncMock(return_value=True),
         ), patch.object(
             test_client.app.state, "minio", mock_minio
@@ -236,7 +237,7 @@ class TestDocumentEndpoints:
         mock_minio = self._mock_minio_service()
 
         with patch(
-            "api.routes.documents.delete_document",
+            "api.services.document_service.delete_document",
             AsyncMock(return_value=False),
         ), patch.object(
             test_client.app.state, "minio", mock_minio
@@ -254,7 +255,7 @@ class TestDocumentEndpoints:
         mock_minio = self._mock_minio_service()
 
         with patch(
-            "api.routes.documents.get_download_url",
+            "api.services.document_service.get_download_url",
             AsyncMock(return_value="https://minio.example.com/sujoly-documents/reports/test.pdf?X-Amz-Signature=abc"),
         ), patch.object(
             test_client.app.state, "minio", mock_minio
@@ -272,7 +273,7 @@ class TestDocumentEndpoints:
         mock_minio = self._mock_minio_service()
 
         with patch(
-            "api.routes.documents.get_download_url",
+            "api.services.document_service.get_download_url",
             AsyncMock(return_value=None),
         ), patch.object(
             test_client.app.state, "minio", mock_minio
@@ -297,7 +298,7 @@ class TestDocumentEndpoints:
             "api.services.document_service.ProvenanceModel",
             return_value=mock_provenance,
         ) as MockProvenance, patch(
-            "api.routes.documents.register_document",
+            "api.services.document_service.register_document",
             AsyncMock(return_value=mock_doc),
         ):
             response = test_client.post(
