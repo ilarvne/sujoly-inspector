@@ -1,0 +1,12 @@
+.git
+node_modules
+.venv
+__pycache__
+*.pyc
+.env
+apps/web/.next
+apps/api/.venv
+apps/agent/.venv
+.planning
+*.log
+nohup.out
