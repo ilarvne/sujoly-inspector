@@ -76,7 +76,7 @@ Plans:
   4. Document attachment endpoints operational (upload, download via MinIO presigned URLs)
   5. RBAC enforced (admin, engineer, inspector, viewer), engineer overrides logged with provenance, export endpoints (CSV/GeoJSON/PDF) in all three languages
 
-**Plans**: 6 plans
+**Plans**: 9 plans
 
 Plans:
 **Wave 1** *(parallel)*
@@ -96,6 +96,12 @@ Plans:
 **Wave 4** *(blocked on Wave 3 completion)*
 
 - [x] 03-06-PLAN.md — Trilingual Export Endpoints: CSV/GeoJSON/PDF with WeasyPrint (RISK-08)
+
+**Wave 5 (Gap Closure)** *(parallel)*
+
+- [ ] 03-07-PLAN.md — RBAC + Auth Hardening: read endpoint auth, api_key hashing, secure defaults (RISK-07)
+- [ ] 03-08-PLAN.md — Risk Provenance Wiring + Model Fixes: confidence data flow, barrel exports, CheckConstraints, datetime (RISK-05)
+- [ ] 03-09-PLAN.md — Export + Dockerfile + Inspection Fixes: templates copy, GeoJSON/CSV/MinIO, structure_id verification (RISK-08, DATA-05)
 
 ### Phase 4: Discovery & Matching Backend
 
@@ -136,6 +142,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
-| 3. Risk Models & Inspection Logic | 6/6 | Complete   | 2026-06-26 |
+| 3. Risk Models & Inspection Logic | 6/9 | Gap closure | - |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |
