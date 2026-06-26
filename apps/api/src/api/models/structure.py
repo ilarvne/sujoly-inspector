@@ -1,18 +1,17 @@
 """Structure and StructureFact ORM models.
 
 StructureModel: Canonical structure record — one per hydraulic structure.
-  Geometry stored as PostGIS Geometry(Point, srid=4326) — no binary in PostgreSQL.
+  Location stored as plain Float latitude/longitude columns (no PostGIS).
 StructureFactModel: Time-based facts about a structure with provenance.
   Every attribute (condition, capacity, length, etc.) is a separate fact
   with its own provenance and time validity range.
 
-Architecture separation (INT-04): structures in PostGIS, binary assets in MinIO.
+Architecture separation (INT-04): structures in PostgreSQL, binary assets in MinIO.
 """
 
 import uuid
 from datetime import datetime, timezone
 
-from geoalchemy2 import Geometry
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
@@ -24,7 +23,7 @@ class StructureModel(Base):
     """Canonical structure record — one per hydraulic structure.
 
     Binary assets (imagery, documents, photos) are stored in MinIO, not here.
-    PostGIS stores only the vector feature (geometry point) and metadata.
+    Location is stored as plain latitude/longitude floats (no PostGIS dependency).
     """
 
     __tablename__ = "structures"
@@ -34,8 +33,9 @@ class StructureModel(Base):
     name_kk: Mapped[str | None] = mapped_column(String(500), nullable=True)
     name_en: Mapped[str | None] = mapped_column(String(500), nullable=True)
     type: Mapped[str] = mapped_column(String(100), nullable=False)
-    # D-02: geometry nullable — spreadsheet has no coordinates, assigned in Phase 4
-    geometry = mapped_column(Geometry("Point", srid=4326), nullable=True)
+    # D-02: lat/lon nullable — spreadsheet has no coordinates, assigned in Phase 4
+    latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     # D-08: filterable denormalized columns for indexed filtering
     district: Mapped[str | None] = mapped_column(String(255), nullable=True)
     water_source: Mapped[str | None] = mapped_column(String(255), nullable=True)

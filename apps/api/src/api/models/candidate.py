@@ -17,7 +17,6 @@ Fields:
 import uuid
 from datetime import datetime, timezone
 
-from geoalchemy2 import Geometry
 from sqlalchemy import (
     CheckConstraint,
     DateTime,
@@ -67,7 +66,8 @@ class CandidateModel(Base):
     name: Mapped[str] = mapped_column(String(500), nullable=False)
     source_type: Mapped[str] = mapped_column(String(50), nullable=False)
     source_id: Mapped[str] = mapped_column(String(255), nullable=False)
-    geometry = mapped_column(Geometry("Point", srid=4326), nullable=True)
+    latitude: Mapped[float | None] = mapped_column(Float, nullable=True)
+    longitude: Mapped[float | None] = mapped_column(Float, nullable=True)
     match_status: Mapped[str] = mapped_column(
         String(50), nullable=False, default=lambda: "unmatched"
     )

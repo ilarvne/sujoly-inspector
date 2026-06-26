@@ -1,18 +1,18 @@
 """Embedding ORM model for vector similarity search.
 
 EmbeddingModel: Stores text embeddings for structures, inspections,
-documents, and candidates. Uses pgvector Vector(1024) column for
-Alem text-1024 model embeddings (1024 dimensions).
+documents, and candidates. Uses a JSONB column to store embedding vectors
+as JSON arrays (no pgvector dependency required).
 
-Architecture (AI-03): Hybrid search combines full-text + pg_trgm + pgvector
-cosine similarity with RRF fusion. This model is the vector component.
+Architecture (AI-03): Hybrid search combines full-text + pg_trgm + JSONB-stored
+embeddings. Vector similarity search is performed in Python when needed.
 """
 
 import uuid
 from datetime import datetime, timezone
 
-from pgvector.sqlalchemy import Vector
 from sqlalchemy import DateTime, Index, String, Text, Uuid
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
 from api.infrastructure.database import Base
@@ -23,8 +23,7 @@ class EmbeddingModel(Base):
 
     Each row stores an embedding vector for a piece of content from
     a source entity (structure, inspection, document, or candidate).
-    The HNSW index on the embedding column enables fast cosine
-    similarity queries via pgvector.
+    The embedding is stored as a JSONB array of floats.
     """
 
     __tablename__ = "embeddings"
@@ -42,9 +41,9 @@ class EmbeddingModel(Base):
         Text, nullable=False,
         comment="The text that was embedded",
     )
-    embedding = mapped_column(
-        Vector(1024), nullable=True,
-        comment="Alem text-1024 1024-dim embedding vector",
+    embedding: Mapped[list | None] = mapped_column(
+        JSONB, nullable=True,
+        comment="Embedding vector stored as JSON array of floats",
     )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False,
