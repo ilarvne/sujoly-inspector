@@ -16,7 +16,7 @@ test('PDF export button disabled until structure selected', async ({ page }) => 
   await expect(pdfButton).toBeVisible();
   await expect(pdfButton).toBeDisabled();
 
-  const structureTrigger = page.getByRole('combobox');
+  const structureTrigger = page.locator('[data-slot="select-trigger"]');
   await structureTrigger.click();
   await page.getByRole('option', { name: 'KZ-ZH-0001' }).click();
 
