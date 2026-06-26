@@ -520,9 +520,17 @@ async function fetchStructures(
     return { type: 'FeatureCollection', features: [] };
   }
 
-  const features = data.features.map((f) =>
-    mapApiStructureToFeature(f.properties),
-  );
+  const features = data.features.map((f) => {
+    const feature = mapApiStructureToFeature(f.properties);
+    // Use geometry from the GeoJSON feature level (API puts it there, not in properties)
+    if (f.geometry && !feature.geometry) {
+      feature.geometry = {
+        type: 'Point',
+        coordinates: [f.geometry.coordinates[0], f.geometry.coordinates[1]],
+      };
+    }
+    return feature;
+  });
 
   return { type: 'FeatureCollection', features };
 }
