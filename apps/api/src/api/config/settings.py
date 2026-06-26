@@ -52,5 +52,12 @@ class Settings(BaseSettings):
     initial_admin_username: str = "admin"
     initial_admin_api_key: str = ""
 
+    # LLM / Copilot (Alem API — OpenAI-compatible)
+    llm_base_url: str = "https://llm.alem.ai/v1"
+    llm_model: str = "qwen3-6"
+    llm_api_key: str = ""  # Filled from .env CHAT_QWEN_API_KEY or LLM_DEFAULT_API_KEY
+    llm_temperature: float = 0.6
+    llm_max_tokens: int = 2048
+
 
 settings = Settings()
