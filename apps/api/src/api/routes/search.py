@@ -21,10 +21,11 @@ async def hybrid_search_endpoint(
     body: SearchRequest,
     current_user: UserModel = Depends(require_role("viewer")),
 ) -> SearchResponse:
-    """Hybrid search combining full-text + trigram + vector with RRF fusion (AI-03).
+    """Hybrid search combining full-text + trigram with RRF fusion (AI-03).
 
-    Combines PostgreSQL full-text search, pg_trgm fuzzy matching, and
-    pgvector cosine similarity using Reciprocal Rank Fusion (RRF).
+    Combines PostgreSQL full-text search and pg_trgm fuzzy matching
+    using Reciprocal Rank Fusion (RRF). Vector similarity search is
+    disabled (pgvector not available on cloud PostgreSQL).
 
     The `lang` parameter selects the FTS config:
     - ru → russian config with stemming

@@ -5,6 +5,7 @@ Provides:
   using hierarchical spatial → name similarity → attribute comparison
 - match_all_unmatched: batch processing for all unmatched candidates
 - compute_confidence: weighted confidence scoring formula
+- haversine_distance: great-circle distance between two lat/lon points
 
 Match state assignment (DISC-03):
 - matched: spatial < 100m AND name_sim > 0.7 → HIGH confidence
@@ -17,10 +18,10 @@ score = 0.4 * name_sim + 0.3 * (1 - spatial_dist/500) + 0.3 * (attr_matches/3)
 HIGH >= 0.7, MEDIUM >= 0.4, LOW < 0.4
 """
 
+import math
 import uuid
 
 import structlog
-from geoalchemy2 import functions as geofunc
 from sqlalchemy import and_, func, select, update
 
 from api.infrastructure.database import async_session
@@ -30,12 +31,41 @@ from api.schemas.candidates import CandidateMatchResult
 
 logger = structlog.get_logger(__name__)
 
+# Bounding box delta for ~500m radius at Zhambyl Oblast latitude (~42.5°N)
+# 1 degree latitude ≈ 111km, 1 degree longitude at 42.5°N ≈ 82km
+# 500m ≈ 0.0045 degrees latitude, 500m ≈ 0.0061 degrees longitude
+# Using 0.006 as a safe upper bound for the bbox pre-filter
+_BBOX_DELTA = 0.006
+
+
+def haversine_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Compute haversine distance between two lat/lon points in meters.
+
+    Args:
+        lat1, lon1: Latitude and longitude of point 1 (degrees)
+        lat2, lon2: Latitude and longitude of point 2 (degrees)
+
+    Returns:
+        Distance in meters.
+    """
+    R = 6371000.0  # Earth radius in meters
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    dphi = math.radians(lat2 - lat1)
+    dlambda = math.radians(lon2 - lon1)
+    a = (
+        math.sin(dphi / 2) ** 2
+        + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    )
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
 
 class MatchingService:
     """Hierarchical matching engine for comparing candidates against the registry.
 
     Implements the three-level matching strategy from DISC-02:
-    1. Spatial proximity: ST_DWithin 500m radius
+    1. Spatial proximity: bounding box pre-filter + haversine distance < 500m
     2. Name similarity: pg_trgm similarity() > 0.3 threshold
     3. Attribute comparison: type, district, water_source match
 
@@ -49,7 +79,7 @@ class MatchingService:
         """Match a single candidate against the registry.
 
         Hierarchical matching:
-        1. Find structures within 500m using ST_DWithin
+        1. Find structures within 500m using bounding box + haversine distance
         2. Compute name similarity using pg_trgm similarity()
         3. Compare attributes (type, district, water_source)
         4. Assign match state and confidence
@@ -60,42 +90,41 @@ class MatchingService:
         Returns:
             CandidateMatchResult with assigned match_status and confidence.
         """
-        if candidate.geometry is None:
-            # No geometry → can't do spatial matching → new_candidate
+        if candidate.latitude is None or candidate.longitude is None:
+            # No coordinates → can't do spatial matching → new_candidate
             return CandidateMatchResult(
                 candidate_id=candidate.id,
                 match_status="new_candidate",
                 confidence="LOW",
                 confidence_score=0.0,
                 matched_structure_id=None,
-                evidence={"reason": "no_geometry", "spatial": None, "name_sim": None, "attr_matches": 0},
+                evidence={"reason": "no_coordinates", "spatial": None, "name_sim": None, "attr_matches": 0},
             )
 
+        candidate_lat = float(candidate.latitude)
+        candidate_lon = float(candidate.longitude)
+
         async with async_session() as session:
-            # Step 1: Spatial proximity — find structures within 500m
-            nearby_stmt = select(
-                StructureModel,
-                geofunc.ST_Distance(
-                    geofunc.ST_Transform(StructureModel.geometry, 3857),
-                    geofunc.ST_Transform(candidate.geometry, 3857),
-                ).label("distance_m"),
-            ).where(
+            # Step 1: Spatial proximity — bounding box pre-filter (no PostGIS)
+            nearby_stmt = select(StructureModel).where(
                 and_(
-                    StructureModel.geometry.isnot(None),
+                    StructureModel.latitude.isnot(None),
+                    StructureModel.longitude.isnot(None),
                     StructureModel.status != "deleted",
-                    geofunc.ST_DWithin(
-                        geofunc.ST_Transform(StructureModel.geometry, 3857),
-                        geofunc.ST_Transform(candidate.geometry, 3857),
-                        500,  # meters
+                    StructureModel.latitude.between(
+                        candidate_lat - _BBOX_DELTA, candidate_lat + _BBOX_DELTA
+                    ),
+                    StructureModel.longitude.between(
+                        candidate_lon - _BBOX_DELTA, candidate_lon + _BBOX_DELTA
                     ),
                 )
             )
 
             nearby_result = await session.execute(nearby_stmt)
-            nearby_structures = nearby_result.all()
+            nearby_structures = nearby_result.scalars().all()
 
         if not nearby_structures:
-            # No structures within 500m → new_candidate
+            # No structures within bounding box → new_candidate
             return CandidateMatchResult(
                 candidate_id=candidate.id,
                 match_status="new_candidate",
@@ -110,13 +139,21 @@ class MatchingService:
                 },
             )
 
-        # Step 2: For each nearby structure, compute name similarity + attribute comparison
+        # Step 2: For each nearby structure, compute haversine distance + name similarity + attribute comparison
         best_match = None
         best_score = -1.0
         best_evidence = {}
 
-        for structure, distance_m in nearby_structures:
-            distance = float(distance_m) if distance_m is not None else 500.0
+        for structure in nearby_structures:
+            # Compute haversine distance
+            distance = haversine_distance(
+                candidate_lat, candidate_lon,
+                float(structure.latitude), float(structure.longitude),
+            )
+
+            # Skip if beyond 500m
+            if distance > 500.0:
+                continue
 
             # Name similarity: pg_trgm similarity against all name columns
             name_sim = 0.0
@@ -159,6 +196,22 @@ class MatchingService:
                 best_score = score
                 best_match = structure
                 best_evidence = evidence
+
+        if best_match is None:
+            # All structures in bbox were > 500m away
+            return CandidateMatchResult(
+                candidate_id=candidate.id,
+                match_status="new_candidate",
+                confidence="LOW",
+                confidence_score=0.0,
+                matched_structure_id=None,
+                evidence={
+                    "reason": "no_structures_within_500m",
+                    "spatial": None,
+                    "name_sim": None,
+                    "attr_matches": 0,
+                },
+            )
 
         # Step 3: Determine match state based on thresholds
         distance = best_evidence.get("spatial_distance_m", 500.0)

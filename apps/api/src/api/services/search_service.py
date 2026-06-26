@@ -1,10 +1,10 @@
-"""Hybrid search service combining full-text + pg_trgm + pgvector with RRF fusion.
+"""Hybrid search service combining full-text + pg_trgm with RRF fusion.
 
 Provides:
-- hybrid_search: RRF-fused results from three search methods (AI-03)
+- hybrid_search: RRF-fused results from search methods (AI-03)
 - _fulltext_search: PostgreSQL full-text search on tsvector columns
 - _trigram_search: pg_trgm similarity on name columns
-- _vector_search: pgvector cosine distance on embeddings (placeholder for MVP)
+- _vector_search: no-op placeholder (pgvector not available on cloud PG)
 
 RRF fusion: score = sum(1 / (k + rank_i)) for each method, k=60
 
@@ -33,7 +33,7 @@ _RRF_K = 60
 
 
 class SearchService:
-    """Hybrid search combining full-text + trigram + vector with RRF fusion (AI-03)."""
+    """Hybrid search combining full-text + trigram with RRF fusion (AI-03)."""
 
     async def hybrid_search(
         self,
@@ -42,11 +42,11 @@ class SearchService:
         source_types: list[str] | None = None,
         lang: str = "ru",
     ) -> list[dict]:
-        """Hybrid search combining three methods with RRF fusion (AI-03).
+        """Hybrid search combining methods with RRF fusion (AI-03).
 
         1. Full-text search: tsvector @@ tsquery on search_ts_ru/kk/en
         2. Trigram similarity: pg_trgm similarity() on name_ru/kk/en
-        3. Vector similarity: pgvector cosine distance on embeddings
+        3. Vector similarity: disabled (pgvector not available on cloud PG)
 
         RRF fusion: score = sum(1 / (k + rank_i)) for each method
         k = 60 (standard RRF constant)
@@ -60,7 +60,7 @@ class SearchService:
         Returns:
             Ranked list of dicts with source_type, source_id, score, snippet.
         """
-        # Run all three search methods in parallel conceptually
+        # Run search methods (vector search is a no-op without pgvector)
         fulltext_results = await self._fulltext_search(query, limit * 2, lang)
         trigram_results = await self._trigram_search(query, limit * 2)
         vector_results = await self._vector_search(query, limit * 2)
@@ -71,9 +71,6 @@ class SearchService:
         for rank, result in enumerate(fulltext_results, start=1):
             key = f"{result['source_type']}:{result['source_id']}"
             scores[key] = scores.get(key, 0.0) + 1.0 / (_RRF_K + rank)
-            if key not in scores or result.get("snippet"):
-                # Store metadata from first occurrence
-                pass
 
         for rank, result in enumerate(trigram_results, start=1):
             key = f"{result['source_type']}:{result['source_id']}"
@@ -228,56 +225,21 @@ class SearchService:
     async def _vector_search(
         self, query: str, limit: int
     ) -> list[dict]:
-        """pgvector cosine similarity search on embeddings (AI-03).
+        """Vector similarity search — no-op (pgvector not available on cloud PG).
 
-        Generates an embedding for the query text via EmbeddingService,
-        then searches for the closest embeddings using cosine distance.
+        pgvector is not installed on the cloud PostgreSQL. Embeddings are
+        stored as JSONB arrays but cannot be searched via cosine distance
+        in-database. This method returns empty results so the hybrid search
+        falls back to FTS + trigram only.
 
         Args:
             query: search query string to embed and search.
             limit: max number of results.
 
         Returns:
-            List of dicts with source_type, source_id, score, snippet.
+            Empty list (vector search disabled without pgvector).
         """
-        from api.services.embedding_service import embedding_service
-
-        try:
-            query_embedding = await embedding_service.embed_text(query)
-        except Exception as exc:
-            logger.warning("vector_search_embedding_failed", error=str(exc))
-            return []
-
-        # Check if query embedding is all zeros (empty/fallback)
-        if all(v == 0.0 for v in query_embedding):
-            logger.debug("vector_search_skipped", reason="zero_embedding")
-            return []
-
-        async with async_session() as session:
-            stmt = (
-                select(
-                    EmbeddingModel.source_type,
-                    EmbeddingModel.source_id,
-                    EmbeddingModel.content_text,
-                    EmbeddingModel.embedding.cosine_distance(query_embedding).label("distance"),
-                )
-                .where(EmbeddingModel.embedding.isnot(None))
-                .order_by(EmbeddingModel.embedding.cosine_distance(query_embedding))
-                .limit(limit)
-            )
-
-            result = await session.execute(stmt)
-            rows = result.all()
-
-            return [
-                {
-                    "source_type": row[0],
-                    "source_id": str(row[1]),
-                    "snippet": row[2][:200] if row[2] else "",
-                    "score": 1.0 - float(row[3]),  # cosine distance → similarity
-                }
-                for row in rows
-            ]
+        return []
 
 
 # Module-level singleton for route handlers

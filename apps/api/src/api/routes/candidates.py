@@ -29,14 +29,14 @@ router = APIRouter(prefix="/api/v1", tags=["candidates"])
 
 
 def _model_to_response(model) -> CandidateResponse:
-    """Convert CandidateModel to CandidateResponse with geometry serialization."""
-    from geoalchemy2.shape import to_shape
-
+    """Convert CandidateModel to CandidateResponse with lat/lon serialization."""
     data = {
         "id": model.id,
         "name": model.name,
         "source_type": model.source_type,
         "source_id": model.source_id,
+        "latitude": getattr(model, "latitude", None),
+        "longitude": getattr(model, "longitude", None),
         "match_status": model.match_status,
         "matched_structure_id": model.matched_structure_id,
         "confidence": model.confidence,
@@ -52,13 +52,11 @@ def _model_to_response(model) -> CandidateResponse:
         "created_at": model.created_at,
         "updated_at": model.updated_at,
     }
-    # Convert geometry to GeoJSON dict
-    if model.geometry is not None:
-        try:
-            geom = to_shape(model.geometry)
-            data["geometry"] = geom.__geo_interface__
-        except Exception:
-            data["geometry"] = None
+    # Build GeoJSON Point from lat/lon
+    lat = getattr(model, "latitude", None)
+    lon = getattr(model, "longitude", None)
+    if lat is not None and lon is not None:
+        data["geometry"] = {"type": "Point", "coordinates": [lon, lat]}
     else:
         data["geometry"] = None
 

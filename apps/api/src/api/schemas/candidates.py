@@ -12,14 +12,14 @@ Provides:
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class CandidateCreate(BaseModel):
     """Request body for creating a candidate record from a discovery source.
 
     The `source_type`, `source_id`, and `name` fields are required.
-    Geometry is provided as lat/lng; the service layer converts to WKT.
+    Location is provided as latitude/longitude floats.
     """
 
     source_type: str = Field(
@@ -29,8 +29,8 @@ class CandidateCreate(BaseModel):
         ..., description="External reference: OSM node/way ID, satellite scene ID, etc."
     )
     name: str = Field(..., description="Candidate name from source")
-    latitude: float | None = Field(None, description="Latitude for geometry Point")
-    longitude: float | None = Field(None, description="Longitude for geometry Point")
+    latitude: float | None = Field(None, description="Latitude (WGS84)")
+    longitude: float | None = Field(None, description="Longitude (WGS84)")
     evidence: dict | None = Field(
         None, description="Evidence sources and contributions"
     )
@@ -43,7 +43,8 @@ class CandidateResponse(BaseModel):
     """Response model for a candidate record.
 
     Uses ConfigDict(from_attributes=True) to enable model_validate() from
-    SQLAlchemy ORM model instances.
+    SQLAlchemy ORM model instances. The `geometry` field is computed from
+    latitude/longitude columns as a GeoJSON Point dict.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -52,6 +53,8 @@ class CandidateResponse(BaseModel):
     name: str
     source_type: str
     source_id: str
+    latitude: float | None = None
+    longitude: float | None = None
     geometry: dict | None = None
     match_status: str
     matched_structure_id: uuid.UUID | None = None
@@ -67,6 +70,32 @@ class CandidateResponse(BaseModel):
     provenance_id: uuid.UUID
     created_at: datetime
     updated_at: datetime
+
+    @model_validator(mode="before")
+    @classmethod
+    def _build_geometry_from_latlon(cls, data):
+        """Build GeoJSON Point geometry dict from latitude/longitude columns."""
+        if hasattr(data, "latitude") and hasattr(data, "longitude"):
+            lat = getattr(data, "latitude", None)
+            lon = getattr(data, "longitude", None)
+            if lat is not None and lon is not None:
+                d = {}
+                for field in ["id", "name", "source_type", "source_id",
+                              "latitude", "longitude", "match_status",
+                              "matched_structure_id", "confidence",
+                              "confidence_score", "evidence", "district",
+                              "water_source", "type", "review_notes",
+                              "reviewed_by", "reviewed_at", "provenance_id",
+                              "created_at", "updated_at"]:
+                    d[field] = getattr(data, field, None)
+                d["geometry"] = {"type": "Point", "coordinates": [lon, lat]}
+                return d
+        if isinstance(data, dict):
+            lat = data.get("latitude")
+            lon = data.get("longitude")
+            if lat is not None and lon is not None and "geometry" not in data:
+                data["geometry"] = {"type": "Point", "coordinates": [lon, lat]}
+        return data
 
 
 class CandidateListResponse(BaseModel):

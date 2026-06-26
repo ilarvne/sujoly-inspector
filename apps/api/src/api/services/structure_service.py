@@ -16,7 +16,6 @@ import uuid
 from datetime import datetime
 
 import structlog
-from geoalchemy2 import functions as geofunc
 from sqlalchemy import and_, desc, func, literal_column, or_, select
 
 from api.infrastructure.database import async_session
@@ -34,10 +33,10 @@ _TS_COLUMNS = {"ru": "search_ts_ru", "kk": "search_ts_kk", "en": "search_ts_en"}
 
 
 def _apply_bbox_filter(stmt, bbox: str | None):
-    """Apply bbox spatial filter to a select statement (T-02-03 mitigation).
+    """Apply bbox spatial filter to a select statement using plain lat/lon (T-02-03 mitigation).
 
-    Parses the bbox string to floats, validates exactly 4 values, and uses
-    func.ST_MakeEnvelope + geofunc.ST_Intersects with NULL geometry guard.
+    Parses the bbox string to floats, validates exactly 4 values, and filters
+    structures whose latitude/longitude fall within the bounding box.
     Raises ValueError for invalid bbox input — the route layer catches this
     and returns HTTP 400.
     """
@@ -50,11 +49,13 @@ def _apply_bbox_filter(stmt, bbox: str | None):
         minx, miny, maxx, maxy = (float(p) for p in parts)
     except ValueError:
         raise ValueError("bbox values must be numeric") from None
-    envelope = func.ST_MakeEnvelope(minx, miny, maxx, maxy, 4326)
+    # Plain lat/lon bounding box filter (no PostGIS required)
     return stmt.where(
         and_(
-            StructureModel.geometry.isnot(None),
-            geofunc.ST_Intersects(StructureModel.geometry, envelope),
+            StructureModel.latitude.isnot(None),
+            StructureModel.longitude.isnot(None),
+            StructureModel.latitude.between(miny, maxy),
+            StructureModel.longitude.between(minx, maxx),
         )
     )
 
@@ -95,6 +96,8 @@ async def create_structure(
                 name_kk=data.name_kk,
                 name_en=data.name_en,
                 type=data.type,
+                latitude=data.latitude,
+                longitude=data.longitude,
                 district=data.district,
                 water_source=data.water_source,
                 technical_condition=data.technical_condition,
@@ -102,7 +105,6 @@ async def create_structure(
                 commissioning_year=data.commissioning_year,
                 cadastral_number=data.cadastral_number,
                 structure_count=data.structure_count,
-                geometry=None,
                 provenance_id=provenance_id,
             )
             session.add(model)
@@ -330,6 +332,8 @@ async def update_structure(
                 "name_kk": "name_kk",
                 "name_en": "name_en",
                 "type": "type",
+                "latitude": "latitude",
+                "longitude": "longitude",
                 "district": "district",
                 "water_source": "water_source",
                 "technical_condition": "technical_condition",

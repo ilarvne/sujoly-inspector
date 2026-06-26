@@ -257,11 +257,12 @@ def bulk_insert_structures(filepath: str = "датасет.xls", force: bool = F
                 session.add(provenance)
                 session.flush()  # Get provenance.id
 
-                # Create structure with NULL geometry (D-01, D-02) and type='canal' (D-09)
+                # Create structure with NULL lat/lon (D-01, D-02) and type='canal' (D-09)
                 structure = StructureModel(
                     name_ru=str(record.get("name", "")),
                     type="canal",
-                    geometry=None,
+                    latitude=None,
+                    longitude=None,
                     provenance_id=provenance.id,
                     # Denormalized filterable columns (D-08)
                     district=record.get("district"),

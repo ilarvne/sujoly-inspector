@@ -9,11 +9,10 @@ Provides:
 - SearchListResponse: paginated search results envelope
 """
 
-import struct
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class StructureCreate(BaseModel):
@@ -27,6 +26,8 @@ class StructureCreate(BaseModel):
     name_kk: str | None = Field(None, description="Structure name in Kazakh")
     name_en: str | None = Field(None, description="Structure name in English")
     type: str = Field(..., description="Structure type: canal, dam, reservoir, etc.")
+    latitude: float | None = Field(None, description="Latitude (WGS84)")
+    longitude: float | None = Field(None, description="Longitude (WGS84)")
     district: str | None = Field(None, description="Administrative district (D-08)")
     water_source: str | None = Field(None, description="Water source name (D-08)")
     technical_condition: str | None = Field(
@@ -58,6 +59,8 @@ class StructureUpdate(BaseModel):
     name_kk: str | None = None
     name_en: str | None = None
     type: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
     district: str | None = None
     water_source: str | None = None
     technical_condition: str | None = None
@@ -71,7 +74,8 @@ class StructureResponse(BaseModel):
     """Response model for a structure record.
 
     Uses ConfigDict(from_attributes=True) to enable model_validate() from
-    SQLAlchemy ORM model instances.
+    SQLAlchemy ORM model instances. The `geometry` field is computed from
+    latitude/longitude columns as a GeoJSON Point dict.
     """
 
     model_config = ConfigDict(from_attributes=True)
@@ -81,6 +85,8 @@ class StructureResponse(BaseModel):
     name_kk: str | None
     name_en: str | None
     type: str
+    latitude: float | None = None
+    longitude: float | None = None
     district: str | None
     water_source: str | None
     technical_condition: str | None
@@ -94,40 +100,40 @@ class StructureResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
 
-    @field_validator("geometry", mode="before")
+    @model_validator(mode="before")
     @classmethod
-    def convert_wkb_geometry(cls, v):
-        """Convert GeoAlchemy2 WKBElement to GeoJSON dict (Rule 3 fix).
+    def _build_geometry_from_latlon(cls, data):
+        """Build GeoJSON Point geometry dict from latitude/longitude columns.
 
-        PostGIS geometry columns load as ``WKBElement`` (raw EWKB bytes) when
-        accessed via SQLAlchemy ORM. Pydantic cannot serialise ``WKBElement``
-        to ``dict`` directly, causing a validation error on every list/detail
-        endpoint. This validator parses the EWKB binary to a GeoJSON dict for
-        Point geometries (the only geometry type used in this project) without
-        requiring the ``shapely`` dependency.
+        Since we replaced PostGIS Geometry with plain Float columns, the
+        geometry is constructed in Python from latitude/longitude. This
+        validator runs before field validation and injects the computed
+        `geometry` dict into the data.
         """
-        if v is None or isinstance(v, dict):
-            return v
-
-        # WKBElement from GeoAlchemy2 — parse EWKB to GeoJSON dict
-        if hasattr(v, "data"):
-            data = v.data
-            if isinstance(data, str):
-                data = bytes.fromhex(data)
-            if not data or len(data) < 5:
-                return None
-            endian = "<" if data[0] == 1 else ">"
-            geom_type = struct.unpack_from(endian + "I", data, 1)[0]
-            has_srid = bool(geom_type & 0x20000000)
-            base_type = (geom_type & 0x0FFFFFFF) % 1000
-            offset = 5 + (4 if has_srid else 0)
-            if base_type == 1:  # Point
-                if len(data) < offset + 16:
-                    return None
-                x = struct.unpack_from(endian + "d", data, offset)[0]
-                y = struct.unpack_from(endian + "d", data, offset + 8)[0]
-                return {"type": "Point", "coordinates": [x, y]}
-        return None
+        # Handle ORM model instances (from_attributes=True)
+        if hasattr(data, "latitude") and hasattr(data, "longitude"):
+            lat = getattr(data, "latitude", None)
+            lon = getattr(data, "longitude", None)
+            if lat is not None and lon is not None:
+                # Inject geometry as a dict — model_validate will pick it up
+                # We can't set attribute on ORM instance, so convert to dict
+                d = {}
+                for field in ["id", "name_ru", "name_kk", "name_en", "type",
+                              "latitude", "longitude", "district", "water_source",
+                              "technical_condition", "wear_percentage",
+                              "commissioning_year", "cadastral_number",
+                              "structure_count", "provenance_id", "status",
+                              "created_at", "updated_at"]:
+                    d[field] = getattr(data, field, None)
+                d["geometry"] = {"type": "Point", "coordinates": [lon, lat]}
+                return d
+        # Handle dict input
+        if isinstance(data, dict):
+            lat = data.get("latitude")
+            lon = data.get("longitude")
+            if lat is not None and lon is not None and "geometry" not in data:
+                data["geometry"] = {"type": "Point", "coordinates": [lon, lat]}
+        return data
 
 
 class StructureListResponse(BaseModel):

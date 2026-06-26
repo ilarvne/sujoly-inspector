@@ -236,19 +236,13 @@ class DiscoveryService:
                     session.add(provenance)
                     await session.flush()
 
-                    # Create geometry WKT if lat/lng available
-                    geometry_wkt = None
-                    if candidate_data.latitude is not None and candidate_data.longitude is not None:
-                        geometry_wkt = (
-                            f"SRID=4326;POINT({candidate_data.longitude} {candidate_data.latitude})"
-                        )
-
-                    # Create candidate model
+                    # Create candidate model with lat/lon floats
                     model = CandidateModel(
                         name=candidate_data.name,
                         source_type=candidate_data.source_type,
                         source_id=candidate_data.source_id,
-                        geometry=geometry_wkt,
+                        latitude=candidate_data.latitude,
+                        longitude=candidate_data.longitude,
                         match_status="unmatched",
                         confidence="MEDIUM",
                         evidence=candidate_data.evidence,

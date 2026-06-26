@@ -23,7 +23,6 @@ from pathlib import Path
 
 import structlog
 from fastapi.responses import StreamingResponse
-from geoalchemy2.shape import to_shape
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 
@@ -338,11 +337,11 @@ async def export_structures_geojson(
             properties["repair_status"] = None
             properties["composite_score"] = None
 
-        # Geometry from structure — convert WKB to GeoJSON-compatible dict (D-21 fix)
-        raw_geom = getattr(struct, "geometry", None)
-        if raw_geom is not None:
-            shape = to_shape(raw_geom)
-            geometry = json.loads(shape.geojson)
+        # Geometry from structure — build GeoJSON Point from lat/lon
+        lat = getattr(struct, "latitude", None)
+        lon = getattr(struct, "longitude", None)
+        if lat is not None and lon is not None:
+            geometry = {"type": "Point", "coordinates": [lon, lat]}
         else:
             geometry = None
 
