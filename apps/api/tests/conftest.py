@@ -2,10 +2,11 @@
 
 import sys
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import jwt
 import pytest
 
 # Add src to python path so `api.*` imports resolve
@@ -96,18 +97,39 @@ def mock_failing_minio():
 
 
 @pytest.fixture
-def test_client(mock_healthy_minio):
-    """FastAPI TestClient with MinIO mocked for lifespan.
+def test_client(mock_healthy_minio, mock_user):
+    """FastAPI TestClient with MinIO and auth mocked for lifespan.
 
     Patches Minio at the MinIOService import path so that lifespan startup
-    (which creates a MinIOService) uses the mock client.
+    (which creates a MinIOService) uses the mock client. Also patches
+    get_current_user to return an admin mock user so RBAC-protected endpoints
+    still work for non-auth tests.
     """
     with patch("api.services.minio_client.Minio", mock_healthy_minio):
+        # Conditionally patch auth stack only after it exists (Phase 3 GREEN)
+        auth_patches = []
+        try:
+            auth_patches.append(
+                patch("api.dependencies.auth.get_current_user", return_value=mock_user)
+            )
+            auth_patches.append(
+                patch("api.services.auth_service.get_user_by_id", AsyncMock(return_value=mock_user))
+            )
+            for p in auth_patches:
+                p.start()
+        except AttributeError:
+            # Auth module not yet implemented (RED phase)
+            auth_patches = []
+
         from api.main import app
         from fastapi.testclient import TestClient
 
-        with TestClient(app) as client:
-            yield client
+        try:
+            with TestClient(app) as client:
+                yield client
+        finally:
+            for p in auth_patches:
+                p.stop()
 
 
 # ---------------------------------------------------------------------------
@@ -198,3 +220,139 @@ def mock_structure_list():
 def mock_search_results():
     """List of (mock_structure, 0.85) tuples for search endpoint tests."""
     return [(_make_mock_structure(), 0.85)]
+
+
+# ---------------------------------------------------------------------------
+# Fixtures for auth and RBAC tests (Phase 3)
+# ---------------------------------------------------------------------------
+
+
+def _make_mock_user(role="admin", **overrides):
+    """Create a mock UserModel instance with all response fields."""
+    defaults = {
+        "id": uuid.uuid4(),
+        "username": f"test-{role}",
+        "role": role,
+        "full_name": f"Test {role.capitalize()}",
+        "api_key": f"key-{role}",
+        "created_at": datetime.now(timezone.utc),
+    }
+    defaults.update(overrides)
+    mock = MagicMock()
+    for key, val in defaults.items():
+        setattr(mock, key, val)
+    return mock
+
+
+@pytest.fixture
+def mock_user():
+    """Mock admin user for auth tests."""
+    return _make_mock_user("admin")
+
+
+@pytest.fixture
+def mock_viewer():
+    """Mock viewer user for RBAC tests."""
+    return _make_mock_user("viewer")
+
+
+@pytest.fixture
+def mock_inspector():
+    """Mock inspector user for RBAC tests."""
+    return _make_mock_user("inspector")
+
+
+@pytest.fixture
+def mock_engineer():
+    """Mock engineer user for RBAC tests."""
+    return _make_mock_user("engineer")
+
+
+@pytest.fixture
+def mock_auth_token():
+    """Real JWT token for testing auth endpoints."""
+    return jwt.encode(
+        {
+            "user_id": str(uuid.uuid4()),
+            "username": "admin",
+            "role": "admin",
+            "exp": datetime.now(timezone.utc) + timedelta(hours=1),
+        },
+        "test-secret",
+        algorithm="HS256",
+    )
+
+
+@pytest.fixture
+def auth_client(mock_healthy_minio, mock_user):
+    """FastAPI TestClient with mocked authentication."""
+    with patch("api.services.minio_client.Minio", mock_healthy_minio), \
+         patch("api.dependencies.auth.get_current_user", return_value=mock_user), \
+         patch("api.services.auth_service.get_user_by_id", AsyncMock(return_value=mock_user)):
+        from api.main import app
+        from fastapi.testclient import TestClient
+
+        with TestClient(app) as client:
+            yield client
+
+
+@pytest.fixture
+def mock_risk_assessment():
+    """Mock RiskAssessment object with all factor fields."""
+    mock = MagicMock()
+    for key, val in {
+        "condition_score": 65.0,
+        "consequence_factor": 1.2,
+        "seasonal_modifier": 1.0,
+        "staleness_modifier": 1.0,
+        "composite_score": 78.0,
+        "inspection_interval": "180d",
+        "repair_status": "inspection_required",
+        "red_flags": [],
+        "contributing_factors": {},
+        "weak_evidence_reasons": [],
+    }.items():
+        setattr(mock, key, val)
+    return mock
+
+
+@pytest.fixture
+def mock_inspection():
+    """Mock InspectionModel with all response fields."""
+    mock = MagicMock()
+    for key, val in {
+        "id": uuid.uuid4(),
+        "structure_id": uuid.uuid4(),
+        "inspection_date": "2026-06-01",
+        "inspector_name": "Inspector One",
+        "inspector_role": "inspector",
+        "findings": "Structure in satisfactory condition",
+        "condition_at_inspection": "удовлетворительное",
+        "condition_score_at_inspection": 65.0,
+        "red_flags_observed": [],
+        "provenance_id": uuid.uuid4(),
+        "created_at": datetime.now(timezone.utc),
+    }.items():
+        setattr(mock, key, val)
+    return mock
+
+
+@pytest.fixture
+def mock_document():
+    """Mock DocumentModel with all response fields."""
+    mock = MagicMock()
+    for key, val in {
+        "id": uuid.uuid4(),
+        "structure_id": uuid.uuid4(),
+        "document_type": "inspection_report",
+        "title": "Inspection Report",
+        "language": "ru",
+        "minio_bucket": "sujoly-documents",
+        "minio_object_key": "reports/inspection-1.pdf",
+        "file_size_bytes": 1024,
+        "uploaded_by": "inspector",
+        "provenance_id": uuid.uuid4(),
+        "created_at": datetime.now(timezone.utc),
+    }.items():
+        setattr(mock, key, val)
+    return mock
