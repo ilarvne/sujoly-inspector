@@ -5,14 +5,19 @@ Tasks:
 - ingest_kazvodhoz: bulk ingest Kazvodhoz spreadsheet (D-17)
 - recompute_structure_risk: event-driven risk recomputation for one structure (D-05)
 - recompute_all_risks: daily bulk recomputation for all structures (D-05 trigger 3)
+- run_discovery_pipeline: discover candidates from OSM and auto-match against registry
 """
 
 import asyncio
 import uuid
 from datetime import datetime, timezone
 
+import structlog
+
 from api.celery_app import celery_app
 from api.services.ingestion_service import bulk_insert_structures
+
+logger = structlog.get_logger(__name__)
 
 
 @celery_app.task
@@ -100,3 +105,83 @@ def recompute_all_risks():
         count += 1
 
     return {"dispatched": count, "timestamp": datetime.now(timezone.utc).isoformat()}
+
+
+@celery_app.task(name="discovery.run_pipeline")
+def run_discovery_pipeline(bbox: str, source: str = "osm"):
+    """Full discovery pipeline: discover → match → score.
+
+    1. Run OSM discovery for bbox
+    2. For each new candidate, run matching against the registry
+    3. Return summary of results
+
+    Celery tasks are synchronous — uses asyncio.run() for async service calls.
+
+    Args:
+        bbox: Bounding box in "minx,miny,maxx,maxy" format (EPSG:4326).
+        source: Discovery source (currently only "osm" supported).
+
+    Returns:
+        dict with discovery and matching summary statistics.
+    """
+    from api.services.discovery_service import DiscoveryService
+    from api.services.matching_service import MatchingService
+
+    async def _run_pipeline():
+        # Step 1: Discover candidates from OSM
+        discovery_svc = DiscoveryService()
+        candidates = await discovery_svc.discover_candidates(bbox=bbox, source=source)
+
+        # Step 2: Match each new candidate against the registry
+        matching_svc = MatchingService()
+        match_results = []
+        for candidate in candidates:
+            match_result = await matching_svc.match_candidate(candidate)
+            match_results.append(match_result)
+
+            # Update candidate with match result
+            from sqlalchemy import update
+            from api.infrastructure.database import async_session
+            from api.models.candidate import CandidateModel
+
+            async with async_session() as session:
+                async with session.begin():
+                    await session.execute(
+                        update(CandidateModel)
+                        .where(CandidateModel.id == candidate.id)
+                        .values(
+                            match_status=match_result.match_status,
+                            confidence=match_result.confidence,
+                            confidence_score=match_result.confidence_score,
+                            matched_structure_id=match_result.matched_structure_id,
+                            evidence=match_result.evidence,
+                        )
+                    )
+
+        # Step 3: Summarize results
+        status_counts = {}
+        for mr in match_results:
+            status_counts[mr.match_status] = status_counts.get(mr.match_status, 0) + 1
+
+        return {
+            "discovered": len(candidates),
+            "matched_summary": status_counts,
+            "results": [
+                {
+                    "candidate_id": str(mr.candidate_id),
+                    "match_status": mr.match_status,
+                    "confidence": mr.confidence,
+                    "confidence_score": mr.confidence_score,
+                    "matched_structure_id": str(mr.matched_structure_id) if mr.matched_structure_id else None,
+                }
+                for mr in match_results
+            ],
+        }
+
+    result = asyncio.run(_run_pipeline())
+    logger.info(
+        "discovery_pipeline_complete",
+        discovered=result["discovered"],
+        matched_summary=result["matched_summary"],
+    )
+    return result

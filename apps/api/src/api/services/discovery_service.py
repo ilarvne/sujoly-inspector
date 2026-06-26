@@ -3,6 +3,7 @@
 Provides:
 - discover_from_osm: query OSM Overpass API for hydraulic structures in a bbox
 - discover_candidates: run discovery and persist candidates to DB with dedup
+- discover_and_match: run discovery, persist, then auto-match each candidate
 
 Uses httpx.AsyncClient for async HTTP calls to the Overpass API.
 Default tags target hydraulic structures: waterway=canal/dam/weir/sluice,
@@ -14,12 +15,12 @@ from datetime import datetime, timezone
 
 import httpx
 import structlog
+from sqlalchemy import select, update
 
 from api.infrastructure.database import async_session
 from api.models.candidate import CandidateModel
 from api.models.provenance import ProvenanceModel
-from api.schemas.candidates import CandidateCreate
-from sqlalchemy import select
+from api.schemas.candidates import CandidateCreate, CandidateMatchResult
 
 logger = structlog.get_logger(__name__)
 
@@ -263,3 +264,59 @@ class DiscoveryService:
             new_created=len(created),
         )
         return created
+
+    async def discover_and_match(
+        self, bbox: str, source: str = "osm"
+    ) -> list[tuple[CandidateModel, CandidateMatchResult]]:
+        """Run discovery, persist candidates, then auto-match each one.
+
+        Combines discover_candidates + matching_service.match_candidate
+        so that new candidates are immediately matched against the registry.
+
+        Args:
+            bbox: Bounding box in "minx,miny,maxx,maxy" format.
+            source: Discovery source (currently only "osm" supported).
+
+        Returns:
+            List of (CandidateModel, CandidateMatchResult) tuples.
+        """
+        from api.services.matching_service import MatchingService
+
+        # Step 1: Discover and persist candidates
+        candidates = await self.discover_candidates(bbox=bbox, source=source)
+
+        if not candidates:
+            return []
+
+        # Step 2: Match each new candidate against the registry
+        matching_svc = MatchingService()
+        results: list[tuple[CandidateModel, CandidateMatchResult]] = []
+
+        for candidate in candidates:
+            match_result = await matching_svc.match_candidate(candidate)
+            results.append((candidate, match_result))
+
+            # Update candidate with match result in DB
+            async with async_session() as session:
+                async with session.begin():
+                    await session.execute(
+                        update(CandidateModel)
+                        .where(CandidateModel.id == candidate.id)
+                        .values(
+                            match_status=match_result.match_status,
+                            confidence=match_result.confidence,
+                            confidence_score=match_result.confidence_score,
+                            matched_structure_id=match_result.matched_structure_id,
+                            evidence=match_result.evidence,
+                        )
+                    )
+
+        logger.info(
+            "discover_and_match_complete",
+            discovered=len(candidates),
+            matched_statuses={
+                mr.match_status
+                for _, mr in results
+            },
+        )
+        return results

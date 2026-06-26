@@ -5,7 +5,10 @@ Tests cover:
 - OSM element parsing into CandidateCreate schemas
 - discover_from_osm with mocked Overpass API
 - discover_candidates with dedup
+- discover_and_match (discovery + auto-matching pipeline)
 - Candidate CRUD endpoints (list, get, discover, review, delete)
+- Match endpoints (match all, match single)
+- Celery run_discovery_pipeline task
 """
 
 import uuid
@@ -17,6 +20,7 @@ import pytest
 from api.schemas.candidates import (
     CandidateCreate,
     CandidateListResponse,
+    CandidateMatchResult,
     CandidateResponse,
     CandidateReviewRequest,
 )
@@ -25,6 +29,7 @@ from api.services.discovery_service import (
     _build_overpass_query,
     _parse_osm_element,
 )
+from api.services.matching_service import MatchingService
 
 
 # ---------------------------------------------------------------------------
@@ -586,3 +591,249 @@ class TestDiscoverEndpoint:
             )
 
         assert response.status_code == 502
+
+
+# ---------------------------------------------------------------------------
+# discover_and_match tests (integrated pipeline)
+# ---------------------------------------------------------------------------
+
+
+class TestDiscoverAndMatch:
+    """Tests for DiscoveryService.discover_and_match integrated pipeline."""
+
+    @pytest.mark.asyncio
+    async def test_discover_and_match_with_candidates(self):
+        """discover_and_match runs matching after discovery."""
+        mock_candidate = MagicMock()
+        mock_candidate.id = uuid.uuid4()
+        mock_candidate.name = "Test Dam"
+        mock_candidate.geometry = "SRID=4326;POINT(71.4 42.9)"
+
+        match_result = CandidateMatchResult(
+            candidate_id=mock_candidate.id,
+            match_status="matched",
+            confidence="HIGH",
+            confidence_score=0.85,
+            matched_structure_id=uuid.uuid4(),
+            evidence={"spatial_distance_m": 50.0, "name_similarity": 0.9, "attribute_matches": 3},
+        )
+
+        # Mock the update session
+        update_session = MagicMock()
+        update_session.execute = AsyncMock(return_value=None)
+        update_session.begin = MagicMock()
+        update_cm = MagicMock()
+        update_cm.__aenter__ = AsyncMock(return_value=update_session)
+        update_cm.__aexit__ = AsyncMock(return_value=None)
+
+        with patch.object(
+            DiscoveryService, "discover_candidates",
+            AsyncMock(return_value=[mock_candidate]),
+        ), patch.object(
+            MatchingService, "match_candidate",
+            AsyncMock(return_value=match_result),
+        ), patch(
+            "api.services.discovery_service.async_session",
+            MagicMock(return_value=update_cm),
+        ):
+            service = DiscoveryService()
+            results = await service.discover_and_match(bbox="68.0,42.0,72.0,45.0")
+
+        assert len(results) == 1
+        candidate, mr = results[0]
+        assert mr.match_status == "matched"
+        assert mr.confidence == "HIGH"
+
+    @pytest.mark.asyncio
+    async def test_discover_and_match_empty(self):
+        """discover_and_match returns empty when no candidates discovered."""
+        with patch.object(
+            DiscoveryService, "discover_candidates",
+            AsyncMock(return_value=[]),
+        ):
+            service = DiscoveryService()
+            results = await service.discover_and_match(bbox="68.0,42.0,72.0,45.0")
+
+        assert len(results) == 0
+
+
+# ---------------------------------------------------------------------------
+# Match endpoint tests
+# ---------------------------------------------------------------------------
+
+
+class TestMatchAllEndpoint:
+    """Tests for POST /candidates/match endpoint."""
+
+    def test_match_all_success(self, test_client):
+        """POST /candidates/match returns match results for all unmatched."""
+        match_results = [
+            CandidateMatchResult(
+                candidate_id=uuid.uuid4(),
+                match_status="new_candidate",
+                confidence="LOW",
+                confidence_score=0.1,
+                matched_structure_id=None,
+                evidence={"reason": "no_nearby_structures"},
+            ),
+        ]
+
+        with patch(
+            "api.services.matching_service.MatchingService"
+        ) as MockService:
+            mock_service = MagicMock()
+            mock_service.match_all_unmatched = AsyncMock(return_value=match_results)
+            MockService.return_value = mock_service
+
+            response = test_client.post("/api/v1/candidates/match")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data) == 1
+        assert data[0]["match_status"] == "new_candidate"
+
+    def test_match_all_error(self, test_client):
+        """POST /candidates/match returns 500 on matching error."""
+        with patch(
+            "api.services.matching_service.MatchingService"
+        ) as MockService:
+            mock_service = MagicMock()
+            mock_service.match_all_unmatched = AsyncMock(
+                side_effect=Exception("DB connection lost")
+            )
+            MockService.return_value = mock_service
+
+            response = test_client.post("/api/v1/candidates/match")
+
+        assert response.status_code == 500
+
+
+class TestMatchSingleEndpoint:
+    """Tests for POST /candidates/{id}/match endpoint."""
+
+    def test_match_single_success(self, test_client):
+        """POST /candidates/{id}/match returns match result for candidate."""
+        candidate_id = uuid.uuid4()
+        mock_candidate = _make_mock_candidate(id=candidate_id)
+
+        match_result = CandidateMatchResult(
+            candidate_id=candidate_id,
+            match_status="likely_match",
+            confidence="MEDIUM",
+            confidence_score=0.55,
+            matched_structure_id=None,
+            evidence={"spatial_distance_m": 200.0, "name_similarity": 0.5, "attribute_matches": 1},
+        )
+
+        # Mock the update session
+        update_session = MagicMock()
+        update_session.execute = AsyncMock(return_value=None)
+        update_cm = MagicMock()
+        update_cm.__aenter__ = AsyncMock(return_value=update_session)
+        update_cm.__aexit__ = AsyncMock(return_value=None)
+
+        with patch(
+            "api.routes.candidates._get_candidate_by_id",
+            AsyncMock(return_value=mock_candidate),
+        ), patch(
+            "api.services.matching_service.MatchingService"
+        ) as MockService, patch(
+            "api.infrastructure.database.async_session",
+            MagicMock(return_value=update_cm),
+        ):
+            mock_service = MagicMock()
+            mock_service.match_candidate = AsyncMock(return_value=match_result)
+            MockService.return_value = mock_service
+
+            response = test_client.post(f"/api/v1/candidates/{candidate_id}/match")
+
+        assert response.status_code == 200
+        data = response.json()
+        assert data["match_status"] == "likely_match"
+        assert data["confidence"] == "MEDIUM"
+
+    def test_match_single_not_found(self, test_client):
+        """POST /candidates/{id}/match returns 404 when candidate not found."""
+        candidate_id = uuid.uuid4()
+
+        with patch(
+            "api.routes.candidates._get_candidate_by_id",
+            AsyncMock(return_value=None),
+        ):
+            response = test_client.post(f"/api/v1/candidates/{candidate_id}/match")
+
+        assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Celery run_discovery_pipeline task tests
+# ---------------------------------------------------------------------------
+
+
+class TestRunDiscoveryPipelineTask:
+    """Tests for the Celery run_discovery_pipeline task."""
+
+    def test_pipeline_discovers_and_matches(self):
+        """run_discovery_pipeline returns summary with match results."""
+        from api.tasks.celery_tasks import run_discovery_pipeline
+
+        candidate_id = uuid.uuid4()
+        mock_candidate = MagicMock()
+        mock_candidate.id = candidate_id
+
+        match_result = CandidateMatchResult(
+            candidate_id=candidate_id,
+            match_status="matched",
+            confidence="HIGH",
+            confidence_score=0.85,
+            matched_structure_id=uuid.uuid4(),
+            evidence={"spatial_distance_m": 50.0, "name_similarity": 0.9},
+        )
+
+        # Mock the update session
+        update_session = MagicMock()
+        update_session.execute = AsyncMock(return_value=None)
+        update_session.begin = MagicMock()
+        update_cm = MagicMock()
+        update_cm.__aenter__ = AsyncMock(return_value=update_session)
+        update_cm.__aexit__ = AsyncMock(return_value=None)
+
+        with patch(
+            "api.services.discovery_service.DiscoveryService"
+        ) as MockDiscovery, patch(
+            "api.services.matching_service.MatchingService"
+        ) as MockMatching, patch(
+            "api.infrastructure.database.async_session",
+            MagicMock(return_value=update_cm),
+        ):
+            mock_discovery = MagicMock()
+            mock_discovery.discover_candidates = AsyncMock(return_value=[mock_candidate])
+            MockDiscovery.return_value = mock_discovery
+
+            mock_matching = MagicMock()
+            mock_matching.match_candidate = AsyncMock(return_value=match_result)
+            MockMatching.return_value = mock_matching
+
+            result = run_discovery_pipeline(bbox="68.0,42.0,72.0,45.0")
+
+        assert result["discovered"] == 1
+        assert "matched" in result["matched_summary"]
+        assert len(result["results"]) == 1
+        assert result["results"][0]["match_status"] == "matched"
+
+    def test_pipeline_empty_discovery(self):
+        """run_discovery_pipeline returns zero counts when no candidates found."""
+        from api.tasks.celery_tasks import run_discovery_pipeline
+
+        with patch(
+            "api.services.discovery_service.DiscoveryService"
+        ) as MockDiscovery:
+            mock_discovery = MagicMock()
+            mock_discovery.discover_candidates = AsyncMock(return_value=[])
+            MockDiscovery.return_value = mock_discovery
+
+            result = run_discovery_pipeline(bbox="68.0,42.0,72.0,45.0")
+
+        assert result["discovered"] == 0
+        assert result["matched_summary"] == {}
+        assert result["results"] == []

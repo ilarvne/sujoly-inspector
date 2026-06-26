@@ -1,9 +1,11 @@
-"""Candidate REST endpoints — CRUD + discovery + review.
+"""Candidate REST endpoints — CRUD + discovery + matching + review.
 
 Provides:
 - GET /api/v1/candidates: list with filters (match_status, source_type, confidence)
 - GET /api/v1/candidates/{id}: detail
 - POST /api/v1/candidates/discover: trigger OSM discovery with bbox parameter
+- POST /api/v1/candidates/match: run matching for all unmatched candidates
+- POST /api/v1/candidates/{id}/match: run matching for single candidate
 - POST /api/v1/candidates/{id}/review: review endpoint (accept/link/reject)
 - DELETE /api/v1/candidates/{id}: remove candidate
 """
@@ -17,6 +19,7 @@ from api.dependencies.auth import require_role
 from api.models.user import UserModel
 from api.schemas.candidates import (
     CandidateListResponse,
+    CandidateMatchResult,
     CandidateResponse,
     CandidateReviewRequest,
 )
@@ -254,6 +257,81 @@ async def review_candidate_endpoint(
             detail=f"Candidate '{candidate_id}' not found",
         )
     return _model_to_response(candidate)
+
+
+@router.post("/candidates/match", response_model=list[CandidateMatchResult])
+async def match_all_unmatched_endpoint(
+    current_user: UserModel = Depends(require_role("engineer")),
+):
+    """Run matching for all unmatched candidates.
+
+    Loads all candidates with match_status='unmatched' and runs the
+    hierarchical matching engine (spatial → name → attribute) for each.
+    Updates candidate records with match results.
+    """
+    from api.services.matching_service import MatchingService
+
+    service = MatchingService()
+    try:
+        results = await service.match_all_unmatched()
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Matching error: {str(exc)}",
+        )
+
+    return results
+
+
+@router.post("/candidates/{candidate_id}/match", response_model=CandidateMatchResult)
+async def match_single_candidate_endpoint(
+    candidate_id: uuid.UUID,
+    current_user: UserModel = Depends(require_role("engineer")),
+):
+    """Run matching for a single candidate against the registry.
+
+    Uses the hierarchical matching engine to compare the candidate
+    against existing structures and assign a match state.
+    """
+    candidate = await _get_candidate_by_id(candidate_id)
+    if candidate is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Candidate '{candidate_id}' not found",
+        )
+
+    from api.services.matching_service import MatchingService
+
+    service = MatchingService()
+    try:
+        match_result = await service.match_candidate(candidate)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Matching error: {str(exc)}",
+        )
+
+    # Update candidate with match result
+    from sqlalchemy import update as sql_update
+
+    from api.infrastructure.database import async_session as _async_session
+    from api.models.candidate import CandidateModel as _CandidateModel
+
+    async with _async_session() as session:
+        async with session.begin():
+            await session.execute(
+                sql_update(_CandidateModel)
+                .where(_CandidateModel.id == candidate_id)
+                .values(
+                    match_status=match_result.match_status,
+                    confidence=match_result.confidence,
+                    confidence_score=match_result.confidence_score,
+                    matched_structure_id=match_result.matched_structure_id,
+                    evidence=match_result.evidence,
+                )
+            )
+
+    return match_result
 
 
 @router.delete("/candidates/{candidate_id}")
