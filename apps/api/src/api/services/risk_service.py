@@ -12,7 +12,7 @@ and contributor=user.username per T-03-08 (repudiation mitigation).
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 import structlog
 from sqlalchemy import and_, select
@@ -84,7 +84,7 @@ async def create_assessment(
     Returns:
         The newly created RiskAssessmentModel.
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     async with async_session() as session:
         async with session.begin():
@@ -150,7 +150,7 @@ async def create_override(
     Returns:
         The newly created override RiskAssessmentModel.
     """
-    now = datetime.utcnow()
+    now = datetime.now(timezone.utc)
 
     async with async_session() as session:
         async with session.begin():

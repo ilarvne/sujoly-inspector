@@ -10,7 +10,7 @@ Architecture separation (INT-04): structures in PostGIS, binary assets in MinIO.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from geoalchemy2 import Geometry
 from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Uuid
@@ -52,13 +52,13 @@ class StructureModel(Base):
         Uuid, ForeignKey("provenance.id"), nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
         nullable=False,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        default=lambda: datetime.now(timezone.utc),
+        onupdate=lambda: datetime.now(timezone.utc),
     )
 
 
@@ -82,7 +82,7 @@ class StructureFactModel(Base):
         Uuid, ForeignKey("provenance.id"), nullable=False
     )
     valid_from: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
     valid_to: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True

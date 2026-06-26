@@ -9,7 +9,7 @@ InspectionPhotoModel: Photo attachments linked to inspections via MinIO object k
 """
 
 import uuid
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from sqlalchemy import Date, DateTime, Float, ForeignKey, String, Text, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
@@ -48,7 +48,7 @@ class InspectionModel(Base):
         Uuid, ForeignKey("provenance.id"), nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
 
 
@@ -76,5 +76,5 @@ class InspectionPhotoModel(Base):
         Uuid, ForeignKey("provenance.id"), nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )

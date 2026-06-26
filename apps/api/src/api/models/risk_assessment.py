@@ -11,9 +11,9 @@ system-computed values in contributing_factors for audit transparency.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
-from sqlalchemy import Boolean, DateTime, Float, ForeignKey, String, Uuid
+from sqlalchemy import Boolean, CheckConstraint, DateTime, Float, ForeignKey, String, Uuid
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -40,6 +40,16 @@ class RiskAssessmentModel(Base):
     """
 
     __tablename__ = "risk_assessments"
+    __table_args__ = (
+        CheckConstraint(
+            "inspection_interval IN ('emergency','30d','90d','180d','12mo','24mo')",
+            name="ck_risk_interval",
+        ),
+        CheckConstraint(
+            "repair_status IN ('normal','inspection_required','repair_required','critical_condition')",
+            name="ck_risk_repair_status",
+        ),
+    )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
     structure_id: Mapped[uuid.UUID] = mapped_column(
@@ -61,7 +71,7 @@ class RiskAssessmentModel(Base):
         Boolean, nullable=False, default=False
     )
     computed_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
     valid_to: Mapped[datetime | None] = mapped_column(
         DateTime(timezone=True), nullable=True

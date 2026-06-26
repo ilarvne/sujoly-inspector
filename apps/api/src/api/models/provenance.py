@@ -6,7 +6,7 @@ confidence, and timestamp.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import CheckConstraint, DateTime, String, Text, Uuid
 from sqlalchemy.orm import Mapped, mapped_column
@@ -43,5 +43,5 @@ class ProvenanceModel(Base):
     )
     contributor: Mapped[str | None] = mapped_column(String(255), nullable=True)
     recorded_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True), nullable=False, default=lambda: datetime.now(timezone.utc)
     )
