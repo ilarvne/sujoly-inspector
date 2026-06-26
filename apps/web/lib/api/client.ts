@@ -392,21 +392,21 @@ function mapApiStructureToDetail(item: ApiStructure): StructureDetail {
 function mapApiRiskToRiskScore(api: ApiRisk): RiskScore {
   const components: RiskComponent[] = [
     {
-      key: 'structural',
+      key: 'condition',
       label: 'Structural Integrity',
       score: Math.round(api.condition_score ?? 0),
       weight: 0.35,
       description: 'Condition of dam body, spillway, and load-bearing structures',
     },
     {
-      key: 'hydrological',
+      key: 'significance',
       label: 'Hydrological Risk',
       score: Math.round((api.consequence_factor ?? 0) * 50),
       weight: 0.25,
       description: 'Flood probability, capacity utilization, basin characteristics',
     },
     {
-      key: 'operational',
+      key: 'weather',
       label: 'Operational Status',
       score: Math.round((api.seasonal_modifier ?? 0) * 50),
       weight: 0.25,
