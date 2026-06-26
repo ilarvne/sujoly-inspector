@@ -57,11 +57,8 @@ RUN pip install --no-cache-dir langchain-openai langchain-community langgraph la
 COPY seed.py /app/seed.py
 COPY dataset.xls /app/dataset.xls
 
-# Setup PostgreSQL: create user, db, extensions
-RUN pg_createcluster 17 main --start 2>/dev/null || true
-RUN su - postgres -c "psql -c \"CREATE USER sujoly WITH PASSWORD 'sujoly_dev' SUPERUSER;\"" 2>/dev/null || true
-RUN su - postgres -c "psql -c \"CREATE DATABASE sujoly OWNER sujoly;\"" 2>/dev/null || true
-RUN su - postgres -c "psql -d sujoly -c \"CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS postgis_topology; CREATE EXTENSION IF NOT EXISTS pg_trgm; CREATE EXTENSION IF NOT EXISTS vector;\"" 2>/dev/null || true
+# Create PostgreSQL cluster (user/db/extensions created at runtime in /start.sh)
+RUN pg_createcluster 17 main 2>/dev/null || true
 
 # Supervisord config
 RUN mkdir -p /etc/supervisor/conf.d
@@ -69,14 +66,6 @@ COPY <<'EOF' /etc/supervisor/conf.d/app.ini
 [supervisord]
 nodaemon=true
 logfile=/applogs/supervisord.log
-
-[program:postgres]
-command=/usr/lib/postgresql/17/bin/postgres -D /var/lib/postgresql/17/main -c config_file=/etc/postgresql/17/main/postgresql.conf
-user=postgres
-autostart=true
-autorestart=true
-stdout_logfile=/applogs/pg.log
-stderr_logfile=/applogs/pg-err.log
 
 [program:api]
 command=/app/api/.venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8000
@@ -106,8 +95,8 @@ stdout_logfile=/applogs/agent.log
 stderr_logfile=/applogs/agent-err.log
 EOF
 
-# Start script: start postgres, pre-seed, start services, post-seed, tail logs
-RUN printf '#!/bin/bash\nset -e\necho "Starting PostgreSQL..."\nsu - postgres -c "pg_ctlcluster 17 main start" 2>/dev/null || true\nsleep 3\necho "Pre-seed: migrations + data + coordinates..."\ncd /app/api && PYTHONPATH=/app/api/src API_DATABASE_URL="postgresql+asyncpg://sujoly:sujoly_dev@localhost:5432/sujoly" API_SYNC_DATABASE_URL="postgresql+psycopg://sujoly:sujoly_dev@localhost:5432/sujoly" /app/api/.venv/bin/python /app/seed.py pre 2>&1 | tee /applogs/seed.log\necho "Starting services..."\nsupervisord -c /etc/supervisor/conf.d/app.ini &\nsleep 8\necho "Post-seed: risk assessments..."\ncd /app/api && PYTHONPATH=/app/api/src /app/api/.venv/bin/python /app/seed.py post 2>&1 | tee -a /applogs/seed.log\necho "All started"\ntail -f /applogs/web.log /applogs/api.log /applogs/supervisord.log > /applogs/app.logs 2>&1\n' > /start.sh && chmod +x /start.sh
+# Start script: start postgres, create user/db/extensions, pre-seed, start services, post-seed, tail logs
+RUN printf '#!/bin/bash\nset -e\necho "Starting PostgreSQL..."\nsu - postgres -c "pg_ctlcluster 17 main start" 2>/dev/null || true\nsleep 5\necho "Creating user/db/extensions..."\nsu - postgres -c "psql -c \\"CREATE USER sujoly WITH PASSWORD '\\''sujoly_dev'\\'' SUPERUSER;\\"" 2>/dev/null || true\nsu - postgres -c "psql -c \\"CREATE DATABASE sujoly OWNER sujoly;\\"" 2>/dev/null || true\nsu - postgres -c "psql -d sujoly -c \\"CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS postgis_topology; CREATE EXTENSION IF NOT EXISTS pg_trgm; CREATE EXTENSION IF NOT EXISTS vector;\\"" 2>/dev/null || true\necho "Pre-seed: migrations + data + coordinates..."\ncd /app/api && PYTHONPATH=/app/api/src API_DATABASE_URL="postgresql+asyncpg://sujoly:sujoly_dev@localhost:5432/sujoly" API_SYNC_DATABASE_URL="postgresql+psycopg://sujoly:sujoly_dev@localhost:5432/sujoly" /app/api/.venv/bin/python /app/seed.py pre 2>&1 | tee /applogs/seed.log\necho "Starting services..."\nsupervisord -c /etc/supervisor/conf.d/app.ini &\nsleep 10\necho "Post-seed: risk assessments..."\ncd /app/api && PYTHONPATH=/app/api/src /app/api/.venv/bin/python /app/seed.py post 2>&1 | tee -a /applogs/seed.log\necho "All started"\ntail -f /applogs/web.log /applogs/api.log /applogs/supervisord.log > /applogs/app.logs 2>&1\n' > /start.sh && chmod +x /start.sh
 
 WORKDIR /app
 
