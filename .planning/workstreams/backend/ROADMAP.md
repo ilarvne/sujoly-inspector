@@ -100,7 +100,7 @@ Plans:
 **Wave 5 (Gap Closure)** *(parallel)*
 
 - [ ] 03-07-PLAN.md — RBAC + Auth Hardening: read endpoint auth, api_key hashing, secure defaults (RISK-07)
-- [ ] 03-08-PLAN.md — Risk Provenance Wiring + Model Fixes: confidence data flow, barrel exports, CheckConstraints, datetime (RISK-05)
+- [x] 03-08-PLAN.md — Risk Provenance Wiring + Model Fixes: confidence data flow, barrel exports, CheckConstraints, datetime (RISK-05)
 - [ ] 03-09-PLAN.md — Export + Dockerfile + Inspection Fixes: templates copy, GeoJSON/CSV/MinIO, structure_id verification (RISK-08, DATA-05)
 
 ### Phase 4: Discovery & Matching Backend
@@ -142,6 +142,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
-| 3. Risk Models & Inspection Logic | 6/9 | Gap closure | - |
+| 3. Risk Models & Inspection Logic | 7/9 | In Progress|  |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |
