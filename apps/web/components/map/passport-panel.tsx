@@ -1,7 +1,7 @@
 'use client';
 
+import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useTranslations, useLocale } from 'next-intl';
@@ -13,6 +13,9 @@ import { RiskScoreDisplay } from '@/components/inspection/risk-score-display';
 import { DocumentUpload } from '@/components/documents/document-upload';
 import { DocumentList } from '@/components/documents/document-list';
 import type { TrilingualText } from '@/lib/api/types';
+import { cn } from '@/lib/utils';
+
+type TabValue = 'overview' | 'inspections' | 'risk' | 'documents';
 
 const sourceLabelKeys = {
   kazvodhoz: 'sourceKazvodhoz',
@@ -35,8 +38,16 @@ export function PassportPanel() {
   const t = useTranslations('passport');
   const tMap = useTranslations('map');
   const tTabs = useTranslations('passportTabs');
+  const [activeTab, setActiveTab] = useState<TabValue>('overview');
 
   const nameInLocale = (name: TrilingualText) => name[locale] || name.ru;
+
+  const tabs: { value: TabValue; label: string }[] = [
+    { value: 'overview', label: tTabs('overview') },
+    { value: 'inspections', label: tTabs('inspections') },
+    { value: 'risk', label: tTabs('risk') },
+    { value: 'documents', label: tTabs('documents') },
+  ];
 
   return (
     <Sheet open={!!selectedId} onOpenChange={(open) => { if (!open) setSelectedId(null); }}>
@@ -50,15 +61,30 @@ export function PassportPanel() {
         {isLoading ? (
           <div className="p-4 text-muted-foreground">{tMap('loading')}</div>
         ) : structure ? (
-          <Tabs defaultValue="overview" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="overview">{tTabs('overview')}</TabsTrigger>
-              <TabsTrigger value="inspections">{tTabs('inspections')}</TabsTrigger>
-              <TabsTrigger value="risk">{tTabs('risk')}</TabsTrigger>
-              <TabsTrigger value="documents">{tTabs('documents')}</TabsTrigger>
-            </TabsList>
+          <div className="w-full">
+            <div role="tablist" className="inline-flex w-full items-center justify-center rounded-lg bg-muted p-[3px] text-muted-foreground h-8">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.value}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === tab.value}
+                  data-state={activeTab === tab.value ? 'active' : 'inactive'}
+                  onClick={() => setActiveTab(tab.value)}
+                  className={cn(
+                    'relative inline-flex flex-1 items-center justify-center rounded-md px-1.5 py-0.5 text-sm font-medium whitespace-nowrap transition-all',
+                    activeTab === tab.value
+                      ? 'bg-background text-foreground shadow-sm'
+                      : 'text-foreground/60 hover:text-foreground'
+                  )}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
 
-            <TabsContent value="overview" className="space-y-1 px-4 pb-4">
+            {activeTab === 'overview' && (
+            <div role="tabpanel" className="space-y-1 px-4 pb-4">
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-foreground">{t('identity')}</h3>
               <dl className="space-y-1 text-sm">
@@ -205,25 +231,32 @@ export function PassportPanel() {
                 </div>
               </dl>
             </section>
-            </TabsContent>
+            </div>
+            )}
 
-            <TabsContent value="inspections" className="px-4 pb-4">
-              {structure && <InspectionTimeline structureId={structure.id} />}
-            </TabsContent>
+            {activeTab === 'inspections' && (
+              <div role="tabpanel" className="px-4 pb-4">
+                {structure && <InspectionTimeline structureId={structure.id} />}
+              </div>
+            )}
 
-            <TabsContent value="risk" className="px-4 pb-4">
-              {structure && <RiskScoreDisplay structureId={structure.id} />}
-            </TabsContent>
+            {activeTab === 'risk' && (
+              <div role="tabpanel" className="px-4 pb-4">
+                {structure && <RiskScoreDisplay structureId={structure.id} />}
+              </div>
+            )}
 
-            <TabsContent value="documents" className="px-4 pb-4 space-y-4">
-              {structure && (
-                <>
-                  <DocumentUpload structureId={structure.id} />
-                  <DocumentList structureId={structure.id} />
-                </>
-              )}
-            </TabsContent>
-          </Tabs>
+            {activeTab === 'documents' && (
+              <div role="tabpanel" className="px-4 pb-4 space-y-4">
+                {structure && (
+                  <>
+                    <DocumentUpload structureId={structure.id} />
+                    <DocumentList structureId={structure.id} />
+                  </>
+                )}
+              </div>
+            )}
+          </div>
         ) : null}
       </SheetContent>
     </Sheet>

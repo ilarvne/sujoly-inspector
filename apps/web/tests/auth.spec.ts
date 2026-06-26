@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
+  await page.goto('/ru');
   await page.evaluate(() => localStorage.clear());
 });
 
@@ -68,6 +69,7 @@ test('Login page works in English', async ({ page }) => {
 });
 
 test('Not logged in shows sign-in link', async ({ page }) => {
+  await page.goto('/ru');
   await page.evaluate(() => localStorage.clear());
   await page.goto('/ru/map');
   await expect(page.locator('[data-testid="signin-link"]')).toBeVisible();

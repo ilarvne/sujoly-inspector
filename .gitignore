@@ -39,3 +39,5 @@ npm-debug.log*
 coverage/
 .coverage
 htmlcov/
+
+.playwright-mcp/

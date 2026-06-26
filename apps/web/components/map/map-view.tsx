@@ -48,6 +48,9 @@ export function MapView() {
         ],
       }}
       interactiveLayerIds={['structures']}
+      onLoad={(e) => {
+        (window as Window & { __maplibreMap?: unknown }).__maplibreMap = e.target;
+      }}
       onClick={(e: MapMouseEvent) => {
         if (e.features && e.features.length > 0) {
           const feature = e.features[0];

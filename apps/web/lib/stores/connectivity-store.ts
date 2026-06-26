@@ -8,7 +8,7 @@ interface ConnectivityState {
 }
 
 export const useConnectivityStore = create<ConnectivityState>((set) => ({
-  isOnline: typeof navigator !== 'undefined' ? navigator.onLine : true,
+  isOnline: true,
   pendingSyncCount: 0,
   setOnline: (online) => set({ isOnline: online }),
   setPendingSyncCount: (count) => set({ pendingSyncCount: count }),
