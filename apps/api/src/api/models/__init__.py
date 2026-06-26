@@ -6,5 +6,6 @@ can discover them for migration generation.
 
 from api.models.provenance import ProvenanceModel
 from api.models.structure import StructureFactModel, StructureModel
+from api.models.user import UserModel
 
-__all__ = ["ProvenanceModel", "StructureModel", "StructureFactModel"]
+__all__ = ["ProvenanceModel", "StructureModel", "StructureFactModel", "UserModel"]

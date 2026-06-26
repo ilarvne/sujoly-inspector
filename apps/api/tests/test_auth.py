@@ -1,5 +1,6 @@
 """Tests for JWT authentication and RBAC dependencies."""
 
+import asyncio
 import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -81,35 +82,71 @@ class TestAuthEndpoints:
         assert data["role"] == mock_user.role
         assert data["id"] == str(mock_user.id)
 
-    def test_me_without_token(self, test_client):
+    def test_me_without_token(self, mock_healthy_minio, mock_user):
         """GET /api/v1/auth/me without Authorization header returns 401."""
-        response = test_client.get("/api/v1/auth/me")
+        # Use a raw client without dependency_overrides so the real
+        # OAuth2PasswordBearer runs and returns 401 for missing tokens.
+        mock_db_session = MagicMock()
+        mock_db_session.execute = AsyncMock(
+            return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
+        )
+        mock_db_session.add = MagicMock()
+        mock_db_session.commit = AsyncMock()
+        mock_db_cm = MagicMock()
+        mock_db_cm.__aenter__ = AsyncMock(return_value=mock_db_session)
+        mock_db_cm.__aexit__ = AsyncMock(return_value=None)
+        mock_async_session = MagicMock(return_value=mock_db_cm)
+
+        with patch("api.services.minio_client.Minio", mock_healthy_minio), \
+             patch("api.infrastructure.database.async_session", mock_async_session):
+            from api.main import app
+            from fastapi.testclient import TestClient
+
+            with TestClient(app) as client:
+                response = client.get("/api/v1/auth/me")
         assert response.status_code == 401
 
-    def test_me_with_invalid_token(self, test_client):
+    def test_me_with_invalid_token(self, mock_healthy_minio, mock_user):
         """GET /api/v1/auth/me with malformed JWT returns 401."""
-        response = test_client.get(
-            "/api/v1/auth/me",
-            headers={"Authorization": "Bearer invalid-token"},
+        mock_db_session = MagicMock()
+        mock_db_session.execute = AsyncMock(
+            return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
         )
+        mock_db_session.add = MagicMock()
+        mock_db_session.commit = AsyncMock()
+        mock_db_cm = MagicMock()
+        mock_db_cm.__aenter__ = AsyncMock(return_value=mock_db_session)
+        mock_db_cm.__aexit__ = AsyncMock(return_value=None)
+        mock_async_session = MagicMock(return_value=mock_db_cm)
+
+        with patch("api.services.minio_client.Minio", mock_healthy_minio), \
+             patch("api.infrastructure.database.async_session", mock_async_session):
+            from api.main import app
+            from fastapi.testclient import TestClient
+
+            with TestClient(app) as client:
+                response = client.get(
+                    "/api/v1/auth/me",
+                    headers={"Authorization": "Bearer invalid-token"},
+                )
         assert response.status_code == 401
 
     def test_require_role_inspector_allows_admin(self, mock_user):
         """require_role('inspector') allows admin role."""
         checker = require_role("inspector")
-        result = checker(mock_user)
+        result = asyncio.run(checker(mock_user))
         assert result == mock_user
 
     def test_require_role_engineer_rejects_inspector(self, mock_inspector):
         """require_role('engineer') rejects inspector role → 403."""
         checker = require_role("engineer")
         with pytest.raises(HTTPException) as exc_info:
-            checker(mock_inspector)
+            asyncio.run(checker(mock_inspector))
         assert exc_info.value.status_code == 403
 
     def test_require_role_admin_rejects_engineer(self, mock_engineer):
         """require_role('admin') rejects engineer role → 403."""
         checker = require_role("admin")
         with pytest.raises(HTTPException) as exc_info:
-            checker(mock_engineer)
+            asyncio.run(checker(mock_engineer))
         assert exc_info.value.status_code == 403

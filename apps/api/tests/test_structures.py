@@ -261,85 +261,107 @@ class TestStructureEndpoints:
 class TestStructureRBAC:
     """RBAC retrofit tests for /api/v1/structures per D-12 permissions matrix."""
 
-    def _with_role(self, client, mock_user_with_role, mock_struct):
-        """Helper: patch get_current_user to a specific role for a single request."""
-        with patch(
-            "api.routes.structures.create_structure",
-            AsyncMock(return_value=mock_struct),
-        ) as mock_create:
-            response = client.post(
-                "/api/v1/structures",
-                json={"type": "canal"},
-            )
-        return response
+    def _with_role_override(self, test_client, role_user):
+        """Helper: override get_current_user to return a specific role user.
+
+        Returns the app reference so the caller can clear overrides later.
+        """
+        from api.dependencies.auth import get_current_user
+
+        app = test_client.app
+
+        async def _override():
+            return role_user
+
+        app.dependency_overrides[get_current_user] = _override
+        return app
 
     def test_create_structure_viewer_forbidden(self, test_client, mock_viewer):
         """POST /api/v1/structures with viewer role returns 403 per D-12."""
-        with patch("api.dependencies.auth.get_current_user", return_value=mock_viewer):
+        app = self._with_role_override(test_client, mock_viewer)
+        try:
             response = test_client.post(
                 "/api/v1/structures",
                 json={"type": "canal"},
             )
+        finally:
+            app.dependency_overrides.clear()
         assert response.status_code == 403
 
     def test_create_structure_inspector_forbidden(self, test_client, mock_inspector):
         """POST /api/v1/structures with inspector role returns 403 per D-12."""
-        with patch("api.dependencies.auth.get_current_user", return_value=mock_inspector):
+        app = self._with_role_override(test_client, mock_inspector)
+        try:
             response = test_client.post(
                 "/api/v1/structures",
                 json={"type": "canal"},
             )
+        finally:
+            app.dependency_overrides.clear()
         assert response.status_code == 403
 
     def test_create_structure_engineer_allowed(self, test_client, mock_engineer):
         """POST /api/v1/structures with engineer role returns 201 per D-12."""
-        mock_struct = MagicMock()
-        mock_struct.id = uuid.uuid4()
-        mock_struct.name_ru = "Канал"
-        mock_struct.type = "canal"
-        mock_struct.provenance_id = uuid.uuid4()
-        mock_struct.status = "active"
-        mock_struct.created_at = datetime.now(timezone.utc)
-        mock_struct.updated_at = datetime.now(timezone.utc)
-        with patch("api.dependencies.auth.get_current_user", return_value=mock_engineer), patch(
-            "api.routes.structures.create_structure",
-            AsyncMock(return_value=mock_struct),
-        ):
-            response = test_client.post(
-                "/api/v1/structures",
-                json={"type": "canal"},
-            )
+        from conftest import _make_mock_structure
+
+        mock_struct = _make_mock_structure()
+        prov_id = uuid.uuid4()
+        app = self._with_role_override(test_client, mock_engineer)
+        try:
+            with patch(
+                "api.routes.structures.create_structure",
+                AsyncMock(return_value=mock_struct),
+            ):
+                response = test_client.post(
+                    f"/api/v1/structures?provenance_id={prov_id}",
+                    json={"type": "canal"},
+                )
+        finally:
+            app.dependency_overrides.clear()
         assert response.status_code == 201
 
     def test_update_structure_viewer_forbidden(self, test_client, mock_viewer):
         """PUT /api/v1/structures/{id} with viewer role returns 403 per D-12."""
         struct_id = uuid.uuid4()
-        with patch("api.dependencies.auth.get_current_user", return_value=mock_viewer):
+        app = self._with_role_override(test_client, mock_viewer)
+        try:
             response = test_client.put(
                 f"/api/v1/structures/{struct_id}",
                 json={"name_ru": "Updated"},
             )
+        finally:
+            app.dependency_overrides.clear()
         assert response.status_code == 403
 
     def test_delete_structure_engineer_forbidden(self, test_client, mock_engineer):
         """DELETE /api/v1/structures/{id} with engineer role returns 403 per D-12."""
         struct_id = uuid.uuid4()
-        with patch("api.dependencies.auth.get_current_user", return_value=mock_engineer):
+        app = self._with_role_override(test_client, mock_engineer)
+        try:
             response = test_client.delete(f"/api/v1/structures/{struct_id}")
+        finally:
+            app.dependency_overrides.clear()
         assert response.status_code == 403
 
     def test_delete_structure_admin_allowed(self, test_client, mock_user):
         """DELETE /api/v1/structures/{id} with admin role returns 200 per D-12."""
         struct_id = uuid.uuid4()
-        with patch("api.dependencies.auth.get_current_user", return_value=mock_user), patch(
-            "api.routes.structures.delete_structure",
-            AsyncMock(return_value=True),
-        ):
-            response = test_client.delete(f"/api/v1/structures/{struct_id}")
+        app = self._with_role_override(test_client, mock_user)
+        try:
+            with patch(
+                "api.routes.structures.delete_structure",
+                AsyncMock(return_value=True),
+            ):
+                response = test_client.delete(f"/api/v1/structures/{struct_id}")
+        finally:
+            app.dependency_overrides.clear()
         assert response.status_code == 200
 
     def test_get_structures_all_roles_allowed(self, test_client, mock_viewer):
         """GET /api/v1/structures with viewer role returns 200 per D-12."""
-        with patch("api.dependencies.auth.get_current_user", return_value=mock_viewer):
+        app = self._with_role_override(test_client, mock_viewer)
+        try:
             response = test_client.get("/api/v1/structures")
+        finally:
+            app.dependency_overrides.clear()
         assert response.status_code == 200

@@ -102,34 +102,41 @@ def test_client(mock_healthy_minio, mock_user):
 
     Patches Minio at the MinIOService import path so that lifespan startup
     (which creates a MinIOService) uses the mock client. Also patches
-    get_current_user to return an admin mock user so RBAC-protected endpoints
-    still work for non-auth tests.
+    async_session for admin seeding. Uses app.dependency_overrides for
+    get_current_user to avoid MagicMock signature issues with FastAPI.
     """
-    with patch("api.services.minio_client.Minio", mock_healthy_minio):
-        # Conditionally patch auth stack only after it exists (Phase 3 GREEN)
-        auth_patches = []
-        try:
-            auth_patches.append(
-                patch("api.dependencies.auth.get_current_user", return_value=mock_user)
-            )
-            auth_patches.append(
-                patch("api.services.auth_service.get_user_by_id", AsyncMock(return_value=mock_user))
-            )
-            for p in auth_patches:
-                p.start()
-        except AttributeError:
-            # Auth module not yet implemented (RED phase)
-            auth_patches = []
+    # Mock async_session context manager for admin seeding in lifespan
+    mock_db_session = MagicMock()
+    mock_db_session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
+    )
+    mock_db_session.add = MagicMock()
+    mock_db_session.commit = AsyncMock()
 
+    mock_db_cm = MagicMock()
+    mock_db_cm.__aenter__ = AsyncMock(return_value=mock_db_session)
+    mock_db_cm.__aexit__ = AsyncMock(return_value=None)
+    mock_async_session = MagicMock(return_value=mock_db_cm)
+
+    with patch("api.services.minio_client.Minio", mock_healthy_minio), \
+         patch("api.infrastructure.database.async_session", mock_async_session):
         from api.main import app
+        from api.dependencies.auth import get_current_user
         from fastapi.testclient import TestClient
+
+        # Override get_current_user dependency with a function that
+        # returns mock_user — FastAPI dependency_overrides handles signature
+        # correctly unlike MagicMock-based patching.
+        async def _override_get_current_user():
+            return mock_user
+
+        app.dependency_overrides[get_current_user] = _override_get_current_user
 
         try:
             with TestClient(app) as client:
                 yield client
         finally:
-            for p in auth_patches:
-                p.stop()
+            app.dependency_overrides.clear()
 
 
 # ---------------------------------------------------------------------------
@@ -286,14 +293,34 @@ def mock_auth_token():
 @pytest.fixture
 def auth_client(mock_healthy_minio, mock_user):
     """FastAPI TestClient with mocked authentication."""
+    # Mock async_session for admin seeding in lifespan
+    mock_db_session = MagicMock()
+    mock_db_session.execute = AsyncMock(
+        return_value=MagicMock(scalar_one_or_none=MagicMock(return_value=None))
+    )
+    mock_db_session.add = MagicMock()
+    mock_db_session.commit = AsyncMock()
+
+    mock_db_cm = MagicMock()
+    mock_db_cm.__aenter__ = AsyncMock(return_value=mock_db_session)
+    mock_db_cm.__aexit__ = AsyncMock(return_value=None)
+    mock_async_session = MagicMock(return_value=mock_db_cm)
+
     with patch("api.services.minio_client.Minio", mock_healthy_minio), \
-         patch("api.dependencies.auth.get_current_user", return_value=mock_user), \
-         patch("api.services.auth_service.get_user_by_id", AsyncMock(return_value=mock_user)):
+         patch("api.infrastructure.database.async_session", mock_async_session):
         from api.main import app
+        from api.dependencies.auth import get_current_user
         from fastapi.testclient import TestClient
+
+        async def _override_get_current_user():
+            return mock_user
+
+        app.dependency_overrides[get_current_user] = _override_get_current_user
 
         with TestClient(app) as client:
             yield client
+
+        app.dependency_overrides.clear()
 
 
 @pytest.fixture

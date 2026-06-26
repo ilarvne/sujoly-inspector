@@ -12,8 +12,10 @@ Provides:
 import uuid
 from typing import Literal
 
-from fastapi import APIRouter, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 
+from api.dependencies.auth import require_role
+from api.models.user import UserModel
 from api.schemas.structures import (
     SearchListResponse,
     SearchResultResponse,
@@ -172,10 +174,12 @@ async def get_structure_endpoint(structure_id: uuid.UUID) -> StructureResponse:
 async def create_structure_endpoint(
     body: StructureCreate,
     provenance_id: uuid.UUID = Query(..., description="Provenance UUID for this structure"),
+    current_user: UserModel = Depends(require_role("engineer")),
 ) -> StructureResponse:
     """Create a new structure record (D-13).
 
-    Requires a provenance_id query param (Phase 2: no auth yet).
+    Requires engineer+ role per D-12 RBAC retrofit.
+    Requires a provenance_id query param.
     Returns 201 with the created structure.
     """
     model = await create_structure(data=body, provenance_id=provenance_id)
@@ -187,8 +191,11 @@ async def update_structure_endpoint(
     structure_id: uuid.UUID,
     body: StructureUpdate,
     provenance_id: uuid.UUID = Query(..., description="Provenance UUID for this update"),
+    current_user: UserModel = Depends(require_role("engineer")),
 ) -> StructureResponse:
     """Update a structure with provenance-per-fact tracking (D-13).
+
+    Requires engineer+ role per D-12 RBAC retrofit.
 
     Creates a new provenance record, expires old structure_facts, and creates
     new facts for each non-None field in the request body.
@@ -208,8 +215,13 @@ async def update_structure_endpoint(
 
 
 @router.delete("/structures/{structure_id}")
-async def delete_structure_endpoint(structure_id: uuid.UUID) -> dict:
+async def delete_structure_endpoint(
+    structure_id: uuid.UUID,
+    current_user: UserModel = Depends(require_role("admin")),
+) -> dict:
     """Soft delete a structure by setting status='deleted' (D-13).
+
+    Requires admin role per D-12 RBAC retrofit.
 
     Returns 404 if the structure does not exist.
     """
