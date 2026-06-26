@@ -9,6 +9,7 @@
     "languageSwitcher": "Тілді таңдау"
   },
   "nav": {
+    "title": "Навигация",
     "home": "Басты бет",
     "dashboard": "Басқару панелі",
     "map": "Карта",
@@ -16,11 +17,12 @@
     "field": "Дала режимі",
     "copilot": "Көмекші",
     "reports": "Есептер",
-    "hydrofinder": "Гидроіздеу"
+    "hydrofinder": "Гидроіздеу",
+    "route": "Маршрут"
   },
   "home": {
     "title": "SuJoly Inspector",
-    "subtitle": "Жамбыл облысының гидротехникалық құрылымдарын басқарудың цифрлық платформасы",
+    "subtitle": "Жамбыл облысының гидротехникалық құрылымдарын басқарудың цифрлық платформасы — жаһандық деңгейде",
     "description": "Карта, нысан паспорттары, қарап шығулар, тәуекелдерді бағалау және AI-көмекші бір жүйеде",
     "statsStructures": "Құрылымдар",
     "statsInspections": "Қарап шығулар",
@@ -54,6 +56,11 @@
     "coverageRate": "Қамту, %",
     "structuresByDistrict": "Аудандар бойынша нысандар",
     "structuresByType": "Түрлер бойынша нысандар",
+    "topRisky": "Топ-5 тәуекелді объектілер",
+    "missingCoords": "Координаттар жоқ",
+    "duplicates": "Мүмкін қайталанулар",
+    "byType": "Тип бойынша",
+    "viewOnMap": "Картаны ашу",
     "noData": "Деректер жоқ"
   },
   "map": {
@@ -132,7 +139,8 @@
     "sourceOsm": "OpenStreetMap",
     "sourceSatellite": "Жер серігі суреттері",
     "sourceManual": "Қолмен енгізу",
-    "close": "Жабу"
+    "close": "Жабу",
+    "recommendation": "Ұсыныс"
   },
   "filter": {
     "title": "Сүзгілер",
@@ -161,7 +169,21 @@
     "colInspection": "Қарап шығу",
     "colYear": "Жылы",
     "openPassport": "Паспортты ашу",
-    "resultsCount": "Табылды: {count}"
+    "resultsCount": "Табылды: {count}",
+    "riskLevel": "Тәуекел деңгейі",
+    "efficiency": "ПӘК",
+    "age": "Жасы",
+    "wear": "Тозу",
+    "riskHigh": "Жоғары",
+    "riskMedium": "Орташа",
+    "riskLow": "Төмен",
+    "effBelow70": "< 70%",
+    "eff70to85": "70-85%",
+    "effAbove85": "> 85%",
+    "ageBelow30": "< 30 жыл",
+    "age30to50": "30-50 жыл",
+    "ageAbove50": "> 50 жыл",
+    "all": "Барлығы"
   },
   "copilot": {
     "title": "ЖИ көмекші",
@@ -238,13 +260,16 @@
     "medium": "Орташа",
     "low": "Төмен",
     "componentBreakdown": "Тәуекел құрылымы",
-    "structural": "Құрылымдық беріктік",
-    "hydrological": "Гидрологиялық тәуекел",
-    "operational": "Пайдалану жағдайы",
+    "condition": "Техникалық жағдай",
     "age": "Инфрақұрылым жасы",
+    "efficiency": "ПӘК ауытқуы",
+    "significance": "Объект маңыздылығы",
+    "weather": "Ауа райы тәуекелі",
+    "inspection_overdue": "Қараудың өтіп кетуі",
     "weight": "Салмағы",
     "score": "Балл",
     "explanation": "Түсіндірме",
+    "recommendation": "Ұсыныс",
     "computedAt": "Есептеу күні",
     "loading": "Тәуекелді бағалау жүктелуде..."
   },
@@ -507,5 +532,57 @@
       "spillway": "Су ағызатын құрылғы",
       "other": "Басқа"
     }
+  },
+  "weather": {
+    "title": "Ауа райы сценарийі",
+    "normal": "Қалыпты режим",
+    "heavyRain": "Қатты жаңбыр",
+    "floodSeason": "Тасқын маусымы",
+    "boostActive": "Risk Score ауа райы жағдайына байланысты қайта есептелді",
+    "boostWarning": "⚠ Режим: {mode}",
+    "averageRisk": "Орташа Risk Score",
+    "boostedObjects": "Күшейтілген нысандар"
+  },
+  "route": {
+    "title": "Инспектор маршруты",
+    "subtitle": "Нысандарды тексеруге арналған оңтайландырылған маршрут",
+    "selectDistrict": "Ауданды таңдаңыз",
+    "allDistricts": "Бүкіл облыс",
+    "topObjects": "Тексеруге арналған топ нысандар",
+    "routeOrder": "Айналу реті",
+    "object": "Нысан",
+    "riskScore": "Риск",
+    "distance": "Қашықтық",
+    "totalDistance": "Маршруттың жалпы ұзындығы",
+    "estimatedTime": "Болжалды уақыт",
+    "noObjects": "Таңдалған ауданда координаттары бар нысандар жоқ",
+    "generateRoute": "Маршрут құру",
+    "routeGenerated": "Маршрут құрылды",
+    "startPoint": "Бастапқы нүкте",
+    "endPoint": "Соңғы нүкте"
+  },
+  "report": {
+    "title": "Автоесеп",
+    "overview": "Шолу",
+    "totalStructures": "Барлық құрылымдар",
+    "statusDistribution": "Статус бойынша таралуы",
+    "avgRiskScore": "Орташа тәуекел баллы",
+    "missingCoords": "Координаттар жоқ",
+    "duplicates": "Мүмкін қайталанулар",
+    "byType": "Тип бойынша",
+    "topRisky": "Топ-10 тәуекелді",
+    "inspectionPlan": "Қарау жоспары",
+    "next7days": "Алдағы 7 күн",
+    "next30days": "Алдағы 30 күн",
+    "exportJSON": "JSON экспорттау",
+    "exportHTML": "HTML экспорттау",
+    "rank": "Орын",
+    "name": "Атауы",
+    "type": "Тип",
+    "district": "Аудан",
+    "riskScore": "Тәуекел баллы",
+    "condition": "Жағдай",
+    "generateReport": "Есеп құру",
+    "generated": "Есеп сәтті құрылды"
   }
 }

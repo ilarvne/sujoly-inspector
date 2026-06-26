@@ -51,7 +51,7 @@ export function PassportPanel() {
 
   return (
     <Sheet open={!!selectedId} onOpenChange={(open) => { if (!open) setSelectedId(null); }}>
-      <SheetContent side="right" className="w-[400px] sm:w-[540px] overflow-y-auto">
+      <SheetContent side="right" className="w-full overflow-y-auto sm:w-[400px] sm:max-w-[540px]">
         <SheetHeader>
           <SheetTitle>
             {structure ? nameInLocale(structure.name) : t('title')}
@@ -205,6 +205,15 @@ export function PassportPanel() {
                 </div>
               </dl>
             </section>
+
+            {structure.recommendation && (
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold text-foreground">{t('recommendation')}</h3>
+                <div className="bg-primary/10 p-3 rounded-lg text-sm">
+                  {structure.recommendation}
+                </div>
+              </section>
+            )}
 
             <Separator />
 

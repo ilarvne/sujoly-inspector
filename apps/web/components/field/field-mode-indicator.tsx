@@ -27,10 +27,10 @@ export function FieldModeIndicator() {
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <button
         onClick={() => (fieldModeEnabled ? disableFieldMode() : enableFieldMode())}
-        className={`flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+        className={`flex items-center gap-1.5 rounded-md px-2 py-1 text-xs font-medium transition-colors ${
           fieldModeEnabled
             ? 'bg-primary-foreground/20 text-primary-foreground'
             : 'bg-primary-foreground/10 text-primary-foreground/70 hover:text-primary-foreground'
@@ -39,7 +39,7 @@ export function FieldModeIndicator() {
         title={fieldModeEnabled ? tField('disableFieldMode') : tField('enableFieldMode')}
       >
         <RadioIcon className="size-3.5" />
-        {fieldModeEnabled ? tField('fieldModeEnabled') : tField('fieldModeDisabled')}
+        <span className="hidden sm:inline">{fieldModeEnabled ? tField('fieldModeEnabled') : tField('fieldModeDisabled')}</span>
       </button>
 
       <div
@@ -49,7 +49,7 @@ export function FieldModeIndicator() {
         data-testid="connectivity-status"
       >
         {isOnline ? <WifiIcon className="size-3.5" /> : <WifiOffIcon className="size-3.5" />}
-        {isOnline ? t('online') : t('offline')}
+        <span className="hidden sm:inline">{isOnline ? t('online') : t('offline')}</span>
       </div>
 
       {pendingCount > 0 && (

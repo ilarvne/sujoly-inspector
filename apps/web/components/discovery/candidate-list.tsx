@@ -93,7 +93,7 @@ export function CandidateList() {
           {t('noCandidates')}
         </div>
       ) : (
-        <ScrollArea className="h-[500px] rounded-md border">
+        <ScrollArea className="h-[400px] rounded-md border lg:h-[500px]">
           <Table>
             <TableHeader>
               <TableRow>
@@ -114,7 +114,7 @@ export function CandidateList() {
                   <TableRow
                     key={cand.id}
                     onClick={() => setSelectedCandidate(cand.id)}
-                    className={`cursor-pointer ${isSelected ? 'bg-primary/5' : ''}`}
+                    className={`cursor-pointer transition-colors ${isSelected ? 'bg-primary/10 font-medium' : 'hover:bg-muted/50'}`}
                     data-testid={`candidate-row-${cand.id}`}
                   >
                     <TableCell>

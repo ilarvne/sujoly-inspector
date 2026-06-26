@@ -1,6 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { setRequestLocale } from 'next-intl/server';
-import { ExportPanel } from '@/components/export/export-panel';
+import { ReportView } from '@/components/report/report-view';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -9,7 +9,7 @@ type Props = {
 export default async function ReportsPage({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
-  const t = await getTranslations('exportNs');
+  const t = await getTranslations('reports');
 
   return (
     <div className="flex flex-col gap-6">
@@ -21,7 +21,7 @@ export default async function ReportsPage({ params }: Props) {
           {t('subtitle')}
         </p>
       </div>
-      <ExportPanel />
+      <ReportView />
     </div>
   );
 }

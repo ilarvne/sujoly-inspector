@@ -17,10 +17,10 @@ export default async function FieldPage({ params }: Props) {
   return (
     <div className="flex flex-col gap-6">
       <div>
-        <h1 className="font-display text-3xl font-bold text-primary">
+        <h1 className="font-display text-xl font-bold text-primary sm:text-2xl lg:text-3xl">
           {t('title')}
         </h1>
-        <p className="text-lg text-muted-foreground">
+        <p className="text-sm text-muted-foreground sm:text-base lg:text-lg">
           {t('subtitle')}
         </p>
       </div>

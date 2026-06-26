@@ -9,6 +9,7 @@
     "languageSwitcher": "Выбрать язык"
   },
   "nav": {
+    "title": "Навигация",
     "home": "Главная",
     "dashboard": "Панель управления",
     "map": "Карта",
@@ -16,7 +17,8 @@
     "field": "Полевой режим",
     "copilot": "Помощник",
     "reports": "Отчёты",
-    "hydrofinder": "Гидропоиск"
+    "hydrofinder": "Гидропоиск",
+    "route": "Маршрут"
   },
   "home": {
     "title": "SuJoly Inspector",
@@ -54,6 +56,11 @@
     "coverageRate": "Охват, %",
     "structuresByDistrict": "Сооружения по районам",
     "structuresByType": "Сооружения по типам",
+    "topRisky": "Топ-5 рискованных объектов",
+    "missingCoords": "Нет координат",
+    "duplicates": "Возможные дубли",
+    "byType": "По типам",
+    "viewOnMap": "Открыть карту",
     "noData": "Нет данных"
   },
   "map": {
@@ -132,7 +139,8 @@
     "sourceOsm": "OpenStreetMap",
     "sourceSatellite": "Спутниковые снимки",
     "sourceManual": "Ручной ввод",
-    "close": "Закрыть"
+    "close": "Закрыть",
+    "recommendation": "Рекомендация"
   },
   "filter": {
     "title": "Фильтры",
@@ -161,7 +169,21 @@
     "colInspection": "Инспекция",
     "colYear": "Год",
     "openPassport": "Открыть паспорт",
-    "resultsCount": "Найдено: {count}"
+    "resultsCount": "Найдено: {count}",
+    "riskLevel": "Уровень риска",
+    "efficiency": "КПД",
+    "age": "Возраст",
+    "wear": "Износ",
+    "riskHigh": "Высокий",
+    "riskMedium": "Средний",
+    "riskLow": "Низкий",
+    "effBelow70": "< 70%",
+    "eff70to85": "70-85%",
+    "effAbove85": "> 85%",
+    "ageBelow30": "< 30 лет",
+    "age30to50": "30-50 лет",
+    "ageAbove50": "> 50 лет",
+    "all": "Все"
   },
   "copilot": {
     "title": "ИИ-помощник",
@@ -238,13 +260,16 @@
     "medium": "Средний",
     "low": "Низкий",
     "componentBreakdown": "Структура риска",
-    "structural": "Конструктивная целостность",
-    "hydrological": "Гидрологический риск",
-    "operational": "Эксплуатационное состояние",
+    "condition": "Техническое состояние",
     "age": "Возраст инфраструктуры",
+    "efficiency": "Отклонение КПД",
+    "significance": "Значимость объекта",
+    "weather": "Погодный риск",
+    "inspection_overdue": "Просрочка осмотра",
     "weight": "Вес",
     "score": "Балл",
     "explanation": "Объяснение",
+    "recommendation": "Рекомендация",
     "computedAt": "Дата расчёта",
     "loading": "Загрузка оценки риска..."
   },
@@ -507,5 +532,57 @@
       "spillway": "Водосброс",
       "other": "Прочее"
     }
+  },
+  "weather": {
+    "title": "Погодный сценарий",
+    "normal": "Обычный режим",
+    "heavyRain": "Сильный дождь",
+    "floodSeason": "Сезон паводков",
+    "boostActive": "Risk Score пересчитан с учётом погодных условий",
+    "boostWarning": "⚠ Режим: {mode}",
+    "averageRisk": "Средний Risk Score",
+    "boostedObjects": "Усиленных объектов"
+  },
+  "route": {
+    "title": "Маршрут инспектора",
+    "subtitle": "Оптимизированный маршрут осмотра объектов",
+    "selectDistrict": "Выберите район",
+    "allDistricts": "Вся область",
+    "topObjects": "Топ объектов для осмотра",
+    "routeOrder": "Порядок обхода",
+    "object": "Объект",
+    "riskScore": "Риск",
+    "distance": "Расстояние",
+    "totalDistance": "Общая длина маршрута",
+    "estimatedTime": "Оценочное время",
+    "noObjects": "Нет объектов с координатами в выбранном районе",
+    "generateRoute": "Построить маршрут",
+    "routeGenerated": "Маршрут построен",
+    "startPoint": "Начальная точка",
+    "endPoint": "Конечная точка"
+  },
+  "report": {
+    "title": "Автоотчёт",
+    "overview": "Обзор",
+    "totalStructures": "Всего сооружений",
+    "statusDistribution": "Распределение по статусам",
+    "avgRiskScore": "Средний балл риска",
+    "missingCoords": "Нет координат",
+    "duplicates": "Возможные дубли",
+    "byType": "По типам",
+    "topRisky": "Топ-10 рискованных",
+    "inspectionPlan": "План осмотров",
+    "next7days": "Ближайшие 7 дней",
+    "next30days": "Ближайшие 30 дней",
+    "exportJSON": "Экспорт JSON",
+    "exportHTML": "Экспорт HTML",
+    "rank": "Место",
+    "name": "Название",
+    "type": "Тип",
+    "district": "Район",
+    "riskScore": "Балл риска",
+    "condition": "Состояние",
+    "generateReport": "Сформировать отчёт",
+    "generated": "Отчёт успешно сформирован"
   }
 }

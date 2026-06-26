@@ -49,10 +49,10 @@ export function HomeView() {
   return (
     <div className="space-y-8">
       {/* Hero */}
-      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-8 sm:p-12">
+      <section className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-transparent p-6 sm:p-12">
         <div className="absolute right-0 top-0 -z-10 h-64 w-64 rounded-full bg-primary/5 blur-3xl" />
         <div className="max-w-2xl space-y-4">
-          <h1 className="font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
+          <h1 className="font-display text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
             {t('title')}
           </h1>
           <p className="text-lg text-muted-foreground sm:text-xl">
@@ -125,7 +125,7 @@ export function HomeView() {
 
       {/* Critical Alert */}
       {critical > 0 && (
-        <section className="flex items-center gap-4 rounded-xl border border-destructive/20 bg-destructive/5 p-6">
+        <section className="flex flex-col items-start gap-4 rounded-xl border border-destructive/20 bg-destructive/5 p-4 sm:flex-row sm:items-center sm:p-6">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-destructive/10">
             <TriangleAlert className="h-6 w-6 text-destructive" aria-hidden="true" />
           </div>

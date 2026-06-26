@@ -75,7 +75,7 @@ export function FilterPanel() {
   return (
     <div
       data-testid="filter-panel"
-      className="absolute top-4 left-4 z-10 w-64 rounded-lg border bg-background/95 p-3 shadow-lg backdrop-blur"
+      className="absolute top-2 left-2 z-10 w-56 rounded-lg border bg-background/95 p-3 shadow-lg backdrop-blur sm:top-4 sm:left-4 sm:w-64"
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
