@@ -435,6 +435,7 @@ function mapApiRiskToRiskScore(api: ApiRisk): RiskScore {
     overall: Math.round(api.composite_score),
     components,
     explanation,
+    recommendation: repairLabel[api.repair_status] || 'Inspection recommended',
     computedAt: api.computed_at || new Date().toISOString(),
   };
 }
