@@ -7,19 +7,19 @@ created: 2026-06-25
 
 ## Current Position
 
-**Status:** Phase 03 In Progress (Wave 2)
-**Current Phase:** 03-inspection-risk-ui (in progress)
+**Status:** Phase 06 Complete
+**Current Phase:** 06-ai-copilot-ui (complete)
 **Last Activity:** 2026-06-26
-**Last Activity Description:** Completed 03-01-PLAN.md (Wave 1: Foundation) — packages, shadcn components, types, mock data, auth store, API hooks, i18n, unit tests
+**Last Activity Description:** Completed Phase 6 AI Copilot UI — mock AI engine, chat store, 9 copilot components, trilingual i18n, 27 unit tests
 
 ## Progress
 
-**Phases Complete:** 2
-**Current Plan:** 03-01 (complete) — Phase 3 Wave 1 foundation done, Wave 2 in progress
+**Phases Complete:** 3 (1, 2, 6)
+**Current Plan:** 06-02 (complete)
 
 ## Session Continuity
 
-**Stopped At:** Completed 03-01-PLAN.md — Phase 3 Wave 1 foundation complete, Wave 2 (03-02, 03-04, 03-05) executing in parallel
+**Stopped At:** Phase 6 complete — all plans executed, build passes, 106/106 tests pass
 **Resume File:** None
 
 ## Decisions
@@ -40,3 +40,8 @@ created: 2026-06-25
 - Task 01-15 fix: added home.description field with Kazakh chars ә and ғ to KK messages — ensures all 9 Kazakh chars present on KK page for fonts.spec.ts
 - Task 01-16 manual verification automated via Playwright browser tools — 7/8 checks fully automated, 1/8 (design aesthetic) verified programmatically with objective criteria
 - Phase 1 verification gate passed: build 24 pages, Vitest 6/6, Playwright 30/30 all green
+- Phase 6: Built custom chat UI without external AI chat libraries (assistant-ui/OpenUI) — custom implementation follows existing patterns, avoids dependency risk
+- Phase 6: Mock AI engine uses keyword-based intent detection with trilingual dictionaries — explain_condition and summarize_inspections checked before list_repair/list_inspection for correct precedence
+- Phase 6: Chat store uses Zustand persist with partialize to strip isStreaming flags before localStorage save
+- Phase 6: Source citations navigate to /map with selectedId set via selection store
+- Phase 6: 4 interactive card types (StructureCard, RiskBreakdownCard, InspectionCard, ReportCard) render inline in chat messages
