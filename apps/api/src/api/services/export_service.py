@@ -17,11 +17,13 @@ import asyncio
 import base64
 import csv
 import io
+import json
 import uuid
 from pathlib import Path
 
 import structlog
 from fastapi.responses import StreamingResponse
+from geoalchemy2.shape import to_shape
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 
@@ -247,8 +249,10 @@ async def export_structures_csv(
         # Fetch latest risk assessment for this structure
         risk = await risk_service.get_latest_assessment(struct.id)
 
+        # Lang-aware name column: use name_{lang}, fallback to name_ru (D-20 fix)
+        lang_name = getattr(struct, f"name_{lang}", None) or getattr(struct, "name_ru", "") or ""
         row = [
-            _sanitize_csv_cell(getattr(struct, "name_ru", "") or ""),
+            _sanitize_csv_cell(lang_name),
             _sanitize_csv_cell(getattr(struct, "type", "") or ""),
             _sanitize_csv_cell(getattr(struct, "district", "") or ""),
             _sanitize_csv_cell(getattr(struct, "technical_condition", "") or ""),
@@ -334,8 +338,13 @@ async def export_structures_geojson(
             properties["repair_status"] = None
             properties["composite_score"] = None
 
-        # Geometry from structure
-        geometry = getattr(struct, "geometry", None)
+        # Geometry from structure — convert WKB to GeoJSON-compatible dict (D-21 fix)
+        raw_geom = getattr(struct, "geometry", None)
+        if raw_geom is not None:
+            shape = to_shape(raw_geom)
+            geometry = json.loads(shape.geojson)
+        else:
+            geometry = None
 
         features.append(
             {
@@ -394,12 +403,10 @@ async def export_inspection_report_pdf(
     if minio_service is not None and hasattr(inspection, "photos"):
         for photo in inspection.photos:
             try:
-                response = minio_service.client.get_object(
+                with minio_service.client.get_object(
                     photo.minio_bucket, photo.minio_object_key
-                )
-                photo_bytes = response.read()
-                response.close()
-                response.release_conn()
+                ) as response:
+                    photo_bytes = response.read()
                 b64_data = base64.b64encode(photo_bytes).decode("ascii")
                 photos_data.append(
                     {
