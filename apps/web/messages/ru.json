@@ -519,5 +519,23 @@
     "boostWarning": "⚠ Режим: {mode}",
     "averageRisk": "Средний Risk Score",
     "boostedObjects": "Усиленных объектов"
+  },
+  "route": {
+    "title": "Маршрут инспектора",
+    "subtitle": "Оптимизированный маршрут осмотра объектов",
+    "selectDistrict": "Выберите район",
+    "allDistricts": "Вся область",
+    "topObjects": "Топ объектов для осмотра",
+    "routeOrder": "Порядок обхода",
+    "object": "Объект",
+    "riskScore": "Риск",
+    "distance": "Расстояние",
+    "totalDistance": "Общая длина маршрута",
+    "estimatedTime": "Оценочное время",
+    "noObjects": "Нет объектов с координатами в выбранном районе",
+    "generateRoute": "Построить маршрут",
+    "routeGenerated": "Маршрут построен",
+    "startPoint": "Начальная точка",
+    "endPoint": "Конечная точка"
   }
 }

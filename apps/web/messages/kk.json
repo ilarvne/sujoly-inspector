@@ -519,5 +519,23 @@
     "boostWarning": "⚠ Режим: {mode}",
     "averageRisk": "Орташа Risk Score",
     "boostedObjects": "Күшейтілген нысандар"
+  },
+  "route": {
+    "title": "Инспектор маршруты",
+    "subtitle": "Нысандарды тексеруге арналған оңтайландырылған маршрут",
+    "selectDistrict": "Ауданды таңдаңыз",
+    "allDistricts": "Бүкіл облыс",
+    "topObjects": "Тексеруге арналған топ нысандар",
+    "routeOrder": "Айналу реті",
+    "object": "Нысан",
+    "riskScore": "Риск",
+    "distance": "Қашықтық",
+    "totalDistance": "Маршруттың жалпы ұзындығы",
+    "estimatedTime": "Болжалды уақыт",
+    "noObjects": "Таңдалған ауданда координаттары бар нысандар жоқ",
+    "generateRoute": "Маршрут құру",
+    "routeGenerated": "Маршрут құрылды",
+    "startPoint": "Бастапқы нүкте",
+    "endPoint": "Соңғы нүкте"
   }
 }

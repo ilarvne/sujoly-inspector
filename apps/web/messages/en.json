@@ -519,5 +519,23 @@
     "boostWarning": "⚠ Mode: {mode}",
     "averageRisk": "Average Risk Score",
     "boostedObjects": "Boosted objects"
+  },
+  "route": {
+    "title": "Inspector Route",
+    "subtitle": "Optimized inspection route for structures",
+    "selectDistrict": "Select district",
+    "allDistricts": "All districts",
+    "topObjects": "Top objects to inspect",
+    "routeOrder": "Route order",
+    "object": "Object",
+    "riskScore": "Risk",
+    "distance": "Distance",
+    "totalDistance": "Total route length",
+    "estimatedTime": "Estimated time",
+    "noObjects": "No objects with coordinates in selected district",
+    "generateRoute": "Generate route",
+    "routeGenerated": "Route generated",
+    "startPoint": "Start point",
+    "endPoint": "End point"
   }
 }
