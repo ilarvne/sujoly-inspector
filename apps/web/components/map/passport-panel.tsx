@@ -1,12 +1,15 @@
 'use client';
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { useTranslations, useLocale } from 'next-intl';
 import { useSelectionStore } from '@/lib/stores/selection-store';
 import { useStructureDetail } from '@/lib/api/client';
 import { STATUS_COLORS_HEX } from '@/lib/constants';
+import { InspectionTimeline } from '@/components/inspection/inspection-timeline';
+import { RiskScoreDisplay } from '@/components/inspection/risk-score-display';
 import type { TrilingualText } from '@/lib/api/types';
 
 const sourceLabelKeys = {
@@ -29,6 +32,8 @@ export function PassportPanel() {
   const locale = useLocale() as keyof TrilingualText;
   const t = useTranslations('passport');
   const tMap = useTranslations('map');
+  const tTabs = useTranslations('passportTabs');
+  const tDocs = useTranslations('documents');
 
   const nameInLocale = (name: TrilingualText) => name[locale] || name.ru;
 
@@ -44,7 +49,15 @@ export function PassportPanel() {
         {isLoading ? (
           <div className="p-4 text-muted-foreground">{tMap('loading')}</div>
         ) : structure ? (
-          <div className="space-y-1 px-4 pb-4">
+          <Tabs defaultValue="overview" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="overview">{tTabs('overview')}</TabsTrigger>
+              <TabsTrigger value="inspections">{tTabs('inspections')}</TabsTrigger>
+              <TabsTrigger value="risk">{tTabs('risk')}</TabsTrigger>
+              <TabsTrigger value="documents">{tTabs('documents')}</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="overview" className="space-y-1 px-4 pb-4">
             <section className="space-y-2">
               <h3 className="text-sm font-semibold text-foreground">{t('identity')}</h3>
               <dl className="space-y-1 text-sm">
@@ -191,7 +204,22 @@ export function PassportPanel() {
                 </div>
               </dl>
             </section>
-          </div>
+            </TabsContent>
+
+            <TabsContent value="inspections" className="px-4 pb-4">
+              {structure && <InspectionTimeline structureId={structure.id} />}
+            </TabsContent>
+
+            <TabsContent value="risk" className="px-4 pb-4">
+              {structure && <RiskScoreDisplay structureId={structure.id} />}
+            </TabsContent>
+
+            <TabsContent value="documents" className="px-4 pb-4">
+              <div className="p-4 text-muted-foreground">
+                {tDocs('noDocuments')}
+              </div>
+            </TabsContent>
+          </Tabs>
         ) : null}
       </SheetContent>
     </Sheet>
