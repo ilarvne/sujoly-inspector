@@ -81,7 +81,7 @@ Plans:
 Plans:
 **Wave 1** *(parallel)*
 
-- [ ] 03-01-PLAN.md — Risk Engine TDD: pure Python computation module (RISK-01, RISK-02, RISK-03, RISK-04, RISK-05)
+- [x] 03-01-PLAN.md — Risk Engine TDD: pure Python computation module (RISK-01, RISK-02, RISK-03, RISK-04, RISK-05)
 - [ ] 03-02-PLAN.md — Auth + RBAC + Infrastructure: JWT auth, users table, role dependencies, deps install (RISK-07)
 
 **Wave 2** *(blocked on Wave 1 completion)*
@@ -136,6 +136,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
-| 3. Risk Models & Inspection Logic | 0/6 | Not started | - |
+| 3. Risk Models & Inspection Logic | 1/6 | In Progress|  |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |

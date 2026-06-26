@@ -26,11 +26,11 @@
 
 ### Inspection & Risk
 
-- [ ] **RISK-01**: System computes a risk-informed inspection interval for each structure using a semi-quantitative model: condition score × consequence factor × seasonal modifier × data staleness modifier
-- [ ] **RISK-02**: System maps inspection urgency to legible intervals: 30 days, 90 days, 180 days, 12 months, 24 months, with emergency override
-- [ ] **RISK-03**: System determines repair need using a blended condition score (0-100) with red-flag overrides for critical indicators (seepage, deformation, rapid erosion, repeated emergencies)
-- [ ] **RISK-04**: System assigns one of four repair statuses: normal, inspection required, repair required, critical condition
-- [ ] **RISK-05**: System prefers "inspection required" over false certainty when evidence is weak, stale, or conflicting
+- [x] **RISK-01**: System computes a risk-informed inspection interval for each structure using a semi-quantitative model: condition score × consequence factor × seasonal modifier × data staleness modifier
+- [x] **RISK-02**: System maps inspection urgency to legible intervals: 30 days, 90 days, 180 days, 12 months, 24 months, with emergency override
+- [x] **RISK-03**: System determines repair need using a blended condition score (0-100) with red-flag overrides for critical indicators (seepage, deformation, rapid erosion, repeated emergencies)
+- [x] **RISK-04**: System assigns one of four repair statuses: normal, inspection required, repair required, critical condition
+- [x] **RISK-05**: System prefers "inspection required" over false certainty when evidence is weak, stale, or conflicting
 - [ ] **RISK-06**: System provides endpoints for engineer role to override system-recommended inspection intervals and repair statuses with logged provenance
 - [ ] **RISK-07**: System enforces administrator, engineer, inspector, and viewer role permissions (RBAC)
 - [ ] **RISK-08**: System provides export endpoints for structure lists as CSV/GeoJSON and inspection report generation as PDF in all three languages
@@ -66,11 +66,11 @@
 | DATA-08 | Phase 2 | Pending |
 | INT-01 | Phase 2 | Pending |
 | INT-03 | Phase 2 | Pending |
-| RISK-01 | Phase 3 | Pending |
-| RISK-02 | Phase 3 | Pending |
-| RISK-03 | Phase 3 | Pending |
-| RISK-04 | Phase 3 | Pending |
-| RISK-05 | Phase 3 | Pending |
+| RISK-01 | Phase 3 | Complete |
+| RISK-02 | Phase 3 | Complete |
+| RISK-03 | Phase 3 | Complete |
+| RISK-04 | Phase 3 | Complete |
+| RISK-05 | Phase 3 | Complete |
 | RISK-06 | Phase 3 | Pending |
 | RISK-07 | Phase 3 | Pending |
 | RISK-08 | Phase 3 | Pending |
