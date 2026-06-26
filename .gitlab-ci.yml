@@ -14,7 +14,7 @@ stages:
 build_image:
   stage: build
   only:
-    - main
+    - master
   script:
     - docker login -u $CONTAINER_REGISTRY_USER -p $CONTAINER_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA .
@@ -24,7 +24,7 @@ deploy:
   image: alpine
   stage: deploy
   only:
-    - main
+    - master
   needs: ["build_image"]
   script:
     - apk add --no-cache curl

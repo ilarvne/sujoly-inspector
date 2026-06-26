@@ -1,5 +1,5 @@
 # Multi-stage build: Next.js frontend + FastAPI backend in one container
-# Deployed container exposes port 3000 (Next.js), proxies /api/v1/* to FastAPI on 8000
+# AlemPlus deploy: HTTP port 80, logs to /applogs/app.logs
 
 # ── Stage 1: Build Next.js frontend ──
 FROM node:22-alpine AS web-builder
@@ -21,9 +21,12 @@ COPY apps/api/ ./
 # ── Stage 3: Runtime — both services ──
 FROM node:22-alpine AS runtime
 
-# Install Python and supervisord
-RUN apk add --no-cache python3 py3-pip supervisor curl bash postgresql-client && \
+# Install Python, supervisord, curl
+RUN apk add --no-cache python3 py3-pip supervisor curl bash && \
     python3 -m pip install --no-cache-dir uv
+
+# Create logs directory (AlemPlus sidecar reads /applogs/app.logs)
+RUN mkdir -p /applogs
 
 # Copy built Next.js standalone
 WORKDIR /app/web
@@ -39,12 +42,12 @@ COPY --from=api-builder /app/api/.venv ./.venv
 # Install runtime Python deps
 RUN python3 -m pip install --no-cache-dir fastapi uvicorn[standard] httpx structlog pydantic pydantic-settings sqlalchemy[asyncio] geoalchemy2 asyncpg alembic pgvector celery redis minio xlrd openpyxl jinja2 python-multipart PyJWT passlib bcrypt
 
-# Supervisord config
+# Supervisord config — both services, logs to /applogs/app.logs
 RUN mkdir -p /etc/supervisor.d
 COPY <<'EOF' /etc/supervisor.d/app.ini
 [supervisord]
 nodaemon=true
-logfile=/var/log/supervisord.log
+logfile=/applogs/supervisord.log
 
 [program:api]
 command=python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000
@@ -52,18 +55,25 @@ directory=/app/api
 environment=PYTHONPATH="/app/api/src"
 autostart=true
 autorestart=true
-stdout_logfile=/var/log/api.log
-stderr_logfile=/var/log/api-err.log
+stdout_logfile=/applogs/api.log
+stderr_logfile=/applogs/api-err.log
 
 [program:web]
 command=node server.js
 directory=/app/web
-environment=NODE_ENV="production",PORT="3000",HOSTNAME="0.0.0.0",API_INTERNAL_URL="http://localhost:8000"
+environment=NODE_ENV="production",PORT="80",HOSTNAME="0.0.0.0",API_INTERNAL_URL="http://localhost:8000"
 autostart=true
 autorestart=true
-stdout_logfile=/var/log/web.log
-stderr_logfile=/var/log/web-err.log
+stdout_logfile=/applogs/web.log
+stderr_logfile=/applogs/web-err.log
 EOF
+
+# Startup script that tails all logs into /applogs/app.logs for AlemPlus sidecar
+RUN echo '#!/bin/bash' > /start.sh && \
+    echo 'supervisord -c /etc/supervisor.d/app.ini &' >> /start.sh && \
+    echo 'sleep 2' >> /start.sh && \
+    echo 'tail -f /applogs/web.log /applogs/api.log /applogs/supervisord.log > /applogs/app.logs 2>&1' >> /start.sh && \
+    chmod +x /start.sh
 
 WORKDIR /app
 
@@ -92,8 +102,10 @@ ENV PYTHONPATH="/app/api/src" \
     API_EMBEDDING_DIMENSIONS="1024" \
     EMBEDDINGS_API_KEY="sk-gjHJ15q4DvGwp2eZGS_nhA" \
     NEXT_PUBLIC_API_URL="/api/v1" \
-    API_INTERNAL_URL="http://localhost:8000"
+    API_INTERNAL_URL="http://localhost:8000" \
+    PORT="80" \
+    HOSTNAME="0.0.0.0"
 
-EXPOSE 3000
+EXPOSE 80
 
-CMD ["supervisord", "-c", "/etc/supervisor.d/app.ini"]
+CMD ["/start.sh"]
