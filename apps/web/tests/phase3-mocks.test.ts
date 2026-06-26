@@ -81,14 +81,14 @@ describe('mockRiskScore', () => {
     expect(result.computedAt).toBeDefined();
   });
 
-  it('components array has 4 items', () => {
+  it('components array has 6 items', () => {
     const result = mockRiskScore('KZ-ZH-0001');
-    expect(result.components.length).toBe(4);
+    expect(result.components.length).toBe(6);
   });
 
   it('each component has required fields with valid ranges', () => {
     const result = mockRiskScore('KZ-ZH-0001');
-    const keys = ['structural', 'hydrological', 'operational', 'age'];
+    const keys = ['condition', 'age', 'efficiency', 'significance', 'weather', 'inspection_overdue'];
     for (let i = 0; i < result.components.length; i++) {
       const comp = result.components[i];
       expect(comp.key).toBe(keys[i]);

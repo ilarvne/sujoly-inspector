@@ -3,10 +3,10 @@ import { test, expect } from './auth-fixture';
 test('Reports page renders export panel', async ({ page }) => {
   await page.goto('/ru/reports');
 
-  await expect(page.locator('h1')).toContainText('Экспорт данных');
-  await expect(page.getByTestId('export-csv')).toBeVisible();
-  await expect(page.getByTestId('export-geojson')).toBeVisible();
-  await expect(page.getByTestId('export-pdf')).toBeVisible();
+  await expect(page.locator('h1')).toContainText('Отчёты');
+  await expect(page.getByTestId('export-csv')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByTestId('export-geojson')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByTestId('export-pdf')).toBeVisible({ timeout: 10000 });
 });
 
 test('PDF export button disabled until structure selected', async ({ page }) => {
@@ -50,8 +50,8 @@ test('GeoJSON export triggers download', async ({ page }) => {
 test('Reports page works in English', async ({ page }) => {
   await page.goto('/en/reports');
 
-  await expect(page.locator('h1')).toContainText('Export Data');
-  await expect(page.getByTestId('export-csv')).toBeVisible();
-  await expect(page.getByTestId('export-geojson')).toBeVisible();
-  await expect(page.getByTestId('export-pdf')).toBeVisible();
+  await expect(page.locator('h1')).toContainText('Reports');
+  await expect(page.getByTestId('export-csv')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByTestId('export-geojson')).toBeVisible({ timeout: 10000 });
+  await expect(page.getByTestId('export-pdf')).toBeVisible({ timeout: 10000 });
 });

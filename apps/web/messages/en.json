@@ -56,6 +56,11 @@
     "coverageRate": "Coverage Rate",
     "structuresByDistrict": "Structures by District",
     "structuresByType": "Structures by Type",
+    "topRisky": "Top 5 Riskiest Objects",
+    "missingCoords": "Missing Coordinates",
+    "duplicates": "Possible Duplicates",
+    "byType": "By Structure Type",
+    "viewOnMap": "View on Map",
     "noData": "No data available"
   },
   "map": {
@@ -134,7 +139,8 @@
     "sourceOsm": "OpenStreetMap",
     "sourceSatellite": "Satellite Imagery",
     "sourceManual": "Manual Entry",
-    "close": "Close"
+    "close": "Close",
+    "recommendation": "Recommendation"
   },
   "filter": {
     "title": "Filters",
@@ -163,7 +169,21 @@
     "colInspection": "Inspection",
     "colYear": "Year",
     "openPassport": "Open passport",
-    "resultsCount": "Found: {count}"
+    "resultsCount": "Found: {count}",
+    "riskLevel": "Risk Level",
+    "efficiency": "КПД",
+    "age": "Age",
+    "wear": "Wear",
+    "riskHigh": "High",
+    "riskMedium": "Medium",
+    "riskLow": "Low",
+    "effBelow70": "< 70%",
+    "eff70to85": "70-85%",
+    "effAbove85": "> 85%",
+    "ageBelow30": "< 30 years",
+    "age30to50": "30-50 years",
+    "ageAbove50": "> 50 years",
+    "all": "All"
   },
   "copilot": {
     "title": "AI Copilot",
@@ -240,13 +260,16 @@
     "medium": "Medium",
     "low": "Low",
     "componentBreakdown": "Component Breakdown",
-    "structural": "Structural Integrity",
-    "hydrological": "Hydrological Risk",
-    "operational": "Operational Status",
+    "condition": "Technical Condition",
     "age": "Infrastructure Age",
+    "efficiency": "Efficiency Deviation",
+    "significance": "Object Significance",
+    "weather": "Weather Risk",
+    "inspection_overdue": "Inspection Overdue",
     "weight": "Weight",
     "score": "Score",
     "explanation": "Explanation",
+    "recommendation": "Recommendation",
     "computedAt": "Computed At",
     "loading": "Loading risk assessment..."
   },
@@ -537,5 +560,29 @@
     "routeGenerated": "Route generated",
     "startPoint": "Start point",
     "endPoint": "End point"
+  },
+  "report": {
+    "title": "Auto Report",
+    "overview": "Overview",
+    "totalStructures": "Total Structures",
+    "statusDistribution": "Status Distribution",
+    "avgRiskScore": "Average Risk Score",
+    "missingCoords": "Missing Coordinates",
+    "duplicates": "Possible Duplicates",
+    "byType": "By Type",
+    "topRisky": "Top 10 Riskiest",
+    "inspectionPlan": "Inspection Plan",
+    "next7days": "Next 7 Days",
+    "next30days": "Next 30 Days",
+    "exportJSON": "Export JSON",
+    "exportHTML": "Export HTML",
+    "rank": "Rank",
+    "name": "Name",
+    "type": "Type",
+    "district": "District",
+    "riskScore": "Risk Score",
+    "condition": "Condition",
+    "generateReport": "Generate Report",
+    "generated": "Report generated successfully"
   }
 }

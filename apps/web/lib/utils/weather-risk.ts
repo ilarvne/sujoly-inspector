@@ -2,21 +2,25 @@ import type { RiskScore, RiskComponent } from '@/lib/api/types';
 import type { WeatherMode } from '@/lib/stores/weather-store';
 
 const HEAVY_RAIN_BOOSTS: Record<RiskComponent['key'], number> = {
-  structural: 1.1,
-  hydrological: 1.4,
-  operational: 1.15,
+  condition: 1.1,
   age: 1.2,
+  efficiency: 1.0,
+  significance: 1.0,
+  weather: 1.4,
+  inspection_overdue: 1.0,
 };
 
 const FLOOD_SEASON_BOOSTS: Record<RiskComponent['key'], number> = {
-  structural: 1.2,
-  hydrological: 1.6,
-  operational: 1.25,
+  condition: 1.2,
   age: 1.3,
+  efficiency: 1.0,
+  significance: 1.0,
+  weather: 1.6,
+  inspection_overdue: 1.1,
 };
 
 const WEATHER_EXPLANATIONS: Record<Exclude<WeatherMode, 'normal'>, string> = {
-  heavy_rain: '\u26A0 Heavy rain conditions amplify hydrological risk by 40%',
+  heavy_rain: '\u26A0 Heavy rain conditions amplify weather risk by 40%',
   flood_season: '\u26A0 Flood season conditions significantly amplify all risk components',
 };
 

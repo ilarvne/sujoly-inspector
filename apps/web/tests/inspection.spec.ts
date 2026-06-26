@@ -96,7 +96,7 @@ test('Risk tab shows score and components', async ({ page }) => {
 
   const sheet = page.locator('[data-slot="sheet-content"]');
   await expect(sheet).toContainText('Общий балл риска', { timeout: 5000 });
-  await expect(sheet).toContainText('Конструктивная целостность');
+  await expect(sheet).toContainText('Техническое состояние');
 });
 
 test('Override button hidden for viewer, visible for engineer', async ({ page }) => {

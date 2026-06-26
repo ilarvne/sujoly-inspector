@@ -94,6 +94,12 @@ export function RiskScoreDisplay({ structureId }: { structureId: string }) {
       <div className="space-y-1">
         <h3 className="text-sm font-semibold">{t('explanation')}</h3>
         <p className="text-sm text-muted-foreground">{displayScore.explanation}</p>
+        {displayScore.recommendation && (
+          <div className="rounded-lg bg-primary/10 p-3 text-sm">
+            <span className="font-semibold">{t('recommendation')}: </span>
+            <span>{displayScore.recommendation}</span>
+          </div>
+        )}
         <p className="text-xs text-muted-foreground">{t('computedAt')}: {displayScore.computedAt}</p>
       </div>
 

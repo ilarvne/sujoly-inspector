@@ -206,6 +206,15 @@ export function PassportPanel() {
               </dl>
             </section>
 
+            {structure.recommendation && (
+              <section className="space-y-2">
+                <h3 className="text-sm font-semibold text-foreground">{t('recommendation')}</h3>
+                <div className="bg-primary/10 p-3 rounded-lg text-sm">
+                  {structure.recommendation}
+                </div>
+              </section>
+            )}
+
             <Separator />
 
             <section className="space-y-2">

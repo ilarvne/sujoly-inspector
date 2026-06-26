@@ -12,6 +12,8 @@ import type {
   StructureFilters,
   StructureFeature,
   StructureType,
+  SignificanceLevel,
+  DuplicateCandidate,
   DiscoverySource,
   ConfidenceLevel,
   DiscoveryCandidate,
@@ -93,6 +95,20 @@ function generateMockStructures(): StructureDetail[] {
     const length = type === 'dam' || type === 'canal' ? 100 + (i % 5000) : undefined;
     const capacity = type === 'reservoir' ? 5 + (i % 200) : undefined;
     const yearBuilt = 1960 + (i % 50);
+    const age = new Date().getFullYear() - yearBuilt;
+    const designEff = 75 + (i % 20);
+    const actualEff = designEff - (5 + (i % 25));
+    const significanceLevels: SignificanceLevel[] = ['critical', 'high', 'medium', 'low'];
+    const significance = significanceLevels[i % 4];
+    const wearPercentage = Math.min(100, Math.round(age * 1.2 + (i % 15)));
+
+    const recommendationByCondition: Record<ConditionStatus, string> = {
+      critical: 'Срочный ремонт и декоммиссия при невозможности восстановления',
+      repair: 'Плановый ремонт в течение 3 месяцев',
+      inspection: 'Усиленный мониторинг и внеочередной осмотр',
+      normal: 'Регулярный осмотр по графику',
+      missing: 'Запрос координат и идентификация объекта',
+    };
 
     structures.push({
       id,
@@ -110,6 +126,10 @@ function generateMockStructures(): StructureDetail[] {
       length,
       capacity,
       yearBuilt,
+      efficiency: { design: designEff, actual: actualEff },
+      wearPercentage,
+      significance,
+      recommendation: recommendationByCondition[condition],
       coordinates,
       administrativeLocation: {
         region,
@@ -164,6 +184,10 @@ export function mockStructures(filters?: StructureFilters): StructureCollection 
       length: s.length,
       capacity: s.capacity,
       yearBuilt: s.yearBuilt,
+      efficiency: s.efficiency,
+      wearPercentage: s.wearPercentage,
+      significance: s.significance,
+      recommendation: s.recommendation,
       provenance: s.provenance,
     },
   }));
@@ -267,34 +291,61 @@ export function mockAddDocument(structureId: string, meta: { filename: string; f
 
 export function mockRiskScore(structureId: string): RiskScore {
   const seed = parseInt(structureId.replace(/\D/g, ''), 10) || 1;
+  const structure = mockStructuresRaw.find((s) => s.id === structureId);
+  const yearBuilt = structure?.yearBuilt ?? 1980;
+  const age = new Date().getFullYear() - yearBuilt;
+  const condition = structure?.condition ?? 'normal';
+  const inspectionStatus = structure?.inspectionStatus ?? 'current';
+  const efficiency = structure?.efficiency;
+  const significance = structure?.significance ?? 'medium';
+
+  const conditionScores: Record<string, number> = { normal: 15, inspection: 35, repair: 65, critical: 90, missing: 50 };
+  const significanceScores: Record<string, number> = { critical: 85, high: 60, medium: 40, low: 20 };
+  const inspectionScores: Record<string, number> = { current: 10, due_soon: 30, overdue: 80, never: 70, unknown: 60 };
+  const effDeviation = efficiency ? Math.abs(efficiency.design - efficiency.actual) : 15 + (seed % 20);
+
   const components: RiskComponent[] = [
     {
-      key: 'structural',
-      label: 'Structural Integrity',
-      score: 30 + (seed % 40),
-      weight: 0.35,
-      description: 'Condition of dam body, spillway, and load-bearing structures',
-    },
-    {
-      key: 'hydrological',
-      label: 'Hydrological Risk',
-      score: 20 + (seed * 7 % 50),
+      key: 'condition',
+      label: 'Technical Condition',
+      score: conditionScores[condition] ?? 30,
       weight: 0.25,
-      description: 'Flood probability, capacity utilization, basin characteristics',
-    },
-    {
-      key: 'operational',
-      label: 'Operational Status',
-      score: 25 + (seed * 3 % 45),
-      weight: 0.25,
-      description: 'Equipment condition, maintenance frequency, operational readiness',
+      description: 'Structural integrity based on latest inspection findings',
     },
     {
       key: 'age',
       label: 'Infrastructure Age',
-      score: 35 + (seed * 11 % 50),
+      score: Math.min(100, Math.round(age * 1.5)),
+      weight: 0.20,
+      description: `Age: ${age} years since construction`,
+    },
+    {
+      key: 'efficiency',
+      label: 'Efficiency Deviation',
+      score: Math.min(100, Math.round(effDeviation * 3)),
+      weight: 0.20,
+      description: efficiency ? `Design КПД: ${efficiency.design}%, Actual: ${efficiency.actual}%` : 'No efficiency data available',
+    },
+    {
+      key: 'significance',
+      label: 'Object Significance',
+      score: significanceScores[significance] ?? 40,
       weight: 0.15,
-      description: 'Years since construction, design lifetime, obsolescence factors',
+      description: `Significance level: ${significance}`,
+    },
+    {
+      key: 'weather',
+      label: 'Weather Risk',
+      score: 20 + (seed * 13 % 40),
+      weight: 0.10,
+      description: 'Flood probability and weather exposure based on basin location',
+    },
+    {
+      key: 'inspection_overdue',
+      label: 'Inspection Overdue',
+      score: inspectionScores[inspectionStatus] ?? 20,
+      weight: 0.10,
+      description: `Inspection status: ${inspectionStatus}`,
     },
   ];
   const overall = Math.round(components.reduce((sum, c) => sum + c.score * c.weight, 0));
@@ -304,11 +355,17 @@ export function mockRiskScore(structureId: string): RiskScore {
     medium: 'Moderate risk — scheduled inspection and monitoring recommended.',
     low: 'Low risk — routine inspection schedule applies.',
   };
+  const recommendations: Record<string, string> = {
+    high: 'Срочный ремонт и внеочередной осмотр',
+    medium: 'Плановый ремонт и усиленный мониторинг',
+    low: 'Регулярный осмотр по графику',
+  };
   return {
     structureId,
     overall,
     components,
     explanation: explanations[riskLevel],
+    recommendation: recommendations[riskLevel],
     computedAt: '2024-06-01',
   };
 }
@@ -512,4 +569,27 @@ export function mockSubmitReview(candidateId: string, action: ReviewAction, revi
     reason,
     timestamp: new Date().toISOString(),
   };
+}
+
+export function detectDuplicateStructures(): DuplicateCandidate[] {
+  const groups: Record<string, number[]> = {};
+  for (let i = 0; i < mockStructuresRaw.length; i++) {
+    const s = mockStructuresRaw[i];
+    const key = `${s.district}|${s.basin}|${s.type}|${s.yearBuilt ?? 0}|${Math.round((s.length ?? 0) / 100)}`;
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(i);
+  }
+  const duplicates: DuplicateCandidate[] = [];
+  for (const [key, indices] of Object.entries(groups)) {
+    if (indices.length < 2) continue;
+    const structures = indices.map((i) => mockStructuresRaw[i]);
+    const [d, b, t, y, l] = key.split('|');
+    duplicates.push({
+      id: `DUP-${duplicates.length + 1}`,
+      structureIds: structures.map((s) => s.id),
+      reason: `Same district "${d}", basin "${b}", type "${t}", year ${y}, similar length bucket ${l}`,
+      matchFields: ['district', 'basin', 'type', 'yearBuilt', 'length'],
+    });
+  }
+  return duplicates;
 }

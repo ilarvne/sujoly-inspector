@@ -10,6 +10,13 @@ export interface TrilingualText {
   en: string;
 }
 
+export type SignificanceLevel = 'critical' | 'high' | 'medium' | 'low';
+
+export interface Efficiency {
+  design: number;
+  actual: number;
+}
+
 export interface StructureProperties {
   id: string;
   name: TrilingualText;
@@ -22,6 +29,10 @@ export interface StructureProperties {
   length?: number;
   capacity?: number;
   yearBuilt?: number;
+  efficiency?: Efficiency;
+  wearPercentage?: number;
+  significance?: SignificanceLevel;
+  recommendation?: string;
   provenance: {
     source: string;
     confidence: 'high' | 'medium' | 'low';
@@ -63,6 +74,10 @@ export interface StructureFilters {
   type?: string | null;
   condition?: string | null;
   inspectionStatus?: string | null;
+  riskLevel?: string | null;
+  efficiencyMin?: number | null;
+  ageMin?: number | null;
+  ageMax?: number | null;
 }
 
 export type UserRole = 'admin' | 'engineer' | 'inspector' | 'viewer';
@@ -95,7 +110,7 @@ export interface DocumentMeta {
 }
 
 export interface RiskComponent {
-  key: 'structural' | 'hydrological' | 'operational' | 'age';
+  key: 'condition' | 'age' | 'efficiency' | 'significance' | 'weather' | 'inspection_overdue';
   label: string;
   score: number;
   weight: number;
@@ -107,7 +122,15 @@ export interface RiskScore {
   overall: number;
   components: RiskComponent[];
   explanation: string;
+  recommendation: string;
   computedAt: string;
+}
+
+export interface DuplicateCandidate {
+  id: string;
+  structureIds: string[];
+  reason: string;
+  matchFields: string[];
 }
 
 export type OverrideField = 'inspection_interval' | 'repair_status';
