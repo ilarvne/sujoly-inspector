@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { useDiscoveryCandidates, useMatchResults } from '@/lib/api/client';
+import { useDiscoveryStore } from '@/lib/stores/discovery-store';
 import { CandidateList } from './candidate-list';
 import { ComparisonView } from './comparison-view';
 import { ReviewActions } from './review-actions';
@@ -14,6 +15,7 @@ export function DiscoveryView() {
   const t = useTranslations('discovery');
   const { data: candidates } = useDiscoveryCandidates();
   const { data: matches } = useMatchResults();
+  const selectedCandidateId = useDiscoveryStore((s) => s.selectedCandidateId);
 
   const stats = useMemo(() => {
     const total = candidates?.length ?? 0;
@@ -65,16 +67,18 @@ export function DiscoveryView() {
           </CardContent>
         </Card>
 
-        <div className="space-y-4">
+        <div className="space-y-4 lg:sticky lg:top-20 lg:self-start">
           <ComparisonView />
-          <Card>
-            <CardHeader>
-              <CardTitle>{t('table.review')}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ReviewActions />
-            </CardContent>
-          </Card>
+          {selectedCandidateId && (
+            <Card>
+              <CardHeader>
+                <CardTitle>{t('table.review')}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ReviewActions />
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </div>

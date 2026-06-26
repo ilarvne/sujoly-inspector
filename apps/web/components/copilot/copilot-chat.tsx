@@ -4,7 +4,6 @@ import { useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { SparklesIcon, Trash2Icon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import { useChatStore } from '@/lib/stores/chat-store';
 import { ChatMessage } from './chat-message';
@@ -22,11 +21,8 @@ export function CopilotChat() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const viewport = document.querySelector('[data-radix-scroll-area-viewport]');
-    if (viewport) {
-      viewport.scrollTop = viewport.scrollHeight;
-    } else if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
   }, [messages]);
 
@@ -57,7 +53,7 @@ export function CopilotChat() {
         )}
       </div>
 
-      <ScrollArea className="flex-1" >
+      <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="space-y-4 p-4">
           {isEmpty ? (
             <div className="space-y-4">
@@ -72,11 +68,10 @@ export function CopilotChat() {
               {messages.map((message) => (
                 <ChatMessage key={message.id} message={message} />
               ))}
-              <div ref={scrollRef} />
             </>
           )}
         </div>
-      </ScrollArea>
+      </div>
 
       <ChatInput onSend={handleSend} disabled={isStreaming} />
     </div>

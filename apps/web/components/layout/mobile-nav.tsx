@@ -23,7 +23,7 @@ export function MobileNav() {
         <Menu className="h-5 w-5" aria-hidden="true" />
       </Button>
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="left" className="w-64 p-0">
+        <SheetContent side="left" showCloseButton={false} className="w-64 p-0">
           <div className="flex items-center justify-between border-b px-4 py-3">
             <span className="font-display text-sm font-semibold">{t('title')}</span>
             <Button
@@ -35,7 +35,7 @@ export function MobileNav() {
               <X className="h-4 w-4" aria-hidden="true" />
             </Button>
           </div>
-          <Sidebar onNavigate={() => setOpen(false)} />
+          <Sidebar mobile onNavigate={() => setOpen(false)} />
         </SheetContent>
       </Sheet>
     </>
