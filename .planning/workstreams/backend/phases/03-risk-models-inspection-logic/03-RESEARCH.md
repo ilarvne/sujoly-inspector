@@ -992,19 +992,19 @@ class UserModel(Base):
 | A6 | Russian red-flag keywords are sufficient for initial detection (Kazakh keywords can be added later) | Risk Engine | Medium — if inspection findings are in Kazakh, red flags will be missed. Mitigated by also checking structure_facts which contain spreadsheet data in Russian. |
 | A7 | `asyncio.to_thread()` is the correct approach for running WeasyPrint in async FastAPI routes | Pitfalls | Low — standard Python 3.9+ pattern for running sync code in async context. |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Initial admin user creation**
+1. **Initial admin user creation** — RESOLVED: Plan 03-02 implements admin seeding in lifespan startup via `API_INITIAL_ADMIN_USERNAME` env var, per recommendation below.
    - What we know: D-11 says "no password hashing in Phase 3 — use a simple shared secret or API key lookup." CONTEXT.md specifics say "The users table should support an initial admin user created via environment variables or a seed script."
    - What's unclear: Should the initial admin be created via Alembic migration (seed data), via a startup script in the lifespan, or via a CLI command?
    - Recommendation: Create via a seed function called during lifespan startup if no admin user exists. Use `API_INITIAL_ADMIN_USERNAME` env var. This is in the agent's discretion area.
 
-2. **Redis caching for risk assessments**
+2. **Redis caching for risk assessments** — RESOLVED: Skip Redis cache for MVP (agent's discretion). PostgreSQL index on `structure_id + valid_to IS NULL` is sufficient for 444 structures.
    - What we know: CONTEXT.md lists "Whether to add a `risk_assessments` cache in Redis for frequently-accessed structures" as agent's discretion.
    - What's unclear: Is the ~444 structure dataset small enough that DB queries are always fast?
    - Recommendation: Skip Redis cache for MVP. PostgreSQL with an index on `structure_id + valid_to IS NULL` is fast enough for 444 structures. Add cache only if performance becomes an issue.
 
-3. **WeasyPrint font files for Kazakh script**
+3. **WeasyPrint font files for Kazakh script** — RESOLVED: Plan 03-06 PDF templates include @font-face fallback for Noto Sans to ensure Kazakh Cyrillic characters (ә, ғ, қ, ң, ө, ұ, һ) render correctly.
    - What we know: WeasyPrint uses Pango for text rendering. Cyrillic is well-supported. Kazakh uses Cyrillic script with additional characters (ә, ғ, қ, ң, ө, ұ, һ).
    - What's unclear: Does the default Pango font on `python:3.12-slim-bookworm` include Kazakh Cyrillic characters?
    - Recommendation: Include a Noto Sans font file in the Docker image (or use a web font URL in the Jinja2 template CSS) to guarantee Kazakh character rendering. Test with actual Kazakh text in the PDF report.

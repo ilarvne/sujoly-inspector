@@ -45,9 +45,9 @@ created: 2026-06-26
 | 03-01-05 | 01 | 1 | RISK-05 | — | Weak-evidence floor never below "inspection required" | unit | `pytest tests/test_risk_engine.py::test_weak_evidence -x` | ❌ W0 | ⬜ pending |
 | 03-02-01 | 02 | 1 | RISK-07 | T-03-03 | JWT rejects alg=none, role enforcement on all endpoints | integration | `pytest tests/test_auth.py -x` | ❌ W0 | ⬜ pending |
 | 03-03-01 | 03 | 2 | RISK-06 | T-03-04 | Override creates provenance record, requires engineer/admin role | integration | `pytest tests/test_risk_api.py::test_override -x` | ❌ W0 | ⬜ pending |
-| 03-04-01 | 04 | 2 | DATA-05 | T-03-05 | Inspection CRUD, photos via presigned URLs (time-limited) | integration | `pytest tests/test_inspections.py -x` | ❌ W0 | ⬜ pending |
-| 03-05-01 | 05 | 2 | DATA-06 | T-03-05 | Document CRUD, MinIO presigned URLs (time-limited) | integration | `pytest tests/test_documents.py -x` | ❌ W0 | ⬜ pending |
-| 03-06-01 | 06 | 3 | RISK-08 | T-03-06 | CSV injection mitigation, trilingual export labels | integration | `pytest tests/test_exports.py -x` | ❌ W0 | ⬜ pending |
+| 03-04-01 | 04 | 2 | DATA-06 | T-03-10 | Document CRUD, MinIO presigned URLs (time-limited) | integration | `pytest tests/test_documents.py -x` | ❌ W0 | ⬜ pending |
+| 03-05-01 | 05 | 3 | DATA-05 | T-03-14 | Inspection CRUD, photos via presigned URLs (time-limited) | integration | `pytest tests/test_inspections.py -x` | ❌ W0 | ⬜ pending |
+| 03-06-01 | 06 | 4 | RISK-08 | T-03-06 | CSV injection mitigation, trilingual export labels | integration | `pytest tests/test_exports.py -x` | ❌ W0 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
