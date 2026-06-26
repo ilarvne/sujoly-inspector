@@ -143,5 +143,5 @@ Plans:
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
 | 3. Risk Models & Inspection Logic | 8/9 | In Progress|  |
-| 4. Discovery & Matching Backend | 1/4 | In Progress|  |
+| 4. Discovery & Matching Backend | 3/4 | In Progress|  |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |

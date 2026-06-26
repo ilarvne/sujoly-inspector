@@ -5,14 +5,14 @@ milestone_name: milestone
 current_phase: 04
 current_plan: 2
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-06-26T03:50:20.417Z"
+stopped_at: Completed 04-03-PLAN.md
+last_updated: "2026-06-26T03:57:07.367Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 18
-  completed_plans: 15
+  completed_plans: 16
   percent: 40
 ---
 
@@ -21,7 +21,7 @@ progress:
 ## Current Position
 
 Phase: 04 (discovery-matching-backend) — EXECUTING
-Plan: 3 of 4
+Plan: 4 of 4
 **Status:** Ready to execute
 **Current Phase:** 04
 **Current Plan:** 2
@@ -50,6 +50,7 @@ Progress: [████████░░] 78%
 | Phase 03 P09 | 4min | 2 tasks | 4 files |
 | 04 | 01 | 3min | 1 | 5 |
 | Phase 04 P02 | 4min | 2 tasks | 5 files |
+| Phase 04 P03 | 4min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,8 @@ Progress: [████████░░] 78%
 - [Phase 03]: Return 404 (not 403) on structure_id mismatch to avoid disclosing inspection existence — 403 would disclose inspection existence in another structure
 - [Phase 04]: ORM defaults (match_status, confidence) are SQL INSERT defaults — service layer sets them explicitly
 - [Phase 04]: Migration 0008 branches from 0006 as latest in chain; no 0007 exists
+- [Phase 04]: STAC catalog stored as JSON in MinIO (not full STAC server) for hackathon MVP — Lightweight approach, upgrade path to stac-fastapi preserved
+- [Phase 04]: OCR uses pattern-matching stub (not Tesseract/EasyOCR), Russian/Kazakh bilingual entity extraction — Upgrade path to real OCR preserved; confidence=LOW for images until Tesseract/EasyOCR integrated
 
 ### Blockers/Concerns
 
@@ -84,6 +87,6 @@ None current.
 
 ## Session Continuity
 
-**Last Session:** 2026-06-26T03:50:20.409Z
-**Stopped At:** Completed 04-02-PLAN.md
+**Last Session:** 2026-06-26T03:57:07.360Z
+**Stopped At:** Completed 04-03-PLAN.md
 **Resume File:** None
