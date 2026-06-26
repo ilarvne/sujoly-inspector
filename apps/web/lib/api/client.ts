@@ -78,3 +78,53 @@ export function useOverrides(structureId: string | null) {
     enabled: !!structureId,
   });
 }
+
+async function fetchDiscoveryCandidates(): Promise<DiscoveryCandidate[]> {
+  await new Promise((resolve) => setTimeout(resolve, 150));
+  return mockDiscoveryCandidates();
+}
+
+async function fetchMatchResults(): Promise<MatchResult[]> {
+  await new Promise((resolve) => setTimeout(resolve, 150));
+  return mockMatchResults();
+}
+
+export function useDiscoveryCandidates() {
+  return useQuery({
+    queryKey: ['discovery', 'candidates'],
+    queryFn: () => fetchDiscoveryCandidates(),
+  });
+}
+
+export function useMatchResults() {
+  return useQuery({
+    queryKey: ['discovery', 'matches'],
+    queryFn: () => fetchMatchResults(),
+  });
+}
+
+export function useDiscoveryCandidate(candidateId: string | null) {
+  return useQuery({
+    queryKey: ['discovery', 'candidate', candidateId],
+    queryFn: () => {
+      if (!candidateId) return null;
+      return Promise.resolve(mockDiscoveryCandidateById(candidateId));
+    },
+    enabled: !!candidateId,
+  });
+}
+
+export function useMatchResult(candidateId: string | null) {
+  return useQuery({
+    queryKey: ['discovery', 'match', candidateId],
+    queryFn: () => {
+      if (!candidateId) return null;
+      return Promise.resolve(mockMatchResultByCandidateId(candidateId));
+    },
+    enabled: !!candidateId,
+  });
+}
+
+export function mockSubmitReviewAction(candidateId: string, action: ReviewAction, reviewerName: string, reason: string): ReviewActionRecord {
+  return mockSubmitReview(candidateId, action, reviewerName, reason);
+}

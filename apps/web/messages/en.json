@@ -374,5 +374,107 @@
     "voiceNoteLanguage": "Language",
     "languageRu": "Russian",
     "languageKk": "Kazakh"
+  },
+  "discovery": {
+    "title": "Discovery & Matching",
+    "subtitle": "Review candidate hydraulic structures discovered from external sources",
+    "candidateCount": "{count} candidates",
+    "loading": "Loading candidates...",
+    "noCandidates": "No candidates found",
+    "stats": {
+      "total": "Total",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "linked": "Linked",
+      "rejected": "Rejected"
+    },
+    "confidence": {
+      "high": "High",
+      "medium": "Medium",
+      "low": "Low"
+    },
+    "sources": {
+      "osm": "OpenStreetMap",
+      "satellite": "Satellite Imagery",
+      "kazvodhoz": "Kazvodhoz Registry",
+      "manual": "Manual Entry"
+    },
+    "evidence": {
+      "name_similarity": "Name Similarity",
+      "distance": "Distance",
+      "type_agreement": "Type Agreement",
+      "source_overlap": "Source Overlap",
+      "agreement": "Match",
+      "mismatch": "Mismatch"
+    },
+    "review": {
+      "accept": "Accept",
+      "link": "Link",
+      "reject": "Reject",
+      "accepted": "Accepted",
+      "linked": "Linked",
+      "rejected": "Rejected",
+      "pending": "Pending",
+      "acceptDesc": "Add as new structure in registry",
+      "linkDesc": "Merge with existing record",
+      "rejectDesc": "Mark as false positive",
+      "reviewSuccess": "Review submitted successfully",
+      "confirmAccept": "Accept this candidate as a new structure?",
+      "confirmLink": "Link this candidate to the existing record?",
+      "confirmReject": "Reject this candidate as a false positive?",
+      "reason": "Reason (optional)",
+      "reasonPlaceholder": "Provide a reason for this decision...",
+      "submit": "Submit",
+      "cancel": "Cancel",
+      "loginRequired": "Login required to review candidates",
+      "permissionDenied": "Only administrators and engineers can review candidates"
+    },
+    "comparison": {
+      "title": "Comparison",
+      "existingRecord": "Existing Record",
+      "candidateRecord": "Candidate",
+      "noMatch": "No existing match found",
+      "matchScore": "Match Score",
+      "name": "Name",
+      "type": "Type",
+      "coordinates": "Coordinates",
+      "district": "District",
+      "basin": "Basin",
+      "height": "Height (m)",
+      "length": "Length (m)",
+      "capacity": "Capacity (million m³)",
+      "yearBuilt": "Year Built",
+      "detectedAt": "Detected At",
+      "evidence": "Match Evidence",
+      "selectCandidate": "Select a candidate to view comparison"
+    },
+    "table": {
+      "source": "Source",
+      "name": "Name",
+      "type": "Type",
+      "confidence": "Confidence",
+      "matchScore": "Match",
+      "status": "Status",
+      "detectedAt": "Detected",
+      "actions": "Actions",
+      "review": "Review"
+    },
+    "filter": {
+      "all": "All",
+      "pending": "Pending",
+      "accepted": "Accepted",
+      "linked": "Linked",
+      "rejected": "Rejected",
+      "search": "Search by name...",
+      "filterBy": "Filter by status"
+    },
+    "structureType": {
+      "dam": "Dam",
+      "reservoir": "Reservoir",
+      "canal": "Canal",
+      "pumping_station": "Pumping Station",
+      "spillway": "Spillway",
+      "other": "Other"
+    }
   }
 }
