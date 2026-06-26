@@ -8,8 +8,8 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
 
 - [x] **Phase 1: App Shell & i18n** - Next.js project, trilingual (RU/KK/EN), cyrillic-ext fonts, Tailwind, shadcn/ui, design system
 - [x] **Phase 2: Map UI & Digital Passport** - MapLibre map, structure markers, digital passport, portfolio dashboard, filtering — the MVP
-- [ ] **Phase 3: Inspection & Risk UI** - Inspection timeline, document upload, risk display, RBAC UI, export UI
-- [ ] **Phase 4: Discovery & Matching UI** - Candidate discovery view, side-by-side comparison, HITL review, confidence badges — **COMPLETE**
+- [x] **Phase 3: Inspection & Risk UI** - Inspection timeline, document upload, risk display, RBAC UI, export UI
+- [x] **Phase 4: Discovery & Matching UI** - Candidate discovery view, side-by-side comparison, HITL review, confidence badges
 - [x] **Phase 5: PWA Field Mode** - Offline capture, deferred sync, voice transcription, sync status UI
 - [x] **Phase 6: AI Copilot UI** - OpenUI renderer, assistant-ui chat, copilot page, tool provider integration
 
@@ -61,10 +61,10 @@ Plans:
 **Plans**: 5 plans
 Plans:
 - [x] 03-01-PLAN.md — Foundation: packages, shadcn components, types, mock data, auth store, API hooks, i18n
-- [ ] 03-02-PLAN.md — Passport tabs + inspection timeline + risk score + engineer override dialog
-- [ ] 03-03-PLAN.md — Document upload/list wired into passport Documents tab
-- [ ] 03-04-PLAN.md — RBAC: login page, user menu, permission guard
-- [ ] 03-05-PLAN.md — Export UI: CSV/GeoJSON/PDF on /reports page
+- [x] 03-02-PLAN.md — Passport tabs + inspection timeline + risk score + engineer override dialog
+- [x] 03-03-PLAN.md — Document upload/list wired into passport Documents tab
+- [x] 03-04-PLAN.md — RBAC: login page, user menu, permission guard
+- [x] 03-05-PLAN.md — Export UI: CSV/GeoJSON/PDF on /reports page
 **UI hint**: yes
 
 ### Phase 4: Discovery & Matching UI
@@ -125,7 +125,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. App Shell & i18n | 4/4 | Complete | 2026-06-26 |
 | 2. Map UI & Digital Passport | 4/4 | Complete | 2026-06-26 |
-| 3. Inspection & Risk UI | 1/5 | In Progress | - |
+| 3. Inspection & Risk UI | 5/5 | Complete | 2026-06-26 |
 | 4. Discovery & Matching UI | 2/2 | Complete | 2026-06-26 |
 | 5. PWA Field Mode | 4/4 | Complete | 2026-06-26 |
 | 6. AI Copilot UI | 2/2 | Complete | 2026-06-26 |
