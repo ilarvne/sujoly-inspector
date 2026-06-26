@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server';
 import { Sidebar } from './sidebar';
 import { LanguageSwitcher } from './language-switcher';
 import { UserMenu } from '@/components/auth/user-menu';
+import { FieldModeIndicator } from '@/components/field/field-mode-indicator';
 
 export async function AppShell({ children }: { children: React.ReactNode }) {
   const t = await getTranslations('common');
@@ -13,6 +14,7 @@ export async function AppShell({ children }: { children: React.ReactNode }) {
           {t('appTitle')}
         </span>
         <div className="flex items-center gap-3">
+          <FieldModeIndicator />
           <LanguageSwitcher />
           <UserMenu />
         </div>
