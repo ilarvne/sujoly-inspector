@@ -64,3 +64,61 @@ export interface StructureFilters {
   condition?: string | null;
   inspectionStatus?: string | null;
 }
+
+export type UserRole = 'admin' | 'engineer' | 'inspector' | 'viewer';
+
+export interface AuthUser {
+  id: string;
+  name: string;
+  role: UserRole;
+}
+
+export interface InspectionRecord {
+  id: string;
+  structureId: string;
+  date: string;
+  inspectorName: string;
+  findings: string;
+  photoUrls: string[];
+  conditionAtInspection: ConditionStatus;
+}
+
+export interface DocumentMeta {
+  id: string;
+  structureId: string;
+  filename: string;
+  fileType: string;
+  fileSize: number;
+  uploadedBy: string;
+  uploadedAt: string;
+  downloadUrl: string;
+}
+
+export interface RiskComponent {
+  key: 'structural' | 'hydrological' | 'operational' | 'age';
+  label: string;
+  score: number;
+  weight: number;
+  description: string;
+}
+
+export interface RiskScore {
+  structureId: string;
+  overall: number;
+  components: RiskComponent[];
+  explanation: string;
+  computedAt: string;
+}
+
+export type OverrideField = 'inspection_interval' | 'repair_status';
+
+export interface EngineerOverride {
+  id: string;
+  structureId: string;
+  field: OverrideField;
+  originalValue: string;
+  newValue: string;
+  reason: string;
+  engineerName: string;
+  timestamp: string;
+}

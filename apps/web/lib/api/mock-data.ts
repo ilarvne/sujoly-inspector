@@ -1,6 +1,12 @@
 import type {
   ConditionStatus,
   InspectionStatus,
+  InspectionRecord,
+  DocumentMeta,
+  RiskScore,
+  RiskComponent,
+  EngineerOverride,
+  OverrideField,
   StructureCollection,
   StructureDetail,
   StructureFilters,
@@ -170,4 +176,163 @@ export function mockDistricts(): string[] {
 
 export function mockBasins(): string[] {
   return [...new Set(mockStructuresRaw.map((s) => s.basin))];
+}
+
+const inspectorNames = [
+  'А. Беков', 'К. Жусупов', 'М. Сулейменов', 'Б. Ахметов', 'Д. Касымов',
+];
+
+const findingsText = [
+  'Состояние удовлетворительное. Требуется плановый осмотр через 6 месяцев.',
+  'Обнаружены трещины на бетонной части. Рекомендуется ремонт.',
+  'Водосбросное сооружение работает в штатном режиме.',
+  'Уровень воды близок к критическому. Усиленный мониторинг.',
+  'Грунтовая плотина имеет просадку на 2 см. Наблюдение продолжается.',
+  'Оборудование насосной станции требует замены отдельных узлов.',
+  'Канал очищен от наносов. Пропускная способность восстановлена.',
+  'Выявлена фильтрация через тело плотины. Срочный ремонт.',
+];
+
+const documentTypes = ['passport_scan', 'inspection_report', 'photo', 'technical_drawing', 'certificate'];
+const documentExtensions: Record<string, string> = {
+  passport_scan: 'pdf',
+  inspection_report: 'pdf',
+  photo: 'jpg',
+  technical_drawing: 'pdf',
+  certificate: 'pdf',
+};
+
+export function mockInspections(structureId: string): InspectionRecord[] {
+  const seed = parseInt(structureId.replace(/\D/g, ''), 10) || 1;
+  const count = 3 + (seed % 6);
+  const records: InspectionRecord[] = [];
+  for (let i = 0; i < count; i++) {
+    const year = 2024 - i;
+    const month = ((seed + i) % 12) + 1;
+    const day = ((seed + i * 3) % 28) + 1;
+    records.push({
+      id: `${structureId}-INS-${String(i + 1).padStart(3, '0')}`,
+      structureId,
+      date: `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`,
+      inspectorName: inspectorNames[(seed + i) % inspectorNames.length],
+      findings: findingsText[(seed + i) % findingsText.length],
+      photoUrls: i < 2 ? [`/mock-photos/${structureId}-${i + 1}.jpg`] : [],
+      conditionAtInspection: conditions[(seed + i) % conditions.length] as ConditionStatus,
+    });
+  }
+  return records.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+export function mockDocuments(structureId: string): DocumentMeta[] {
+  const seed = parseInt(structureId.replace(/\D/g, ''), 10) || 1;
+  const count = seed % 4;
+  const docs: DocumentMeta[] = [];
+  for (let i = 0; i < count; i++) {
+    const type = documentTypes[(seed + i) % documentTypes.length];
+    docs.push({
+      id: `${structureId}-DOC-${String(i + 1).padStart(3, '0')}`,
+      structureId,
+      filename: `${structureId}_${type}.${documentExtensions[type]}`,
+      fileType: type,
+      fileSize: 1024 * (100 + (seed + i) * 500),
+      uploadedBy: inspectorNames[(seed + i) % inspectorNames.length],
+      uploadedAt: `2024-${String(((seed + i) % 12) + 1).padStart(2, '0')}-15`,
+      downloadUrl: `#mock-download/${structureId}/${type}/${i + 1}`,
+    });
+  }
+  return docs;
+}
+
+export function mockAddDocument(structureId: string, meta: { filename: string; fileType: string; fileSize: number }): DocumentMeta {
+  const id = `${structureId}-DOC-${Date.now()}`;
+  return {
+    id,
+    structureId,
+    filename: meta.filename,
+    fileType: meta.fileType,
+    fileSize: meta.fileSize,
+    uploadedBy: 'Current User',
+    uploadedAt: new Date().toISOString().split('T')[0],
+    downloadUrl: `#mock-download/${structureId}/upload/${id}`,
+  };
+}
+
+export function mockRiskScore(structureId: string): RiskScore {
+  const seed = parseInt(structureId.replace(/\D/g, ''), 10) || 1;
+  const components: RiskComponent[] = [
+    {
+      key: 'structural',
+      label: 'Structural Integrity',
+      score: 30 + (seed % 40),
+      weight: 0.35,
+      description: 'Condition of dam body, spillway, and load-bearing structures',
+    },
+    {
+      key: 'hydrological',
+      label: 'Hydrological Risk',
+      score: 20 + (seed * 7 % 50),
+      weight: 0.25,
+      description: 'Flood probability, capacity utilization, basin characteristics',
+    },
+    {
+      key: 'operational',
+      label: 'Operational Status',
+      score: 25 + (seed * 3 % 45),
+      weight: 0.25,
+      description: 'Equipment condition, maintenance frequency, operational readiness',
+    },
+    {
+      key: 'age',
+      label: 'Infrastructure Age',
+      score: 35 + (seed * 11 % 50),
+      weight: 0.15,
+      description: 'Years since construction, design lifetime, obsolescence factors',
+    },
+  ];
+  const overall = Math.round(components.reduce((sum, c) => sum + c.score * c.weight, 0));
+  const riskLevel = overall >= 70 ? 'high' : overall >= 40 ? 'medium' : 'low';
+  const explanations: Record<string, string> = {
+    high: 'High risk score indicates urgent inspection and potential repair requirements.',
+    medium: 'Moderate risk — scheduled inspection and monitoring recommended.',
+    low: 'Low risk — routine inspection schedule applies.',
+  };
+  return {
+    structureId,
+    overall,
+    components,
+    explanation: explanations[riskLevel],
+    computedAt: '2024-06-01',
+  };
+}
+
+export function mockOverrides(structureId: string): EngineerOverride[] {
+  const seed = parseInt(structureId.replace(/\D/g, ''), 10) || 1;
+  const count = seed % 3;
+  const overrides: EngineerOverride[] = [];
+  const fields: OverrideField[] = ['inspection_interval', 'repair_status'];
+  for (let i = 0; i < count; i++) {
+    const field = fields[i % fields.length];
+    overrides.push({
+      id: `${structureId}-OVR-${String(i + 1).padStart(3, '0')}`,
+      structureId,
+      field,
+      originalValue: field === 'inspection_interval' ? '12 months' : 'repair_required',
+      newValue: field === 'inspection_interval' ? '6 months' : 'monitor',
+      reason: field === 'inspection_interval'
+        ? 'Increased risk due to age and recent findings of minor cracking.'
+        : 'Visual inspection shows condition is stable. Monitoring recommended instead of immediate repair.',
+      engineerName: inspectorNames[(seed + i) % inspectorNames.length],
+      timestamp: `2024-${String(((seed + i) % 6) + 1).padStart(2, '0')}-10`,
+    });
+  }
+  return overrides;
+}
+
+export function mockAddOverride(structureId: string, data: { field: OverrideField; originalValue: string; newValue: string; reason: string; engineerName: string }): EngineerOverride {
+  return {
+    id: `${structureId}-OVR-${Date.now()}`,
+    structureId,
+    ...data,
+    timestamp: new Date().toISOString().split('T')[0],
+  };
 }
