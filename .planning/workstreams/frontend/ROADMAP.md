@@ -7,7 +7,7 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
 ## Phases
 
 - [x] **Phase 1: App Shell & i18n** - Next.js project, trilingual (RU/KK/EN), cyrillic-ext fonts, Tailwind, shadcn/ui, design system
-- [ ] **Phase 2: Map UI & Digital Passport** - MapLibre map, structure markers, digital passport, portfolio dashboard, filtering — the MVP
+- [x] **Phase 2: Map UI & Digital Passport** - MapLibre map, structure markers, digital passport, portfolio dashboard, filtering — the MVP
 - [ ] **Phase 3: Inspection & Risk UI** - Inspection timeline, document upload, risk display, RBAC UI, export UI
 - [ ] **Phase 4: Discovery & Matching UI** - Candidate discovery view, side-by-side comparison, HITL review, confidence badges
 - [ ] **Phase 5: PWA Field Mode** - Offline capture, deferred sync, voice transcription, sync status UI
@@ -41,10 +41,10 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
   4. Map and dashboard filterable by district, basin, type, condition, inspection status
 **Plans**: 4 plans
 Plans:
-- [ ] 02-01-PLAN.md — Interactive map with color-coded structures, mock data layer, Zustand stores, TanStack Query
-- [ ] 02-02-PLAN.md — Digital passport side panel with identity, geometry, specs, status, provenance
-- [ ] 02-03-PLAN.md — Portfolio dashboard with condition donut, repair queue, inspection stats, heatmap
-- [ ] 02-04-PLAN.md — Filter panel with district, basin, type, condition, inspection status selectors
+- [x] 02-01-PLAN.md — Interactive map with color-coded structures, mock data layer, Zustand stores, TanStack Query
+- [x] 02-02-PLAN.md — Digital passport side panel with identity, geometry, specs, status, provenance
+- [x] 02-03-PLAN.md — Portfolio dashboard with condition donut, repair queue, inspection stats, heatmap
+- [x] 02-04-PLAN.md — Filter panel with district, basin, type, condition, inspection status selectors
 **UI hint**: yes
 
 ### Phase 3: Inspection & Risk UI
@@ -58,7 +58,13 @@ Plans:
   3. Risk score display with component breakdown and explanation
   4. Engineer override UI for inspection intervals and repair statuses with provenance logging
   5. Login/role gating (admin, engineer, inspector, viewer) and export UI (CSV/GeoJSON/PDF) in all three languages
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [x] 03-01-PLAN.md — Foundation: packages, shadcn components, types, mock data, auth store, API hooks, i18n
+- [ ] 03-02-PLAN.md — Passport tabs + inspection timeline + risk score + engineer override dialog
+- [ ] 03-03-PLAN.md — Document upload/list wired into passport Documents tab
+- [ ] 03-04-PLAN.md — RBAC: login page, user menu, permission guard
+- [ ] 03-05-PLAN.md — Export UI: CSV/GeoJSON/PDF on /reports page
 **UI hint**: yes
 
 ### Phase 4: Discovery & Matching UI
@@ -109,8 +115,8 @@ Plans:
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. App Shell & i18n | 4/4 | Complete | 2026-06-26 |
-| 2. Map UI & Digital Passport | 0/4 | Not started | - |
-| 3. Inspection & Risk UI | 0/TBD | Not started | - |
+| 2. Map UI & Digital Passport | 4/4 | Complete | 2026-06-26 |
+| 3. Inspection & Risk UI | 1/5 | In Progress | - |
 | 4. Discovery & Matching UI | 0/TBD | Not started | - |
 | 5. PWA Field Mode | 0/TBD | Not started | - |
 | 6. AI Copilot UI | 0/TBD | Not started | - |
