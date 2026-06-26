@@ -87,7 +87,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 03-03-PLAN.md — Risk Assessment Persistence + Override + Celery recomputation (RISK-06)
-- [ ] 03-04-PLAN.md — Document Attachments: CRUD endpoints with MinIO presigned URLs (DATA-06)
+- [x] 03-04-PLAN.md — Document Attachments: CRUD endpoints with MinIO presigned URLs (DATA-06)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -136,6 +136,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
-| 3. Risk Models & Inspection Logic | 3/6 | In Progress|  |
+| 3. Risk Models & Inspection Logic | 4/6 | In Progress|  |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |
