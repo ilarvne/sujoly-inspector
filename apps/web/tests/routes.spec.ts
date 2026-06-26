@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const routes = ['', '/dashboard', '/map', '/objects', '/copilot', '/reports', '/hydrofinder'];
+const routes = ['', '/dashboard', '/map', '/objects', '/copilot', '/reports', '/hydrofinder', '/login'];
 const locales = ['ru', 'kk', 'en'];
 
 for (const locale of locales) {
