@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ labels.title }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm 15mm;
+        }
+        body {
+            font-family: "Noto Sans", "DejaVu Sans", sans-serif;
+            font-size: 11pt;
+            line-height: 1.5;
+            color: #222;
+        }
+        h1 {
+            font-size: 16pt;
+            text-align: center;
+            border-bottom: 2px solid #1a5276;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            color: #1a5276;
+        }
+        h2 {
+            font-size: 13pt;
+            color: #1a5276;
+            border-bottom: 1px solid #bbb;
+            padding-bottom: 4px;
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10px 0;
+        }
+        td, th {
+            border: 1px solid #ccc;
+            padding: 6px 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #eaf2f8;
+            font-weight: bold;
+            width: 35%;
+        }
+        .photos-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .photo-item {
+            max-width: 200px;
+        }
+        .photo-item img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+        }
+        .photo-caption {
+            font-size: 9pt;
+            color: #666;
+            text-align: center;
+            margin-top: 4px;
+        }
+        .risk-summary {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 9pt;
+            color: #888;
+            text-align: center;
+            border-top: 1px solid #ccc;
+            padding-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ labels.title }}</h1>
+
+    <!-- Structure Identity Section -->
+    <h2>{{ labels.structure_identity }}</h2>
+    <table>
+        <tr><th>{{ labels.name }}</th><td>{{ structure.name_ru or "—" }}</td></tr>
+        <tr><th>{{ labels.type }}</th><td>{{ structure.type or "—" }}</td></tr>
+        <tr><th>{{ labels.district }}</th><td>{{ structure.district or "—" }}</td></tr>
+        <tr><th>{{ labels.water_source }}</th><td>{{ structure.water_source or "—" }}</td></tr>
+        <tr><th>{{ labels.technical_condition }}</th><td>{{ status_names.get(structure.technical_condition, structure.technical_condition) or "—" }}</td></tr>
+        <tr><th>{{ labels.wear_percentage }}</th><td>{{ structure.wear_percentage or "—" }}</td></tr>
+    </table>
+
+    <!-- Inspection Details Section -->
+    <h2>{{ labels.inspection_details }}</h2>
+    <table>
+        <tr><th>{{ labels.inspection_date }}</th><td>{{ inspection.inspection_date or "—" }}</td></tr>
+        <tr><th>{{ labels.inspector_name }}</th><td>{{ inspection.inspector_name or "—" }}</td></tr>
+        <tr><th>{{ labels.inspector_role }}</th><td>{{ inspection.inspector_role or "—" }}</td></tr>
+        <tr><th>{{ labels.condition_at_inspection }}</th><td>{{ status_names.get(inspection.condition_at_inspection, inspection.condition_at_inspection) or "—" }}</td></tr>
+        <tr><th>{{ labels.findings }}</th><td>{{ inspection.findings or "—" }}</td></tr>
+    </table>
+
+    <!-- Photos Section -->
+    {% if photos %}
+    <h2>{{ labels.photos }}</h2>
+    <div class="photos-grid">
+        {% for photo in photos %}
+        <div class="photo-item">
+            <img src="data:image/jpeg;base64,{{ photo.data }}" alt="{{ photo.caption }}" />
+            {% if photo.caption %}
+            <div class="photo-caption">{{ photo.caption }}</div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Risk Assessment Section -->
+    {% if risk %}
+    <h2>{{ labels.risk_assessment }}</h2>
+    <div class="risk-summary">
+        <table>
+            <tr><th>{{ labels.condition_score }}</th><td>{{ risk.condition_score or "—" }}</td></tr>
+            <tr><th>{{ labels.consequence_factor }}</th><td>{{ risk.consequence_factor or "—" }}</td></tr>
+            <tr><th>{{ labels.seasonal_modifier }}</th><td>{{ risk.seasonal_modifier or "—" }}</td></tr>
+            <tr><th>{{ labels.staleness_modifier }}</th><td>{{ risk.staleness_modifier or "—" }}</td></tr>
+            <tr><th>{{ labels.composite_score }}</th><td>{{ risk.composite_score or "—" }}</td></tr>
+            <tr><th>{{ labels.inspection_interval }}</th><td>{{ risk.inspection_interval or "—" }}</td></tr>
+            <tr><th>{{ labels.repair_status }}</th><td>{{ status_names.get(risk.repair_status, risk.repair_status) or "—" }}</td></tr>
+            <tr><th>{{ labels.red_flags }}</th><td>{{ risk.red_flags | join(", ") if risk.red_flags else "—" }}</td></tr>
+        </table>
+    </div>
+    {% endif %}
+
+    <!-- Provenance Section -->
+    <h2>{{ labels.provenance }}</h2>
+    <table>
+        <tr><th>Record ID</th><td>{{ inspection.id or "—" }}</td></tr>
+        <tr><th>Created At</th><td>{{ inspection.created_at or "—" }}</td></tr>
+        <tr><th>Provenance ID</th><td>{{ inspection.provenance_id or "—" }}</td></tr>
+    </table>
+
+    <div class="footer">
+        SuJoly Inspector — Zhambyl Oblast Hydraulic Structures Catalog System
+    </div>
+</body>
+</html>
