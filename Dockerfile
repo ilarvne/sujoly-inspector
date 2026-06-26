@@ -19,12 +19,15 @@ RUN uv sync --frozen --no-dev --no-install-project
 COPY apps/api/ ./
 RUN uv sync --frozen --no-dev
 
-# ── Stage 3: Runtime — both services ──
-FROM node:22-alpine AS runtime
+# ── Stage 3: Runtime — both services in one container ──
+FROM python:3.12-slim AS runtime
 
-# Install Python, supervisord, curl
-RUN apk add --no-cache python3 py3-pip supervisor curl bash && \
-    python3 -m pip install --no-cache-dir uv
+# Install Node.js, supervisord, curl
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl supervisor bash \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create logs directory (AlemPlus sidecar reads /applogs/app.logs)
 RUN mkdir -p /applogs
@@ -35,23 +38,19 @@ COPY --from=web-builder /app/web/.next/standalone ./
 COPY --from=web-builder /app/web/.next/static ./.next/static
 COPY --from=web-builder /app/web/public ./public
 
-# Copy FastAPI app
+# Copy FastAPI app + venv (already has all deps from api-builder)
 WORKDIR /app/api
 COPY --from=api-builder /app/api/ ./
-COPY --from=api-builder /app/api/.venv ./.venv
 
-# Install runtime Python deps
-RUN python3 -m pip install --no-cache-dir fastapi uvicorn[standard] httpx structlog pydantic pydantic-settings sqlalchemy[asyncio] geoalchemy2 asyncpg alembic pgvector celery redis minio xlrd openpyxl jinja2 python-multipart PyJWT passlib bcrypt
-
-# Supervisord config — both services, logs to /applogs/app.logs
-RUN mkdir -p /etc/supervisor.d
-COPY <<'EOF' /etc/supervisor.d/app.ini
+# Supervisord config — both services, logs to /applogs/
+RUN mkdir -p /etc/supervisor/conf.d
+COPY <<'EOF' /etc/supervisor/conf.d/app.ini
 [supervisord]
 nodaemon=true
 logfile=/applogs/supervisord.log
 
 [program:api]
-command=python3 -m uvicorn api.main:app --host 0.0.0.0 --port 8000
+command=/app/api/.venv/bin/uvicorn api.main:app --host 0.0.0.0 --port 8000
 directory=/app/api
 environment=PYTHONPATH="/app/api/src"
 autostart=true
@@ -69,16 +68,16 @@ stdout_logfile=/applogs/web.log
 stderr_logfile=/applogs/web-err.log
 EOF
 
-# Startup script that tails all logs into /applogs/app.logs for AlemPlus sidecar
+# Startup script: run supervisord, tail logs into /applogs/app.logs for AlemPlus sidecar
 RUN echo '#!/bin/bash' > /start.sh && \
-    echo 'supervisord -c /etc/supervisor.d/app.ini &' >> /start.sh && \
-    echo 'sleep 2' >> /start.sh && \
+    echo 'supervisord -c /etc/supervisor/conf.d/app.ini &' >> /start.sh && \
+    echo 'sleep 3' >> /start.sh && \
     echo 'tail -f /applogs/web.log /applogs/api.log /applogs/supervisord.log > /applogs/app.logs 2>&1' >> /start.sh && \
     chmod +x /start.sh
 
 WORKDIR /app
 
-# Cloud infra env vars (overridden by deployment)
+# Cloud infra env vars
 ENV PYTHONPATH="/app/api/src" \
     API_DATABASE_URL="postgresql+asyncpg://ilarvne:yOv34H9W0E@a1-postgres1.alem.ai:30100/alemhackdb" \
     API_SYNC_DATABASE_URL="postgresql+psycopg://ilarvne:yOv34H9W0E@a1-postgres1.alem.ai:30100/alemhackdb" \
