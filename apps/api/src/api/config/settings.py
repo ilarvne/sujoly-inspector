@@ -46,5 +46,11 @@ class Settings(BaseSettings):
     # CORS
     allowed_origins: str = "http://localhost:3000"
 
+    # JWT Auth (Phase 3)
+    jwt_secret: str = ""
+    jwt_expiry_hours: int = 24
+    initial_admin_username: str = "admin"
+    initial_admin_api_key: str = ""
+
 
 settings = Settings()

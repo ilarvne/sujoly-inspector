@@ -4,17 +4,19 @@ Lifespan initializes MinIOService and ensures buckets exist on startup.
 Shutdown disposes the SQLAlchemy async engine.
 """
 
+import importlib
+import pkgutil
 import time
 import uuid
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from api.config.settings import settings
-from api.infrastructure.database import engine
-from api.routes import health, ingestion, minio, provenance, structures
+from api.infrastructure.database import async_session, engine
 from api.services.minio_client import MinIOService
 from api.utils.logging import configure_logging, get_logger
 
@@ -25,7 +27,7 @@ _BUCKETS = ["sujoly-imagery", "sujoly-documents", "sujoly-photos"]
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Startup: configure logging, init MinIO, ensure buckets. Shutdown: dispose engine."""
+    """Startup: configure logging, init MinIO, ensure buckets, seed admin. Shutdown: dispose engine."""
     configure_logging(level="DEBUG" if settings.debug else "INFO")
     logger.info("api_starting", environment=settings.environment)
 
@@ -40,6 +42,28 @@ async def lifespan(app: FastAPI):
         minio_service.ensure_bucket(bucket)
     app.state.minio = minio_service
     logger.info("minio_buckets_ready", buckets=_BUCKETS)
+
+    # Seed initial admin user if no admin exists
+    try:
+        from api.models.user import UserModel
+        from sqlalchemy import select
+
+        async with async_session() as session:
+            result = await session.execute(
+                select(UserModel).where(UserModel.role == "admin").limit(1)
+            )
+            if result.scalar_one_or_none() is None:
+                admin = UserModel(
+                    username=settings.initial_admin_username,
+                    role="admin",
+                    api_key=settings.initial_admin_api_key,
+                    full_name="Initial Administrator",
+                )
+                session.add(admin)
+                await session.commit()
+                logger.info("initial_admin_seeded", username=admin.username)
+    except ImportError:
+        logger.warning("admin_seed_skipped", reason="UserModel not available yet")
 
     yield
 
@@ -121,11 +145,13 @@ app.add_middleware(
     expose_headers=["X-Request-ID", "X-Process-Time"],
 )
 
-app.include_router(health.router)
-app.include_router(provenance.router)
-app.include_router(minio.router)
-app.include_router(ingestion.router)
-app.include_router(structures.router)
+# Auto-discover and include all route modules in api.routes
+routes_dir = Path(__file__).parent / "routes"
+for _, module_name, _ in pkgutil.iter_modules([str(routes_dir)]):
+    module = importlib.import_module(f"api.routes.{module_name}")
+    if hasattr(module, "router"):
+        app.include_router(module.router)
+        logger.debug("router_included", module=module_name)
 
 
 @app.get("/health")
