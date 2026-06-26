@@ -11,9 +11,9 @@
 - [ ] **DATA-01**: System can ingest the Kazvodhoz canal registry spreadsheet (444 records, 22 columns, Russian) into PostGIS with coordinate transformation (QazTRF-23 / EPSG:10941)
 - [ ] **DATA-02**: System can ingest data from OpenStreetMap (water/hydraulic features via Overpass API) with provenance tracking
 - [ ] **DATA-03**: System can ingest scanned passport documents via OCR (Russian/Kazakh) with confidence scoring
-- [ ] **DATA-05**: System stores inspection history per structure (date, inspector, findings, photo URLs, condition at time of inspection)
-- [ ] **DATA-06**: System provides document attachment endpoints (scanned passports, inspection reports, photos) via MinIO presigned URLs
-- [ ] **DATA-07**: Every fact and status on every structure has a provenance record (source type, source reference, confidence level, timestamp, contributor)
+- [x] **DATA-05**: System stores inspection history per structure (date, inspector, findings, photo URLs, condition at time of inspection)
+- [x] **DATA-06**: System provides document attachment endpoints (scanned passports, inspection reports, photos) via MinIO presigned URLs
+- [x] **DATA-07**: Every fact and status on every structure has a provenance record (source type, source reference, confidence level, timestamp, contributor)
 - [ ] **DATA-08**: System provides search and filter endpoints by name, type, condition, district, or location using multilingual full-text search (Russian, Kazakh, English) and fuzzy matching (pg_trgm)
 
 ### Discovery & Matching
@@ -26,21 +26,21 @@
 
 ### Inspection & Risk
 
-- [ ] **RISK-01**: System computes a risk-informed inspection interval for each structure using a semi-quantitative model: condition score × consequence factor × seasonal modifier × data staleness modifier
-- [ ] **RISK-02**: System maps inspection urgency to legible intervals: 30 days, 90 days, 180 days, 12 months, 24 months, with emergency override
-- [ ] **RISK-03**: System determines repair need using a blended condition score (0-100) with red-flag overrides for critical indicators (seepage, deformation, rapid erosion, repeated emergencies)
-- [ ] **RISK-04**: System assigns one of four repair statuses: normal, inspection required, repair required, critical condition
-- [ ] **RISK-05**: System prefers "inspection required" over false certainty when evidence is weak, stale, or conflicting
-- [ ] **RISK-06**: System provides endpoints for engineer role to override system-recommended inspection intervals and repair statuses with logged provenance
-- [ ] **RISK-07**: System enforces administrator, engineer, inspector, and viewer role permissions (RBAC)
-- [ ] **RISK-08**: System provides export endpoints for structure lists as CSV/GeoJSON and inspection report generation as PDF in all three languages
+- [x] **RISK-01**: System computes a risk-informed inspection interval for each structure using a semi-quantitative model: condition score × consequence factor × seasonal modifier × data staleness modifier
+- [x] **RISK-02**: System maps inspection urgency to legible intervals: 30 days, 90 days, 180 days, 12 months, 24 months, with emergency override
+- [x] **RISK-03**: System determines repair need using a blended condition score (0-100) with red-flag overrides for critical indicators (seepage, deformation, rapid erosion, repeated emergencies)
+- [x] **RISK-04**: System assigns one of four repair statuses: normal, inspection required, repair required, critical condition
+- [x] **RISK-05**: System prefers "inspection required" over false certainty when evidence is weak, stale, or conflicting
+- [x] **RISK-06**: System provides endpoints for engineer role to override system-recommended inspection intervals and repair statuses with logged provenance
+- [x] **RISK-07**: System enforces administrator, engineer, inspector, and viewer role permissions (RBAC)
+- [x] **RISK-08**: System provides export endpoints for structure lists as CSV/GeoJSON and inspection report generation as PDF in all three languages
 
 ### Integration
 
 - [ ] **INT-01**: System exposes OGC API Features (Part 1 Core, Part 3 Filtering/CQL2) and OGC API Tiles (Part 1 Core) via TiPG for external GIS clients (QGIS, ArcGIS, government systems)
 - [ ] **INT-02**: System maintains a STAC catalog for Earth observation evidence (Sentinel-2 scenes, water index composites) with TiTiler dynamic raster serving from COGs
 - [ ] **INT-03**: System exposes a REST API for the application frontend (CRUD, search, copilot, ingestion, sync endpoints)
-- [ ] **INT-04**: System separates imagery evidence (STAC/COG in MinIO) from structure features (PostGIS) per the architecture principle
+- [x] **INT-04**: System separates imagery evidence (STAC/COG in MinIO) from structure features (PostGIS) per the architecture principle
 
 ### AI & Search (Backend)
 
@@ -60,22 +60,22 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| DATA-07 | Phase 1 | Pending |
-| INT-04 | Phase 1 | Pending |
+| DATA-07 | Phase 1 | Complete |
+| INT-04 | Phase 1 | Complete |
 | DATA-01 | Phase 2 | Pending |
 | DATA-08 | Phase 2 | Pending |
 | INT-01 | Phase 2 | Pending |
 | INT-03 | Phase 2 | Pending |
-| RISK-01 | Phase 3 | Pending |
-| RISK-02 | Phase 3 | Pending |
-| RISK-03 | Phase 3 | Pending |
-| RISK-04 | Phase 3 | Pending |
-| RISK-05 | Phase 3 | Pending |
-| RISK-06 | Phase 3 | Pending |
-| RISK-07 | Phase 3 | Pending |
-| RISK-08 | Phase 3 | Pending |
-| DATA-05 | Phase 3 | Pending |
-| DATA-06 | Phase 3 | Pending |
+| RISK-01 | Phase 3 | Complete |
+| RISK-02 | Phase 3 | Complete |
+| RISK-03 | Phase 3 | Complete |
+| RISK-04 | Phase 3 | Complete |
+| RISK-05 | Phase 3 | Complete |
+| RISK-06 | Phase 3 | Complete |
+| RISK-07 | Phase 3 | Complete |
+| RISK-08 | Phase 3 | Complete |
+| DATA-05 | Phase 3 | Complete |
+| DATA-06 | Phase 3 | Complete |
 | DATA-02 | Phase 4 | Pending |
 | DATA-03 | Phase 4 | Pending |
 | DISC-01 | Phase 4 | Pending |
