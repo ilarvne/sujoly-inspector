@@ -348,6 +348,14 @@ async def update_structure(
 
             await session.flush()
             await session.refresh(structure)
+
+            # D-05 trigger 2: dispatch risk recomputation after structure update
+            try:
+                from api.tasks.celery_tasks import recompute_structure_risk
+                recompute_structure_risk.delay(str(structure_id))
+            except Exception:
+                logger.warning("risk_recompute_dispatch_failed", structure_id=str(structure_id))
+
             return structure
 
 
