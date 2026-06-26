@@ -9,7 +9,7 @@ Frontend workstream: Next.js PWA + MapLibre GL JS + Tailwind + shadcn/ui + OpenU
 - [x] **Phase 1: App Shell & i18n** - Next.js project, trilingual (RU/KK/EN), cyrillic-ext fonts, Tailwind, shadcn/ui, design system
 - [x] **Phase 2: Map UI & Digital Passport** - MapLibre map, structure markers, digital passport, portfolio dashboard, filtering — the MVP
 - [ ] **Phase 3: Inspection & Risk UI** - Inspection timeline, document upload, risk display, RBAC UI, export UI
-- [ ] **Phase 4: Discovery & Matching UI** - Candidate discovery view, side-by-side comparison, HITL review, confidence badges
+- [ ] **Phase 4: Discovery & Matching UI** - Candidate discovery view, side-by-side comparison, HITL review, confidence badges — **COMPLETE**
 - [x] **Phase 5: PWA Field Mode** - Offline capture, deferred sync, voice transcription, sync status UI
 - [x] **Phase 6: AI Copilot UI** - OpenUI renderer, assistant-ui chat, copilot page, tool provider integration
 
@@ -77,10 +77,11 @@ Plans:
   2. Side-by-side comparison: existing record vs candidate with evidence chips (name similarity, distance, type agreement)
   3. Review workflow: accept (add to registry), link (merge), reject (false positive) with one-click actions
   4. Confidence badges (HIGH/MEDIUM/LOW) and provenance source chips visible throughout UI
-**Plans**: TBD
+**Plans**: 2 plans (complete)
+Plans:
+- [x] 04-01-PLAN.md — Foundation: discovery types, mock data (20 candidates), API hooks, Zustand store, i18n (discovery namespace), reusable components (ConfidenceBadge, SourceChip, EvidenceChip)
+- [x] 04-02-PLAN.md — UI: candidate list with filters/search, side-by-side comparison with evidence chips, review actions (accept/link/reject with permission guard), discovery view orchestration, hydrofinder page wiring
 **UI hint**: yes
-
-### Phase 5: PWA Field Mode
 **Goal**: Installable PWA with offline capture, deferred sync, and voice transcription
 **Mode:** mvp
 **Depends on**: Backend Phase 3 (needs sync endpoints)
@@ -125,6 +126,6 @@ Plans:
 | 1. App Shell & i18n | 4/4 | Complete | 2026-06-26 |
 | 2. Map UI & Digital Passport | 4/4 | Complete | 2026-06-26 |
 | 3. Inspection & Risk UI | 1/5 | In Progress | - |
-| 4. Discovery & Matching UI | 0/TBD | Not started | - |
+| 4. Discovery & Matching UI | 2/2 | Complete | 2026-06-26 |
 | 5. PWA Field Mode | 4/4 | Complete | 2026-06-26 |
 | 6. AI Copilot UI | 2/2 | Complete | 2026-06-26 |

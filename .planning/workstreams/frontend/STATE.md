@@ -7,15 +7,15 @@ created: 2026-06-25
 
 ## Current Position
 
-**Status:** Phase 05 Complete
-**Current Phase:** 05-pwa-field-mode (complete)
+**Status:** Phase 04 Complete
+**Current Phase:** 04-discovery-matching-ui (complete)
 **Last Activity:** 2026-06-26
-**Last Activity Description:** Completed Phase 5 PWA Field Mode — PWA foundation (Serwist SW, manifest, offline page), offline data layer (Dexie IndexedDB, sync engine, conflict resolution), field capture UI (inspection form, photos, voice notes, GPS), sync status UI (queue panel, conflict dialog, voice transcription status), 28 new unit tests
+**Last Activity Description:** Completed Phase 4 Discovery & Matching UI — candidate list with filters/search, side-by-side comparison with evidence chips, review workflow (accept/link/reject with permission guard), confidence badges, source chips, trilingual i18n
 
 ## Progress
 
-**Phases Complete:** 4 (1, 2, 5, 6)
-**Current Plan:** 05-04 (complete)
+**Phases Complete:** 5 (1, 2, 4, 5, 6)
+**Current Plan:** 04-02 (complete)
 
 ## Session Continuity
 
