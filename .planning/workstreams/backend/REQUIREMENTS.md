@@ -32,7 +32,7 @@
 - [x] **RISK-04**: System assigns one of four repair statuses: normal, inspection required, repair required, critical condition
 - [x] **RISK-05**: System prefers "inspection required" over false certainty when evidence is weak, stale, or conflicting
 - [ ] **RISK-06**: System provides endpoints for engineer role to override system-recommended inspection intervals and repair statuses with logged provenance
-- [ ] **RISK-07**: System enforces administrator, engineer, inspector, and viewer role permissions (RBAC)
+- [x] **RISK-07**: System enforces administrator, engineer, inspector, and viewer role permissions (RBAC)
 - [ ] **RISK-08**: System provides export endpoints for structure lists as CSV/GeoJSON and inspection report generation as PDF in all three languages
 
 ### Integration
@@ -72,7 +72,7 @@
 | RISK-04 | Phase 3 | Complete |
 | RISK-05 | Phase 3 | Complete |
 | RISK-06 | Phase 3 | Pending |
-| RISK-07 | Phase 3 | Pending |
+| RISK-07 | Phase 3 | Complete |
 | RISK-08 | Phase 3 | Pending |
 | DATA-05 | Phase 3 | Pending |
 | DATA-06 | Phase 3 | Pending |
