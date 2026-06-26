@@ -10,6 +10,8 @@ import { useStructureDetail } from '@/lib/api/client';
 import { STATUS_COLORS_HEX } from '@/lib/constants';
 import { InspectionTimeline } from '@/components/inspection/inspection-timeline';
 import { RiskScoreDisplay } from '@/components/inspection/risk-score-display';
+import { DocumentUpload } from '@/components/documents/document-upload';
+import { DocumentList } from '@/components/documents/document-list';
 import type { TrilingualText } from '@/lib/api/types';
 
 const sourceLabelKeys = {
@@ -33,7 +35,6 @@ export function PassportPanel() {
   const t = useTranslations('passport');
   const tMap = useTranslations('map');
   const tTabs = useTranslations('passportTabs');
-  const tDocs = useTranslations('documents');
 
   const nameInLocale = (name: TrilingualText) => name[locale] || name.ru;
 
@@ -214,10 +215,13 @@ export function PassportPanel() {
               {structure && <RiskScoreDisplay structureId={structure.id} />}
             </TabsContent>
 
-            <TabsContent value="documents" className="px-4 pb-4">
-              <div className="p-4 text-muted-foreground">
-                {tDocs('noDocuments')}
-              </div>
+            <TabsContent value="documents" className="px-4 pb-4 space-y-4">
+              {structure && (
+                <>
+                  <DocumentUpload structureId={structure.id} />
+                  <DocumentList structureId={structure.id} />
+                </>
+              )}
             </TabsContent>
           </Tabs>
         ) : null}
