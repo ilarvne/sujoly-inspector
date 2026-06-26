@@ -6,6 +6,7 @@ import { transcribeVoiceNote } from './voice-transcription';
 import type { SyncQueueEntry, FieldInspection } from '@/lib/db/types';
 
 let isSyncing = false;
+let syncEngineInitialized = false;
 
 export async function processSyncQueue(): Promise<void> {
   if (isSyncing) return;
@@ -119,6 +120,8 @@ async function processPendingTranscriptions(): Promise<void> {
 
 export function initSyncEngine(): void {
   if (typeof window === 'undefined') return;
+  if (syncEngineInitialized) return;
+  syncEngineInitialized = true;
 
   window.addEventListener('online', () => {
     useConnectivityStore.getState().setOnline(true);
