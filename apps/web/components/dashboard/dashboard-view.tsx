@@ -38,11 +38,15 @@ export function DashboardView() {
     );
   }
 
-  const baseScore = mockRiskScore('KZ-ZH-0001');
-  const avgRiskScore =
-    weatherMode !== 'normal'
-      ? applyWeatherBoost('KZ-ZH-0001', baseScore, weatherMode).overall
-      : baseScore.overall;
+  const avgRiskScore = (() => {
+    const scores = features.map((f) => {
+      const base = mockRiskScore(f.properties.id);
+      return weatherMode !== 'normal'
+        ? applyWeatherBoost(f.properties.id, base, weatherMode).overall
+        : base.overall;
+    });
+    return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  })();
 
   return (
     <div className="space-y-6">
