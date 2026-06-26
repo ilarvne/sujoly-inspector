@@ -3,10 +3,10 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 05
-current_plan: 1
+current_plan: 2
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-06-26T04:11:06.397Z"
+stopped_at: Completed 05-02-PLAN.md
+last_updated: "2026-06-26T04:18:19Z"
 last_activity: 2026-06-26
 progress:
   total_phases: 5
@@ -24,9 +24,9 @@ Phase: 05 (rag-agent-integration) — EXECUTING
 Plan: 2 of 3
 **Status:** Ready to execute
 **Current Phase:** 05
-**Current Plan:** 1
+**Current Plan:** 2
 **Last Activity:** 2026-06-26
-**Last Activity Description:** Phase 05 execution started
+**Last Activity Description:** Completed 05-02 copilot chat endpoint
 
 ## Progress
 
@@ -53,6 +53,7 @@ Progress: [████████░░] 78%
 | Phase 04 P03 | 4min | 2 tasks | 6 files |
 | Phase 04 P04 | 3min | 1 tasks | 4 files |
 | Phase 05 P01 | 2min | 1 tasks | 7 files |
+| Phase 05 P02 | 6min | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,9 @@ Progress: [████████░░] 78%
 - [Phase 04]: Late imports in Celery task/route handlers for clean test patching at source module level — Late imports avoid AttributeError when patching at module level and prevent circular dependencies
 - [Phase 05]: Vector search placeholder returns empty for MVP — No embedding generation pipeline yet; RRF still works with fulltext + trigram
 - [Phase 05]: Route imports search_service singleton directly to avoid module/instance name collision — from api.services.search_service import search_service instead of from api.services import search_service
+- [Phase 05]: Real LLM integration via httpx to Alem API instead of template stubs — per user directive; template fallback preserved for robustness
+- [Phase 05]: Engineering decision detection via trilingual keyword pattern matching (EN/RU/KK) — condition_assignment, risk_override, inspection_conclusion
+- [Phase 05]: Thinking block stripping for reasoning models (qwen3 uses <thinking> tags)
 
 ### Blockers/Concerns
 
@@ -93,6 +97,6 @@ None current.
 
 ## Session Continuity
 
-**Last Session:** 2026-06-26T04:11:06.389Z
-**Stopped At:** Completed 05-01-PLAN.md
+**Last Session:** 2026-06-26T04:18:19Z
+**Stopped At:** Completed 05-02-PLAN.md
 **Resume File:** None

@@ -144,4 +144,4 @@ Plans:
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
 | 3. Risk Models & Inspection Logic | 8/9 | In Progress|  |
 | 4. Discovery & Matching Backend | 4/4 | Complete   | 2026-06-26 |
-| 5. RAG Agent Integration | 0/TBD | Not started | - |
+| 5. RAG Agent Integration | 2/3 | In Progress|  |
