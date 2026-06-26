@@ -3,6 +3,7 @@ export const navItems = [
   { href: '/dashboard' as const, labelKey: 'dashboard' },
   { href: '/map' as const, labelKey: 'map' },
   { href: '/objects' as const, labelKey: 'objects' },
+  { href: '/field' as const, labelKey: 'field' },
   { href: '/copilot' as const, labelKey: 'copilot' },
   { href: '/reports' as const, labelKey: 'reports' },
   { href: '/hydrofinder' as const, labelKey: 'hydrofinder' },

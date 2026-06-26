@@ -122,3 +122,128 @@ export interface EngineerOverride {
   engineerName: string;
   timestamp: string;
 }
+
+export type ChatIntent =
+  | 'list_critical'
+  | 'list_repair'
+  | 'list_inspection'
+  | 'show_risk'
+  | 'summarize_inspections'
+  | 'explain_condition'
+  | 'list_by_district'
+  | 'list_by_basin'
+  | 'general';
+
+export type CopilotSourceType = 'inspection' | 'registry' | 'osm' | 'document' | 'risk_assessment';
+
+export interface CopilotSource {
+  id: string;
+  type: CopilotSourceType;
+  label: string;
+  reference: string;
+  structureId?: string;
+}
+
+export type CopilotCardType = 'structure' | 'risk' | 'inspection' | 'report';
+
+export interface StructureCardData {
+  type: 'structure';
+  data: StructureDetail;
+}
+
+export interface RiskCardData {
+  type: 'risk';
+  data: RiskScore;
+  structureId: string;
+  structureName: string;
+}
+
+export interface InspectionCardData {
+  type: 'inspection';
+  data: InspectionRecord;
+  structureName: string;
+}
+
+export interface ReportCardData {
+  type: 'report';
+  data: {
+    title: string;
+    summary: string;
+    structureCount: number;
+    structures: StructureDetail[];
+  };
+}
+
+export type CopilotCard = StructureCardData | RiskCardData | InspectionCardData | ReportCardData;
+
+export interface CopilotMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: string;
+  sources?: CopilotSource[];
+  cards?: CopilotCard[];
+  isStreaming?: boolean;
+}
+
+export type DiscoverySource = 'osm' | 'satellite' | 'kazvodhoz' | 'manual';
+
+export type ConfidenceLevel = 'high' | 'medium' | 'low';
+
+export type EvidenceType = 'name_similarity' | 'distance' | 'type_agreement' | 'source_overlap';
+
+export interface MatchEvidence {
+  type: EvidenceType;
+  label: string;
+  value: string;
+  score: number;
+  agreement: boolean;
+}
+
+export type ReviewStatus = 'pending' | 'accepted' | 'linked' | 'rejected';
+
+export type ReviewAction = 'accept' | 'link' | 'reject';
+
+export interface DiscoveryCandidate {
+  id: string;
+  source: DiscoverySource;
+  sourceName: TrilingualText;
+  name: TrilingualText;
+  type: StructureType;
+  coordinates: { lon: number; lat: number } | null;
+  district: string;
+  basin: string;
+  confidence: ConfidenceLevel;
+  detectedAt: string;
+  properties: {
+    height?: number;
+    length?: number;
+    capacity?: number;
+    yearBuilt?: number;
+    osmId?: string;
+    osmTags?: Record<string, string>;
+    satelliteTile?: string;
+  };
+}
+
+export interface MatchResult {
+  candidateId: string;
+  existingStructureId: string | null;
+  matchScore: number;
+  evidence: MatchEvidence[];
+  reviewStatus: ReviewStatus;
+}
+
+export interface ReviewActionRecord {
+  id: string;
+  candidateId: string;
+  action: ReviewAction;
+  reviewerName: string;
+  reason: string;
+  timestamp: string;
+}
+
+export interface DiscoveryFilters {
+  reviewStatus: ReviewStatus | 'all';
+  searchQuery: string;
+}

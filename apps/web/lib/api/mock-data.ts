@@ -12,6 +12,14 @@ import type {
   StructureFilters,
   StructureFeature,
   StructureType,
+  DiscoverySource,
+  ConfidenceLevel,
+  DiscoveryCandidate,
+  MatchResult,
+  MatchEvidence,
+  ReviewStatus,
+  ReviewAction,
+  ReviewActionRecord,
 } from './types';
 
 const districts = [
@@ -334,5 +342,174 @@ export function mockAddOverride(structureId: string, data: { field: OverrideFiel
     structureId,
     ...data,
     timestamp: new Date().toISOString().split('T')[0],
+  };
+}
+
+const discoverySources: DiscoverySource[] = ['osm', 'satellite', 'osm', 'satellite', 'kazvodhoz'];
+
+const candidateNames: { ru: string; kk: string; en: string }[] = [
+  { ru: 'Плотина №1 (OSM)', kk: 'Бөгет №1 (OSM)', en: 'Dam #1 (OSM)' },
+  { ru: 'Водохранилище Тасуткель (спутник)', kk: 'Суқойма Тасөткел (жер серігі)', en: 'Tasutkel Reservoir (satellite)' },
+  { ru: 'Канал Мерке-Талас (OSM)', kk: 'Канал Мерке-Талас (OSM)', en: 'Merke-Talas Canal (OSM)' },
+  { ru: 'Насосная станция Акколь (спутник)', kk: 'Сорғы станциясы Ақкөл (жер серігі)', en: 'Akkol Pumping Station (satellite)' },
+  { ru: 'Водосброс Каратау (OSM)', kk: 'Су ағызатын Қаратау (OSM)', en: 'Karatau Spillway (OSM)' },
+  { ru: 'Плотина Кулан (спутник)', kk: 'Бөгет Құлан (жер серігі)', en: 'Kulan Dam (satellite)' },
+  { ru: 'Водохранилище Асса (OSM)', kk: 'Суқойма Аса (OSM)', en: 'Assa Reservoir (OSM)' },
+  { ru: 'Канал Шу-Мойынкум (спутник)', kk: 'Канал Шу-Мойынқұм (жер серігі)', en: 'Chu-Moynkum Canal (satellite)' },
+  { ru: 'Плотина Кордай (OSM)', kk: 'Бөгет Қордай (OSM)', en: 'Korday Dam (OSM)' },
+  { ru: 'Водосброс Сарыкемер (спутник)', kk: 'Су ағызатын Сарыкемер (жер серігі)', en: 'Sarykemer Spillway (satellite)' },
+  { ru: 'Насосная станция Талас (OSM)', kk: 'Сорғы станциясы Талас (OSM)', en: 'Talas Pumping Station (OSM)' },
+  { ru: 'Плотина Акколь-2 (спутник)', kk: 'Бөгет Ақкөл-2 (жер серігі)', en: 'Akkol Dam #2 (satellite)' },
+  { ru: 'Канал Мерке-2 (OSM)', kk: 'Канал Мерке-2 (OSM)', en: 'Merke Canal #2 (OSM)' },
+  { ru: 'Водохранилище Кулан (спутник)', kk: 'Суқойма Құлан (жер серігі)', en: 'Kulan Reservoir (satellite)' },
+  { ru: 'Плотина Шу (OSM)', kk: 'Бөгет Шу (OSM)', en: 'Chu Dam (OSM)' },
+  { ru: 'Водосброс Тасуткель-2 (спутник)', kk: 'Су ағызатын Тасөткел-2 (жер серігі)', en: 'Tasutkel Spillway #2 (satellite)' },
+  { ru: 'Насосная станция Асса (OSM)', kk: 'Сорғы станциясы Аса (OSM)', en: 'Assa Pumping Station (OSM)' },
+  { ru: 'Канал Каратау-Талас (спутник)', kk: 'Канал Қаратау-Талас (жер серігі)', en: 'Karatau-Talas Canal (satellite)' },
+  { ru: 'Плотина Сарыкемер (OSM)', kk: 'Бөгет Сарыкемер (OSM)', en: 'Sarykemer Dam (OSM)' },
+  { ru: 'Водохранилище Кордай-2 (спутник)', kk: 'Суқойма Қордай-2 (жер серігі)', en: 'Korday Reservoir #2 (satellite)' },
+];
+
+const sourceNames: Record<DiscoverySource, { ru: string; kk: string; en: string }> = {
+  osm: { ru: 'OpenStreetMap', kk: 'OpenStreetMap', en: 'OpenStreetMap' },
+  satellite: { ru: 'Спутниковые снимки', kk: 'Жер серігі суреттері', en: 'Satellite Imagery' },
+  kazvodhoz: { ru: 'Реестр Казводхоза', kk: 'Қазсуден шаруашылығы', en: 'Kazvodhoz Registry' },
+  manual: { ru: 'Ручной ввод', kk: 'Қолмен енгізу', en: 'Manual Entry' },
+};
+
+function generateMockCandidates(): DiscoveryCandidate[] {
+  const candidates: DiscoveryCandidate[] = [];
+
+  for (let i = 0; i < 20; i++) {
+    const source = discoverySources[i % discoverySources.length];
+    const settlementIdx = i % settlements.length;
+    const settlement = settlements[settlementIdx];
+    const typeIdx = i % types.length;
+    const type = types[typeIdx];
+    const confidence = (i % 3 === 0 ? 'high' : i % 3 === 1 ? 'medium' : 'low') as ConfidenceLevel;
+
+    const coords = settlement.coords;
+    const jitter = 0.02;
+    const coordinates = {
+      lon: coords[0] + (Math.sin(i * 3.7) * jitter),
+      lat: coords[1] + (Math.cos(i * 5.3) * jitter),
+    };
+
+    candidates.push({
+      id: `CAND-${String(i + 1).padStart(3, '0')}`,
+      source,
+      sourceName: sourceNames[source],
+      name: candidateNames[i],
+      type,
+      coordinates,
+      district: districts[settlement.dIdx],
+      basin: basins[settlement.bIdx],
+      confidence,
+      detectedAt: `2025-${String((i % 6) + 1).padStart(2, '0')}-${String((i * 3 % 28) + 1).padStart(2, '0')}`,
+      properties: {
+        height: type === 'dam' || type === 'reservoir' ? 8 + (i % 25) : undefined,
+        length: type === 'dam' || type === 'canal' ? 50 + (i % 3000) : undefined,
+        capacity: type === 'reservoir' ? 2 + (i % 150) : undefined,
+        yearBuilt: 1965 + (i % 45),
+        osmId: source === 'osm' ? `way/${1000000 + i * 137}` : undefined,
+        osmTags: source === 'osm' ? { waterway: type === 'dam' ? 'dam' : type === 'canal' ? 'canal' : 'reservoir', name: candidateNames[i].en } : undefined,
+        satelliteTile: source === 'satellite' ? `tile/${i + 100}/${i % 8}/${i % 6}` : undefined,
+      },
+    });
+  }
+
+  return candidates;
+}
+
+const mockCandidatesRaw: DiscoveryCandidate[] = generateMockCandidates();
+
+export function mockDiscoveryCandidates(): DiscoveryCandidate[] {
+  return mockCandidatesRaw;
+}
+
+export function mockDiscoveryCandidateById(id: string): DiscoveryCandidate | null {
+  return mockCandidatesRaw.find((c) => c.id === id) ?? null;
+}
+
+const reviewStatuses: ReviewStatus[] = ['pending', 'pending', 'pending', 'pending', 'accepted', 'pending', 'rejected', 'pending', 'linked', 'pending', 'pending', 'pending', 'pending', 'pending', 'rejected', 'pending', 'accepted', 'pending', 'pending', 'linked'];
+
+function generateMatchResults(): MatchResult[] {
+  return mockCandidatesRaw.map((cand, i) => {
+    const matchScore = cand.confidence === 'high' ? 70 + (i % 25) : cand.confidence === 'medium' ? 40 + (i % 30) : 15 + (i % 25);
+    const hasExisting = matchScore >= 45 && i % 3 !== 2;
+    const existingId = hasExisting ? `KZ-ZH-${String((i % 55) + 1).padStart(4, '0')}` : null;
+
+    const evidence: MatchEvidence[] = [];
+
+    if (existingId) {
+      const existing = mockStructuresRaw.find((s) => s.id === existingId);
+      if (existing) {
+        const nameSim = Math.min(95, 50 + (matchScore % 40));
+        evidence.push({
+          type: 'name_similarity',
+          label: 'Name Similarity',
+          value: `${nameSim}%`,
+          score: nameSim,
+          agreement: nameSim >= 60,
+        });
+
+        const distKm = Math.abs(matchScore - 80) * 0.5;
+        evidence.push({
+          type: 'distance',
+          label: 'Distance',
+          value: `${distKm.toFixed(1)} km`,
+          score: Math.max(0, 100 - distKm * 10),
+          agreement: distKm < 5,
+        });
+
+        const typeMatch = existing.type === cand.type;
+        evidence.push({
+          type: 'type_agreement',
+          label: 'Type Agreement',
+          value: typeMatch ? 'Match' : 'Mismatch',
+          score: typeMatch ? 100 : 0,
+          agreement: typeMatch,
+        });
+
+        if (existing.provenance.source === cand.source || (existing.provenance.source === 'kazvodhoz' && cand.source === 'osm')) {
+          evidence.push({
+            type: 'source_overlap',
+            label: 'Source Overlap',
+            value: 'Confirmed',
+            score: 85,
+            agreement: true,
+          });
+        }
+      }
+    }
+
+    return {
+      candidateId: cand.id,
+      existingStructureId: existingId,
+      matchScore,
+      evidence,
+      reviewStatus: reviewStatuses[i % reviewStatuses.length] as ReviewStatus,
+    };
+  });
+}
+
+const mockMatchResultsRaw: MatchResult[] = generateMatchResults();
+
+export function mockMatchResults(): MatchResult[] {
+  return mockMatchResultsRaw;
+}
+
+export function mockMatchResultByCandidateId(candidateId: string): MatchResult | null {
+  return mockMatchResultsRaw.find((m) => m.candidateId === candidateId) ?? null;
+}
+
+export function mockSubmitReview(candidateId: string, action: ReviewAction, reviewerName: string, reason: string): ReviewActionRecord {
+  return {
+    id: `REV-${candidateId}-${Date.now()}`,
+    candidateId,
+    action,
+    reviewerName,
+    reason,
+    timestamp: new Date().toISOString(),
   };
 }

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { mockStructures, mockStructureById, mockInspections, mockDocuments, mockRiskScore, mockOverrides } from './mock-data';
-import type { StructureCollection, StructureDetail, StructureFilters, InspectionRecord, DocumentMeta, RiskScore, EngineerOverride } from './types';
+import { mockStructures, mockStructureById, mockInspections, mockDocuments, mockRiskScore, mockOverrides, mockDiscoveryCandidates, mockMatchResults, mockMatchResultByCandidateId, mockDiscoveryCandidateById, mockSubmitReview } from './mock-data';
+import type { StructureCollection, StructureDetail, StructureFilters, InspectionRecord, DocumentMeta, RiskScore, EngineerOverride, DiscoveryCandidate, MatchResult, ReviewAction, ReviewActionRecord } from './types';
 
 async function fetchStructures(filters?: StructureFilters): Promise<StructureCollection> {
   await new Promise((resolve) => setTimeout(resolve, 100));
