@@ -8,7 +8,7 @@ Backend workstream: FastAPI + PostgreSQL/PostGIS + TiPG + TiTiler + MinIO + Redi
 
 - [x] **Phase 1: Foundation & Infrastructure** - Docker stack, PostGIS schema with provenance, MinIO, Redis, FastAPI skeleton (completed 2026-06-25)
 - [ ] **Phase 2: Data Ingestion & Spatial API** - Kazvodhoz ingestion with QazTRF-23, TiPG OGC API, REST CRUD, multilingual search
-- [ ] **Phase 3: Risk Models & Inspection Logic** - Risk score calculation, inspection intervals, repair status, RBAC, export endpoints
+- [x] **Phase 3: Risk Models & Inspection Logic** - Risk score calculation, inspection intervals, repair status, RBAC, export endpoints (completed 2026-06-26)
 - [ ] **Phase 4: Discovery & Matching Backend** - Evidence-fusion locator, four-state matching, STAC catalog, OCR pipeline
 - [ ] **Phase 5: RAG Agent Integration** - Connect adapted RAG agent, hybrid search, tool endpoints for copilot
 
@@ -95,7 +95,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 03-06-PLAN.md — Trilingual Export Endpoints: CSV/GeoJSON/PDF with WeasyPrint (RISK-08)
+- [x] 03-06-PLAN.md — Trilingual Export Endpoints: CSV/GeoJSON/PDF with WeasyPrint (RISK-08)
 
 ### Phase 4: Discovery & Matching Backend
 
@@ -136,6 +136,6 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation & Infrastructure | 2/2 | Complete    | 2026-06-25 |
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
-| 3. Risk Models & Inspection Logic | 5/6 | In Progress|  |
+| 3. Risk Models & Inspection Logic | 6/6 | Complete   | 2026-06-26 |
 | 4. Discovery & Matching Backend | 0/TBD | Not started | - |
 | 5. RAG Agent Integration | 0/TBD | Not started | - |
