@@ -17,7 +17,8 @@
     "field": "Field Mode",
     "copilot": "Copilot",
     "reports": "Reports",
-    "hydrofinder": "HydroFinder"
+    "hydrofinder": "HydroFinder",
+    "route": "Route"
   },
   "home": {
     "title": "SuJoly Inspector",
@@ -508,5 +509,15 @@
       "spillway": "Spillway",
       "other": "Other"
     }
+  },
+  "weather": {
+    "title": "Weather Scenario",
+    "normal": "Normal Mode",
+    "heavyRain": "Heavy Rain",
+    "floodSeason": "Flood Season",
+    "boostActive": "Risk Score recalculated based on weather conditions",
+    "boostWarning": "⚠ Mode: {mode}",
+    "averageRisk": "Average Risk Score",
+    "boostedObjects": "Boosted objects"
   }
 }

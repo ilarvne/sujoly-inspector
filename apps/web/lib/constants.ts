@@ -7,6 +7,7 @@ export const navItems = [
   { href: '/copilot' as const, labelKey: 'copilot' },
   { href: '/reports' as const, labelKey: 'reports' },
   { href: '/hydrofinder' as const, labelKey: 'hydrofinder' },
+  { href: '/route' as const, labelKey: 'route' },
 ] as const;
 
 export const locales = ['ru', 'kk', 'en'] as const;

@@ -9,13 +9,17 @@ import { Separator } from '@/components/ui/separator';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useRiskScore } from '@/lib/api/client';
 import { useAuthStore } from '@/lib/stores/auth-store';
+import { useWeatherStore } from '@/lib/stores/weather-store';
+import { applyWeatherBoost } from '@/lib/utils/weather-risk';
 import { EngineerOverrideDialog } from '@/components/override/engineer-override-dialog';
 
 export function RiskScoreDisplay({ structureId }: { structureId: string }) {
   const t = useTranslations('risk');
   const tOverride = useTranslations('override');
+  const tWeather = useTranslations('weather');
   const { data: riskScore, isLoading } = useRiskScore(structureId);
   const hasRole = useAuthStore((s) => s.hasRole);
+  const weatherMode = useWeatherStore((s) => s.mode);
   const [overrideOpen, setOverrideOpen] = useState(false);
 
   if (isLoading) {
@@ -26,12 +30,26 @@ export function RiskScoreDisplay({ structureId }: { structureId: string }) {
     return null;
   }
 
-  const riskLevel = riskScore.overall >= 70 ? 'high' : riskScore.overall >= 40 ? 'medium' : 'low';
+  const displayScore =
+    weatherMode !== 'normal' ? applyWeatherBoost(structureId, riskScore, weatherMode) : riskScore;
+
+  const weatherLabelKeys: Record<string, 'normal' | 'heavyRain' | 'floodSeason'> = {
+    normal: 'normal',
+    heavy_rain: 'heavyRain',
+    flood_season: 'floodSeason',
+  };
+
+  const riskLevel = displayScore.overall >= 70 ? 'high' : displayScore.overall >= 40 ? 'medium' : 'low';
   const riskColor = riskLevel === 'high' ? '#ef4444' : riskLevel === 'medium' ? '#f97316' : '#22c55e';
   const canOverride = hasRole('admin', 'engineer');
 
   return (
     <div className="space-y-4">
+      {weatherMode !== 'normal' && (
+        <div className="rounded-lg bg-yellow-100 p-3 text-sm font-medium text-yellow-900 dark:bg-yellow-900/30 dark:text-yellow-100">
+          {tWeather('boostWarning', { mode: tWeather(weatherLabelKeys[weatherMode]) })}
+        </div>
+      )}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <span className="text-sm font-semibold">{t('overallScore')}</span>
@@ -40,8 +58,8 @@ export function RiskScoreDisplay({ structureId }: { structureId: string }) {
           </Badge>
         </div>
         <div className="flex items-center gap-3">
-          <Progress value={riskScore.overall} className="flex-1" />
-          <span className="text-lg font-bold">{riskScore.overall}</span>
+          <Progress value={displayScore.overall} className="flex-1" />
+          <span className="text-lg font-bold">{displayScore.overall}</span>
         </div>
       </div>
 
@@ -50,7 +68,7 @@ export function RiskScoreDisplay({ structureId }: { structureId: string }) {
       <div className="space-y-2">
         <h3 className="text-sm font-semibold">{t('componentBreakdown')}</h3>
         <Accordion type="single" collapsible>
-          {riskScore.components.map((component) => (
+          {displayScore.components.map((component) => (
             <AccordionItem key={component.key} value={component.key}>
               <AccordionTrigger className="text-sm">
                 <div className="flex w-full items-center justify-between pr-2">
@@ -75,8 +93,8 @@ export function RiskScoreDisplay({ structureId }: { structureId: string }) {
 
       <div className="space-y-1">
         <h3 className="text-sm font-semibold">{t('explanation')}</h3>
-        <p className="text-sm text-muted-foreground">{riskScore.explanation}</p>
-        <p className="text-xs text-muted-foreground">{t('computedAt')}: {riskScore.computedAt}</p>
+        <p className="text-sm text-muted-foreground">{displayScore.explanation}</p>
+        <p className="text-xs text-muted-foreground">{t('computedAt')}: {displayScore.computedAt}</p>
       </div>
 
       {canOverride && (

@@ -17,7 +17,8 @@
     "field": "Дала режимі",
     "copilot": "Көмекші",
     "reports": "Есептер",
-    "hydrofinder": "Гидроіздеу"
+    "hydrofinder": "Гидроіздеу",
+    "route": "Маршрут"
   },
   "home": {
     "title": "SuJoly Inspector",
@@ -508,5 +509,15 @@
       "spillway": "Су ағызатын құрылғы",
       "other": "Басқа"
     }
+  },
+  "weather": {
+    "title": "Ауа райы сценарийі",
+    "normal": "Қалыпты режим",
+    "heavyRain": "Қатты жаңбыр",
+    "floodSeason": "Тасқын маусымы",
+    "boostActive": "Risk Score ауа райы жағдайына байланысты қайта есептелді",
+    "boostWarning": "⚠ Режим: {mode}",
+    "averageRisk": "Орташа Risk Score",
+    "boostedObjects": "Күшейтілген нысандар"
   }
 }

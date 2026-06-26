@@ -17,7 +17,8 @@
     "field": "Полевой режим",
     "copilot": "Помощник",
     "reports": "Отчёты",
-    "hydrofinder": "Гидропоиск"
+    "hydrofinder": "Гидропоиск",
+    "route": "Маршрут"
   },
   "home": {
     "title": "SuJoly Inspector",
@@ -508,5 +509,15 @@
       "spillway": "Водосброс",
       "other": "Прочее"
     }
+  },
+  "weather": {
+    "title": "Погодный сценарий",
+    "normal": "Обычный режим",
+    "heavyRain": "Сильный дождь",
+    "floodSeason": "Сезон паводков",
+    "boostActive": "Risk Score пересчитан с учётом погодных условий",
+    "boostWarning": "⚠ Режим: {mode}",
+    "averageRisk": "Средний Risk Score",
+    "boostedObjects": "Усиленных объектов"
   }
 }
