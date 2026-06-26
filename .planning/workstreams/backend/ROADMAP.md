@@ -10,7 +10,7 @@ Backend workstream: FastAPI + PostgreSQL/PostGIS + TiPG + TiTiler + MinIO + Redi
 - [ ] **Phase 2: Data Ingestion & Spatial API** - Kazvodhoz ingestion with QazTRF-23, TiPG OGC API, REST CRUD, multilingual search
 - [x] **Phase 3: Risk Models & Inspection Logic** - Risk score calculation, inspection intervals, repair status, RBAC, export endpoints (completed 2026-06-26)
 - [x] **Phase 4: Discovery & Matching Backend** - Evidence-fusion locator, four-state matching, STAC catalog, OCR pipeline (completed 2026-06-26)
-- [ ] **Phase 5: RAG Agent Integration** - Connect adapted RAG agent, hybrid search, tool endpoints for copilot
+- [x] **Phase 5: RAG Agent Integration** - Connect adapted RAG agent, hybrid search, tool endpoints for copilot (completed 2026-06-26)
 
 ## Phase Details
 
@@ -144,4 +144,4 @@ Plans:
 | 2. Data Ingestion & Spatial API | 0/3 | Not started | - |
 | 3. Risk Models & Inspection Logic | 8/9 | In Progress|  |
 | 4. Discovery & Matching Backend | 4/4 | Complete   | 2026-06-26 |
-| 5. RAG Agent Integration | 2/3 | In Progress|  |
+| 5. RAG Agent Integration | 3/3 | Complete   | 2026-06-26 |
